@@ -1,0 +1,7 @@
+Whenever you have to install new packages follow the following steps to update vcpkg or change where its pointing to
+
+1. Open wsl and change your directory to go to the ROOT of your linux file system
+2. run the scripts they ask you, however modify the scripts first to account for the change in directory since
+   you are at the root
+3. run the SSH server using the clion script on wsl as admin
+4. make sure that your cmake toolchain file is pointing to the vcpkg you want it to point at, change path yourself
