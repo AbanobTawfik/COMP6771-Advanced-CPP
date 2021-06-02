@@ -12,5 +12,4 @@ cxx_test(
 cxx_test(
    TARGET sort3_test
    FILENAME "sort3_test.cpp"
-   LINK sort3
 )

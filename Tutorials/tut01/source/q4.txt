@@ -1,0 +1,18 @@
+int get_age();
+
+int main() {
+  auto name = std::string{};
+  name = "Gary Bai";
+  std::cout << name << " is " << get_age() << '\n';
+  return 0;
+}
+
+int get_age() {
+  return 38;
+}
+
+Q: Which parts of this program are declarations and which parts are definitions?
+
+A: the program declaration is on line 1, where we declare the function int get_age(), note this can be inside a header
+   file instead. The DEFINITION of the function get_age() is on line 10 as this contains the definition and
+   implementation of the function for get_age(), similarly the definition of int main() is on line 3

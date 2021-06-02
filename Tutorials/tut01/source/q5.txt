@@ -1,0 +1,38 @@
+Do any of the following have errors? If so, what are they?
+
+###################################################################
+auto i = 3;
+i = 4;
+-------------------------------------------------------------------
+no errors, you can redefine variables even with use of auto
+###################################################################
+
+###################################################################
+auto const j = 5;
+--j;
+-------------------------------------------------------------------
+yes, you cannot modify j after using const since this is now an
+immutable variable.
+###################################################################
+
+###################################################################
+auto age = 18;
+auto& my_age = age;
+++my_age;
+-------------------------------------------------------------------
+no error, since my_age is just the memory value of the variable age
+we are just adding 1 to the value at the address of age. this is
+essentially making a shallow copy of age into my_age, since
+variables are now linked through memory
+###################################################################
+
+###################################################################
+auto age = 21;
+auto const& my_age = age;
+--my_age;
+-------------------------------------------------------------------
+yes this will cause an error since my_age is a const it is immutable
+even if it is just a reference to age, it still cannot be modified.
+this means that age can be modified but the reference to age cannot
+###################################################################
+
