@@ -1,6 +1,5 @@
 #include <string>
 #include "catch2/catch.hpp"
-//#include "../../../../source/sort3.cpp"
 #include "../source/sort3.cpp"
 //void sort_three(int &num1, int &num2, int &num3);
 //void sort_three(std::string str1, std::string str2, std::string str3);
