@@ -2,6 +2,9 @@
 #include <queue>
 #include <chrono>
 #include <iostream>
+#include <unordered_map>
+#include <set>
+
 
 // Write your implementation here
 namespace word_ladder {
@@ -11,8 +14,8 @@ namespace word_ladder {
     void generate_solution(const std::string &neighbour, const std::string &from, const std::string &to,
                            const std::unordered_map<std::string, std::string> &visited_front,
                            const std::unordered_map<std::string, std::string> &visited_back,
-                           std::vector<std::vector<std::string>> &solutions, const bool &forward);
-
+                           std::vector<std::vector<std::string>> &solutions);
+    void trim_paths_not_shortest(std::vector<std::vector<std::string>> &solutions);
     void
     update_search(const std::string &parent,
                   const std::unordered_set<std::string> &neighbours,
@@ -21,7 +24,9 @@ namespace word_ladder {
                   const std::unordered_map<std::string, std::string> &visited_other_direction,
                   std::vector<std::vector<std::string>> &solutions,
                   const std::string &from, const std::string &to, bool &found, const bool &forward);
-
+    auto generate_all_1nn(
+            std::unordered_set<std::string> lexicon,
+            size_t length) -> std::unordered_map<std::string, std::unordered_set<std::string>>;
     void show_listings(const std::unordered_map<std::string, std::string> &visited_front){
         auto printout = std::unordered_map<std::string, std::vector<std::string>>();
         for(auto node : visited_front){
@@ -55,25 +60,24 @@ namespace word_ladder {
         front.push(from);
         back.push(to);
         auto solutions = std::vector<std::vector<std::string>>();
-        auto found = false;
-
+        auto found_front = false;
+        auto found_back = false;
         while (not front.empty() and not back.empty()) {
-            auto start = std::chrono::high_resolution_clock::now();
             auto front_word = front.front();
             front.pop();
             auto front_neighbours = get_neighbours(front_word, neighbour_map);
-            update_search(front_word, front_neighbours, front, visited_front, visited_back, solutions, from, to, found,
+            update_search(front_word, front_neighbours, front, visited_front, visited_back, solutions, from, to, found_front,
                           true);
 
-            auto end = std::chrono::high_resolution_clock::now();
             auto back_word = back.front();
             back.pop();
             auto back_neighbours = get_neighbours(back_word, neighbour_map);
-            update_search(back_word, back_neighbours, back, visited_back, visited_front, solutions, from, to, found,
+            update_search(back_word, back_neighbours, back, visited_back, visited_front, solutions, from, to, found_back,
                           false);
-            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-//            std::cout << duration.count() << std::endl;
+
         }
+        // remove all paths that aren't the shortest
+        trim_paths_not_shortest(solutions);
         std::sort(solutions.begin(), solutions.end());
         for(auto i : solutions){
             for(auto node : i){
@@ -84,10 +88,34 @@ namespace word_ladder {
         return solutions;
     }
 
+    void trim_paths_not_shortest(std::vector<std::vector<std::string>> &solutions){
+        if(solutions.size() > 0) {
+            auto min_length = solutions.begin()->size();
+            // find shortest length
+            for(auto solution : solutions){
+                if(solution.size() < min_length){
+                    min_length = solution.size();
+                }
+            }
+            auto new_solutions = std::vector<std::vector<std::string>>();
+            // trim all solutions not of that length
+            for(auto solution : solutions){
+                if(solution.size() == min_length){
+                    new_solutions.push_back(solution);
+                }
+            }
+            std::sort(new_solutions.begin(), new_solutions.end());
+            new_solutions.erase(std::unique(new_solutions.begin(), new_solutions.end()), new_solutions.end());
+            solutions = new_solutions;
+
+        }
+
+
+    }
     auto get_neighbours(const std::string &word,
                         const std::unordered_map<std::string, std::unordered_set<std::string>> &neighbour_map) -> std::unordered_set<std::string> {
         auto neighbours = std::unordered_set<std::string>();
-        for (int i = 0; i < word.size(); i++) {
+        for (std::vector<std::string>::size_type i = 0; i < word.size(); i++) {
             auto last_node_copy = word;
             last_node_copy[i] = '_';
             if (neighbour_map.count(last_node_copy)) {
@@ -117,9 +145,9 @@ namespace word_ladder {
                 ((neighbour == from && not forward) || (neighbour == to && forward))) {
                 visited[neighbour] = parent;
                 if (forward) {
-                    generate_solution(neighbour, from, to, visited, visited_other_direction, solutions, forward);
+                    generate_solution(neighbour, from, to, visited, visited_other_direction, solutions);
                 } else {
-                    generate_solution(neighbour, from, to, visited_other_direction, visited, solutions, forward);
+                    generate_solution(neighbour, from, to, visited_other_direction, visited, solutions);
                 }
                 found = true;
             }
@@ -131,16 +159,16 @@ namespace word_ladder {
             }
         }
     }
-    
+
     void generate_solution(const std::string &neighbour, const std::string &from, const std::string &to,
                            const std::unordered_map<std::string, std::string> &visited_front,
                            const std::unordered_map<std::string, std::string> &visited_back,
-                           std::vector<std::vector<std::string>> &solutions, const bool &forward) {
+                           std::vector<std::vector<std::string>> &solutions) {
         // now that we have the intersecting neighbour
 
-        show_listings(visited_front);
-        std::cout << "---------------------------------------------------------" << std::endl;
-        show_listings(visited_back);
+//        show_listings(visited_front);
+//        std::cout << "---------------------------------------------------------" << std::endl;
+//        show_listings(visited_back);
 
         // we want to go from the front -> neighbour, merge that path with the back -> neighbour
         std::string word = neighbour;
@@ -174,13 +202,13 @@ namespace word_ladder {
 
     auto generate_all_1nn(
             std::unordered_set<std::string> lexicon,
-            int length) -> std::unordered_map<std::string, std::unordered_set<std::string>> {
+            size_t length) -> std::unordered_map<std::string, std::unordered_set<std::string>> {
         std::unordered_map<std::string, std::unordered_set<std::string>> all_1nn;
         for (auto word : lexicon) {
             if (word.size() != length) {
                 continue;
             }
-            for (int i = 0; i < word.length(); i++) {
+            for (std::vector<std::string>::size_type i = 0; i < word.length(); i++) {
                 auto cloned_word = word;
                 cloned_word[i] = '_';
                 all_1nn[cloned_word].insert(word);
