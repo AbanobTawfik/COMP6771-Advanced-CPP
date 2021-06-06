@@ -13,8 +13,6 @@
 #include <map>
 
 namespace word_ladder {
-    auto get_neighbours(std::string word,
-                        std::unordered_map<std::string, std::unordered_set<std::string>> neighbour_map) -> std::unordered_set<std::string>;
 
     auto read_lexicon(std::string const &path) -> std::unordered_set<std::string> {
 
@@ -32,22 +30,6 @@ namespace word_ladder {
             std::runtime_error("Didn't reach end of file");
         }
         return lexicon;
-    }
-
-    auto generate_all_1nn(
-            std::unordered_set<std::string> lexicon, int length) -> std::unordered_map<std::string, std::unordered_set<std::string>> {
-        std::unordered_map<std::string, std::unordered_set<std::string>> all_1nn;
-        for (auto word : lexicon) {
-            if(word.size() != length){
-                continue;
-            }
-            for (int i = 0; i < word.length(); i++) {
-                auto cloned_word = word;
-                cloned_word[i] = '_';
-                all_1nn[cloned_word].insert(word);
-            }
-        }
-        return all_1nn;
     }
 
 }// namespace word_ladder
