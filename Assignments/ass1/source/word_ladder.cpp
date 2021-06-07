@@ -11,22 +11,19 @@ namespace word_ladder {
     auto get_neighbours(const std::string &word,
                         const std::unordered_map<std::string, std::unordered_set<std::string>> &neighbour_map) -> std::unordered_set<std::string>;
 
-    void generate_solution(const std::string &neighbour, const std::string &from, const std::string &to,
-                           const std::unordered_map<std::string, std::vector<std::string>> &visited_front,
-                           const std::unordered_map<std::string, std::vector<std::string>> &visited_back,
-                           std::vector<std::vector<std::string>> &solutions, const int &depth);
+    void reconstruct_solutions_from_graph(const std::string &from, const std::string &to,
+                                          const std::unordered_map<std::string, std::vector<std::string>> &graph,
+                                          std::vector<std::vector<std::string>> &solutions);
 
-    void DFS(const std::string &start, const std::string &goal, std::vector<std::string> &path, std::unordered_set<std::string> &visited,
-             std::vector<std::vector<std::string>> &all_paths,
-             const std::unordered_map<std::string, std::vector<std::string>> &child_parent_map, const int &goal_depth, const int &current_depth);
+    void DFS(const std::string &start, const std::string &goal, std::vector<std::string> &path,
+             const std::unordered_map<std::string, std::vector<std::string>> &graph,
+             std::vector<std::vector<std::string>> &all_solutions);
 
-    void
-    update_search(std::unordered_set<std::string> &to_explore,
+    bool
+    update_search(std::unordered_set<std::string> &to_explore_front, std::unordered_set<std::string> &to_explore_back,
+                  std::unordered_set<std::string> &visited,
                   const std::unordered_map<std::string, std::unordered_set<std::string>> &neighbour_map,
-                  std::unordered_map<std::string, std::vector<std::string>> &visited,
-                  const std::unordered_map<std::string, std::vector<std::string>> &visited_other_direction,
-                  std::vector<std::vector<std::string>> &solutions,
-                  const std::string &from, const std::string &to, bool &found, const bool &forward, const int &depth);
+                  std::unordered_map<std::string, std::vector<std::string>> &graph);
 
     auto generate_all_1nn(
             std::unordered_set<std::string> lexicon,
@@ -45,23 +42,21 @@ namespace word_ladder {
         auto front = std::unordered_set<std::string>();
         auto back = std::unordered_set<std::string>();
         // keep a list of parents too while we're at it, poggies
-        auto visited_front = std::unordered_map<std::string, std::vector<std::string>>();
-        auto visited_back = std::unordered_map<std::string, std::vector<std::string>>();
+        auto graph = std::unordered_map<std::string, std::vector<std::string>>();
+        auto visited = std::unordered_set<std::string>();
         front.insert(from);
         back.insert(to);
         auto solutions = std::vector<std::vector<std::string>>();
         auto found = false;
-        auto depth = 0;
         while (not front.empty() and not back.empty()) {
-            update_search(front, neighbour_map, visited_front, visited_back, solutions, from, to, found, true, depth);
+            found = update_search(front, back, visited, neighbour_map, graph);
             if (found) {
                 break;
             }
-            update_search(back, neighbour_map, visited_back, visited_front, solutions, from, to, found, false, depth);
-            if (found) {
-                break;
-            }
-            depth++;
+        }
+
+        if (found) {
+            reconstruct_solutions_from_graph(from, to, graph, solutions);
         }
         // remove all paths that aren't the shortest
         std::sort(solutions.begin(), solutions.end());
@@ -72,6 +67,90 @@ namespace word_ladder {
             std::cout << std::endl;
         }
         return solutions;
+    }
+
+    bool
+    update_search(std::unordered_set<std::string> &to_explore_front, std::unordered_set<std::string> &to_explore_back,
+                  std::unordered_set<std::string> &visited,
+                  const std::unordered_map<std::string, std::unordered_set<std::string>> &neighbour_map,
+                  std::unordered_map<std::string, std::vector<std::string>> &graph) {
+        auto new_layer = std::unordered_set<std::string>();
+        // expand the smaller layer first, overall this will lead to a much more refined search space
+        auto found = false;
+        // keep track of words we are exploring in BOTH directions, we don't want to expand nodes in the other direction
+        // since we will later explore them, this prevents rediscovering nodes in front that are in back, and vice versa
+        for(auto word : to_explore_front){
+            visited.insert(word);
+        }
+        for(auto word : to_explore_back){
+            visited.insert(word);
+        }
+        if (to_explore_front.size() > to_explore_back.size()) {
+            // traversing forward
+            for (const auto &word : to_explore_front) {
+                auto neighbours = get_neighbours(word, neighbour_map);
+                for (const auto &neighbour : neighbours) {
+                    // if the backward direction has this neighbour we have found an intersection
+                    if (to_explore_back.count(neighbour)) {
+                        found = true;
+                        graph[word].push_back(neighbour);
+                    }
+                    // check if the word already seen before, if so we can ignore it
+                    if (not found and not visited.contains(neighbour)) {
+                        new_layer.insert(neighbour);
+                        // we want to add the connection into our graph now with this neighbour, since we are forward
+                        // we want the PARENT to be the origin word, and child to be the neighbour
+                        graph[word].push_back(neighbour);
+                    }
+                }
+            }
+            // next layer to explore for the front will be the adjacent 1 hop layer
+            to_explore_front = new_layer;
+        } else {
+            // traversing backward
+            for (const auto &word : to_explore_back) {
+                auto neighbours = get_neighbours(word, neighbour_map);
+                for (const auto &neighbour : neighbours) {
+                    // if the forward direction has this neighbour we have found an intersection
+                    if (to_explore_front.count(neighbour)) {
+                        found = true;
+                        graph[neighbour].push_back(word);
+                    }
+                    // check if the word already seen before, if so we can ignore it
+                    if (not found and not visited.contains(neighbour)) {
+                        new_layer.insert(neighbour);
+                        // we want to add the connection into our graph now with this neighbour, since we are backward
+                        // we want the PARENT to be the NEIGHBOUR word, and child to be the ORIGIN
+                        graph[neighbour].push_back(word);
+                    }
+                }
+            }
+            // next layer to explore for the front will be the adjacent 1 hop layer
+            to_explore_back = new_layer;
+        }
+        return found;
+    }
+
+    void reconstruct_solutions_from_graph(const std::string &from, const std::string &to,
+                                          const std::unordered_map<std::string, std::vector<std::string>> &graph,
+                                          std::vector<std::vector<std::string>> &solutions) {
+        auto path = std::vector<std::string>{from};
+        DFS(from, to, path, graph, solutions);
+    }
+
+    void DFS(const std::string &start, const std::string &goal, std::vector<std::string> &path,
+             const std::unordered_map<std::string, std::vector<std::string>> &graph,
+             std::vector<std::vector<std::string>> &all_solutions) {
+        if (start == goal) {
+            all_solutions.push_back(path);
+        } else {
+            for (const auto &child : graph.at(start)) {
+                path.push_back(child);
+                DFS(child, goal, path, graph, all_solutions);
+                path.pop_back();
+            }
+        }
+
     }
 
     void trim_paths_not_shortest(std::vector<std::vector<std::string>> &solutions) {
@@ -108,100 +187,6 @@ namespace word_ladder {
         }
         neighbours.erase(word);
         return neighbours;
-    }
-
-
-    void
-    update_search(std::unordered_set<std::string> &to_explore,
-                  const std::unordered_map<std::string, std::unordered_set<std::string>> &neighbour_map,
-                  std::unordered_map<std::string, std::vector<std::string>> &visited,
-                  const std::unordered_map<std::string, std::vector<std::string>> &visited_other_direction,
-                  std::vector<std::vector<std::string>> &solutions,
-                  const std::string &from, const std::string &to, bool &found, const bool &forward, const int &depth) {
-        auto new_layer = std::unordered_set<std::string>();
-        for (auto word : to_explore) {
-            auto neighbours = get_neighbours(word, neighbour_map);
-            for (const auto &neighbour : neighbours) {
-                if (visited.count(neighbour)) {
-                    continue;
-                }
-                if (visited_other_direction.count(neighbour) ||
-                    ((neighbour == from && not forward) || (neighbour == to && forward))) {
-                    if (forward) {
-                        visited[word].push_back(neighbour);
-                    } else {
-                        visited[neighbour].push_back(word);
-                    }
-                    generate_solution(neighbour, from, to, visited, visited_other_direction, solutions, depth);
-                    found = true;
-                }else {
-                    // if we go forward, we update our parent so that the neighbour is a CHILD from the origin word
-                    // this way visited keeps track of the parent node from shortest path its found
-                    if (forward) {
-                        visited[word].push_back(neighbour);
-                    } else {
-                        visited[neighbour].push_back(word);
-                    }
-                    new_layer.insert(neighbour);
-                }
-            }
-        }
-        to_explore = new_layer;
-    }
-
-    void generate_solution(const std::string &neighbour, const std::string &from, const std::string &to,
-                           const std::unordered_map<std::string, std::vector<std::string>> &visited_front,
-                           const std::unordered_map<std::string, std::vector<std::string>> &visited_back,
-                           std::vector<std::vector<std::string>> &solutions, const int &depth) {
-        // now that we have the intersecting neighbour
-        // we want to perform a DFS from, origin -> intersecting neighbour and intersecting neighbour -> end word
-        // and merge the two paths together to form solution
-        auto forward_paths = std::vector<std::vector<std::string>>();
-        auto forward_path_start = std::vector<std::string>{from};
-        auto backward_paths = std::vector<std::vector<std::string>>();
-        auto backward_path_start = std::vector<std::string>{neighbour};
-
-        auto dfs_vis_front = std::unordered_set<std::string>();
-        auto dfs_vis_back = std::unordered_set<std::string>();
-        // we will take all combinations of forward + back paths and insert that into our solutions
-        DFS(from, neighbour, forward_path_start, dfs_vis_front, forward_paths, visited_front, depth, 0);
-        DFS(neighbour, to, backward_path_start, dfs_vis_back, backward_paths, visited_back, depth, 0);
-        for (auto forward_path : forward_paths ){
-            auto  merged_path = std::vector<std::string>();
-            forward_path.pop_back();
-            for(auto backward_path : backward_paths){
-                merged_path.insert(merged_path.end(), forward_path.begin(), forward_path.end());
-                merged_path.insert(merged_path.end(), backward_path.begin(), backward_path.end());
-                solutions.push_back(merged_path);
-            }
-        }
-
-    }
-
-    void DFS(const std::string &start, const std::string &goal, std::vector<std::string> &path, std::unordered_set<std::string> &visited,
-             std::vector<std::vector<std::string>> &all_paths,
-             const std::unordered_map<std::string, std::vector<std::string>> &child_parent_map, const int &goal_depth, const int &current_depth) {
-        if(goal_depth < current_depth){
-            return;
-        }
-        if (start == goal) {
-            all_paths.push_back(path);
-            return;
-        }
-        if (not child_parent_map.count(start)) {
-            return;
-        }
-        auto x = child_parent_map.at(start);
-        for (const auto &child : child_parent_map.at(start)) {
-            if(visited.count(child)){
-                continue;
-            }
-            path.push_back(child);
-            visited.insert(child);
-            DFS(child, goal, path, visited, all_paths, child_parent_map, goal_depth, current_depth + 1);
-            path.pop_back();
-        }
-
     }
 
     auto generate_all_1nn(
