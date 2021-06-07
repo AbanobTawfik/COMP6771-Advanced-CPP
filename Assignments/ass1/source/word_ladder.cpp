@@ -12,38 +12,25 @@ namespace word_ladder {
                         const std::unordered_map<std::string, std::unordered_set<std::string>> &neighbour_map) -> std::unordered_set<std::string>;
 
     void generate_solution(const std::string &neighbour, const std::string &from, const std::string &to,
-                           const std::unordered_map<std::string, std::string> &visited_front,
-                           const std::unordered_map<std::string, std::string> &visited_back,
-                           std::vector<std::vector<std::string>> &solutions);
+                           const std::unordered_map<std::string, std::vector<std::string>> &visited_front,
+                           const std::unordered_map<std::string, std::vector<std::string>> &visited_back,
+                           std::vector<std::vector<std::string>> &solutions, const int &depth);
 
-    void trim_paths_not_shortest(std::vector<std::vector<std::string>> &solutions);
+    void DFS(const std::string &start, const std::string &goal, std::vector<std::string> &path, std::unordered_set<std::string> &visited,
+             std::vector<std::vector<std::string>> &all_paths,
+             const std::unordered_map<std::string, std::vector<std::string>> &child_parent_map, const int &goal_depth, const int &current_depth);
 
     void
     update_search(std::unordered_set<std::string> &to_explore,
                   const std::unordered_map<std::string, std::unordered_set<std::string>> &neighbour_map,
-                  std::unordered_map<std::string, std::string> &visited,
-                  const std::unordered_map<std::string, std::string> &visited_other_direction,
+                  std::unordered_map<std::string, std::vector<std::string>> &visited,
+                  const std::unordered_map<std::string, std::vector<std::string>> &visited_other_direction,
                   std::vector<std::vector<std::string>> &solutions,
-                  const std::string &from, const std::string &to, bool &found, const bool &forward) ;
+                  const std::string &from, const std::string &to, bool &found, const bool &forward, const int &depth);
 
     auto generate_all_1nn(
             std::unordered_set<std::string> lexicon,
             size_t length) -> std::unordered_map<std::string, std::unordered_set<std::string>>;
-
-    void show_listings(const std::unordered_map<std::string, std::string> &visited_front) {
-        auto printout = std::unordered_map<std::string, std::vector<std::string>>();
-        for (auto node : visited_front) {
-            printout[node.second].push_back(node.first);
-        }
-        for (auto x : printout) {
-            std::cout << x.first << " -> ";
-            std::cout << "[";
-            for (auto node : x.second) {
-                std::cout << node << ", ";
-            }
-            std::cout << "]" << std::endl;
-        }
-    }
 
     auto generate(std::string
                   const &from,
@@ -58,19 +45,25 @@ namespace word_ladder {
         auto front = std::unordered_set<std::string>();
         auto back = std::unordered_set<std::string>();
         // keep a list of parents too while we're at it, poggies
-        auto visited_front = std::unordered_map<std::string, std::string>();
-        auto visited_back = std::unordered_map<std::string, std::string>();
+        auto visited_front = std::unordered_map<std::string, std::vector<std::string>>();
+        auto visited_back = std::unordered_map<std::string, std::vector<std::string>>();
         front.insert(from);
         back.insert(to);
         auto solutions = std::vector<std::vector<std::string>>();
         auto found = false;
+        auto depth = 0;
         while (not front.empty() and not back.empty()) {
-            update_search(front, neighbour_map, visited_front, visited_back, solutions, from, to, found, true);
-            update_search(back, neighbour_map, visited_back, visited_front, solutions, from, to, found, false);
+            update_search(front, neighbour_map, visited_front, visited_back, solutions, from, to, found, true, depth);
+            if (found) {
+                break;
+            }
+            update_search(back, neighbour_map, visited_back, visited_front, solutions, from, to, found, false, depth);
+            if (found) {
+                break;
+            }
+            depth++;
         }
         // remove all paths that aren't the shortest
-        trim_paths_not_shortest(solutions);
-        std::cout << visited_back["foam"] << std::endl;
         std::sort(solutions.begin(), solutions.end());
         for (auto i : solutions) {
             for (auto node : i) {
@@ -97,13 +90,9 @@ namespace word_ladder {
                     new_solutions.push_back(solution);
                 }
             }
-            std::sort(new_solutions.begin(), new_solutions.end());
-            new_solutions.erase(std::unique(new_solutions.begin(), new_solutions.end()), new_solutions.end());
+            std::sort(solutions.begin(), new_solutions.end());
             solutions = new_solutions;
-
         }
-
-
     }
 
     auto get_neighbours(const std::string &word,
@@ -125,10 +114,10 @@ namespace word_ladder {
     void
     update_search(std::unordered_set<std::string> &to_explore,
                   const std::unordered_map<std::string, std::unordered_set<std::string>> &neighbour_map,
-                  std::unordered_map<std::string, std::string> &visited,
-                  const std::unordered_map<std::string, std::string> &visited_other_direction,
+                  std::unordered_map<std::string, std::vector<std::string>> &visited,
+                  const std::unordered_map<std::string, std::vector<std::string>> &visited_other_direction,
                   std::vector<std::vector<std::string>> &solutions,
-                  const std::string &from, const std::string &to, bool &found, const bool &forward) {
+                  const std::string &from, const std::string &to, bool &found, const bool &forward, const int &depth) {
         auto new_layer = std::unordered_set<std::string>();
         for (auto word : to_explore) {
             auto neighbours = get_neighbours(word, neighbour_map);
@@ -138,18 +127,21 @@ namespace word_ladder {
                 }
                 if (visited_other_direction.count(neighbour) ||
                     ((neighbour == from && not forward) || (neighbour == to && forward))) {
-                    visited[neighbour] = word;
                     if (forward) {
-                        generate_solution(neighbour, from, to, visited, visited_other_direction, solutions);
+                        visited[word].push_back(neighbour);
                     } else {
-                        generate_solution(neighbour, from, to, visited_other_direction, visited, solutions);
+                        visited[neighbour].push_back(word);
                     }
+                    generate_solution(neighbour, from, to, visited, visited_other_direction, solutions, depth);
                     found = true;
-                }
-                if (!found) {
+                }else {
                     // if we go forward, we update our parent so that the neighbour is a CHILD from the origin word
                     // this way visited keeps track of the parent node from shortest path its found
-                    visited[neighbour] = word;
+                    if (forward) {
+                        visited[word].push_back(neighbour);
+                    } else {
+                        visited[neighbour].push_back(word);
+                    }
                     new_layer.insert(neighbour);
                 }
             }
@@ -158,42 +150,57 @@ namespace word_ladder {
     }
 
     void generate_solution(const std::string &neighbour, const std::string &from, const std::string &to,
-                           const std::unordered_map<std::string, std::string> &visited_front,
-                           const std::unordered_map<std::string, std::string> &visited_back,
-                           std::vector<std::vector<std::string>> &solutions) {
+                           const std::unordered_map<std::string, std::vector<std::string>> &visited_front,
+                           const std::unordered_map<std::string, std::vector<std::string>> &visited_back,
+                           std::vector<std::vector<std::string>> &solutions, const int &depth) {
         // now that we have the intersecting neighbour
+        // we want to perform a DFS from, origin -> intersecting neighbour and intersecting neighbour -> end word
+        // and merge the two paths together to form solution
+        auto forward_paths = std::vector<std::vector<std::string>>();
+        auto forward_path_start = std::vector<std::string>{from};
+        auto backward_paths = std::vector<std::vector<std::string>>();
+        auto backward_path_start = std::vector<std::string>{neighbour};
 
-//        show_listings(visited_front);
-//        std::cout << "---------------------------------------------------------" << std::endl;
-//        show_listings(visited_back);
-
-        // we want to go from the front -> neighbour, merge that path with the back -> neighbour
-        std::string word = neighbour;
-        auto forward_path = std::vector<std::string>();
-        auto backward_path = std::vector<std::string>();
-        // backtrack from neighbour -> beginning word for the forward path
-        // note we storing in reverse order, so we need to reverse this list
-        while (word != from) {
-            forward_path.push_back(word);
-            // get parent of this node and add it to the list
-            word = visited_front.at(word);
-        }
-        std::reverse(forward_path.begin(), forward_path.end());
-        // remove duplicate neighbour from the path
-        forward_path.erase(std::remove(forward_path.begin(), forward_path.end(), neighbour), forward_path.end());
-
-        word = neighbour;
-        while (word != to) {
-
-            backward_path.push_back(word);
-            word = visited_back.at(word);
+        auto dfs_vis_front = std::unordered_set<std::string>();
+        auto dfs_vis_back = std::unordered_set<std::string>();
+        // we will take all combinations of forward + back paths and insert that into our solutions
+        DFS(from, neighbour, forward_path_start, dfs_vis_front, forward_paths, visited_front, depth, 0);
+        DFS(neighbour, to, backward_path_start, dfs_vis_back, backward_paths, visited_back, depth, 0);
+        for (auto forward_path : forward_paths ){
+            auto  merged_path = std::vector<std::string>();
+            forward_path.pop_back();
+            for(auto backward_path : backward_paths){
+                merged_path.insert(merged_path.end(), forward_path.begin(), forward_path.end());
+                merged_path.insert(merged_path.end(), backward_path.begin(), backward_path.end());
+                solutions.push_back(merged_path);
+            }
         }
 
-        forward_path.insert(forward_path.end(), backward_path.begin(), backward_path.end());
-        forward_path.insert(forward_path.begin(), from);
-        forward_path.insert(forward_path.end(), to);
+    }
 
-        solutions.push_back(forward_path);
+    void DFS(const std::string &start, const std::string &goal, std::vector<std::string> &path, std::unordered_set<std::string> &visited,
+             std::vector<std::vector<std::string>> &all_paths,
+             const std::unordered_map<std::string, std::vector<std::string>> &child_parent_map, const int &goal_depth, const int &current_depth) {
+        if(goal_depth < current_depth){
+            return;
+        }
+        if (start == goal) {
+            all_paths.push_back(path);
+            return;
+        }
+        if (not child_parent_map.count(start)) {
+            return;
+        }
+        auto x = child_parent_map.at(start);
+        for (const auto &child : child_parent_map.at(start)) {
+            if(visited.count(child)){
+                continue;
+            }
+            path.push_back(child);
+            visited.insert(child);
+            DFS(child, goal, path, visited, all_paths, child_parent_map, goal_depth, current_depth + 1);
+            path.pop_back();
+        }
 
     }
 
