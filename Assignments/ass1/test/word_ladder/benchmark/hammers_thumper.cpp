@@ -14,13 +14,9 @@
 // limitations under the License.
 //
 
-// this test will check the correctness of the benchmark. knowing the solution is 840 words of length 58, both retrieved
-// from the known naive solution and other peoples output posted on forums, exact values will be used to do all benchmark
-// testing. all tests will assume the ladders produced from the naive solution are correct and verified, based on the
-// knowledge from the other tests. This means we will just compare the known output from the naive solution to the optimised
-// solution each time.
-
-// This is the benchmark for atlases -> cabaret the hardest case for word ladders.
+// this test will check more difficult word ladders, this case hammer -> thumper is a word ladder of length 26, with
+// 342 solutions. the correctness of the output has been validated in previous tests using the naive solution, so we
+// just need to check the efficient solution matches
 
 #include "comp6771/word_ladder.hpp"
 
@@ -31,13 +27,13 @@
 #include "comp6771/testing/range/same_length.hpp"
 #include "comp6771/testing/range/unique_ladders.hpp"
 
-TEST_CASE("atlases -> cabaret") {
+TEST_CASE("hammers -> thumper") {
 	auto const english_lexicon = ::word_ladder::read_lexicon("./english.txt");
-    auto const ladders_efficient = ::word_ladder::generate("atlases", "cabaret", english_lexicon);
-    auto const ladders_correct = ::word_ladder_slow::generate_accurate("atlases", "cabaret", english_lexicon);
+    auto const ladders_efficient = ::word_ladder::generate("hammers", "thumper", english_lexicon);
+    auto const ladders_correct = ::word_ladder_slow::generate_accurate("hammers", "thumper", english_lexicon);
 
-	CHECK(std::size(ladders_correct) == 840);
-    CHECK(ladders_correct[0].size() == 58);
+	CHECK(std::size(ladders_correct) == 342);
+    CHECK(ladders_correct[0].size() == 26);
     CHECK(testing::ladders_same_length(ladders_correct));
     CHECK(testing::unique_ladders(ladders_correct));
     CHECK(std::is_sorted(ladders_correct.begin(), ladders_correct.begin()));

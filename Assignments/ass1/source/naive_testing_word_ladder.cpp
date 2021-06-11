@@ -28,7 +28,7 @@ namespace word_ladder_slow {
         for (std::vector<std::string>::size_type i = 0; i < word.size(); i++) {
             auto last_node_copy = word;
             last_node_copy[i] = '_';
-            if (neighbour_map.count(last_node_copy)) {
+            if (neighbour_map.contains(last_node_copy)) {
                 neighbours.insert(neighbour_map.at(last_node_copy).begin(),
                                   neighbour_map.at(last_node_copy).end());
             }
@@ -45,7 +45,7 @@ namespace word_ladder_slow {
         if (start == goal) {
             all_solutions.push_back(path);
         } else {
-            if (graph.count(start)) {
+            if (graph.contains(start)) {
                 for (const auto &child : graph.at(start)) {
                     path.push_back(child);
                     DFS(child, goal, path, graph, all_solutions);
@@ -181,7 +181,7 @@ namespace word_ladder_slow {
                            std::string const &to,
                            std::unordered_set<std::string>
                            const &lexicon) -> std::vector<std::vector<std::string>> {
-        if (from.size() != to.size()) {
+        if (from.size() != to.size() || not lexicon.contains(from) || not lexicon.contains(to) || from == to) {
             return std::vector<std::vector<std::string>>();
         }
 

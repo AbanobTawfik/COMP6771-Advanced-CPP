@@ -35,7 +35,6 @@ TEST_CASE("work -> play simple") {
     // testing the naive and optimal solution on a small lexicon that only contains a few possible paths
     auto const english_lexicon = ::word_ladder::read_lexicon("./tiny_lexicon.txt");
     auto const ladders_efficient = ::word_ladder::generate("work", "play", english_lexicon);
-    // NOT MADE CONST ON PURPOSE TO TEST THE TEST METHOD ITSELF
     auto const ladders_correct = ::word_ladder_slow::generate_accurate("work", "play", english_lexicon);
 
     // LADDER VALIDITY CHECK ON CORRECT SOLUTION

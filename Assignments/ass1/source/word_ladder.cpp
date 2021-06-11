@@ -24,12 +24,12 @@ namespace word_ladder {
     // all valid words that fill the underscore for: woo_
     auto get_neighbours(const std::string &word,
                         const std::unordered_map<std::string,
-                        std::unordered_set<std::string>> &neighbour_map) -> std::unordered_set<std::string> {
+                                std::unordered_set<std::string>> &neighbour_map) -> std::unordered_set<std::string> {
         auto neighbours = std::unordered_set<std::string>();
         for (std::vector<std::string>::size_type i = 0; i < word.size(); i++) {
             auto last_node_copy = word;
             last_node_copy[i] = '_';
-            if (neighbour_map.count(last_node_copy)) {
+            if (neighbour_map.contains(last_node_copy)) {
                 neighbours.insert(neighbour_map.at(last_node_copy).begin(),
                                   neighbour_map.at(last_node_copy).end());
             }
@@ -46,7 +46,7 @@ namespace word_ladder {
         if (start == goal) {
             all_solutions.push_back(path);
         } else {
-            if(graph.count(start)) {
+            if (graph.contains(start)) {
                 for (const auto &child : graph.at(start)) {
                     path.push_back(child);
                     DFS(child, goal, path, graph, all_solutions);
@@ -99,7 +99,8 @@ namespace word_ladder {
     // and d is the depth of the search. Halving the search space more than halves the speed of execution as the complexity
     // grows exponentially
     bool
-    expand_shortest_set(std::unordered_set<std::string> &to_explore_front, std::unordered_set<std::string> &to_explore_back,
+    expand_shortest_set(std::unordered_set<std::string> &to_explore_front,
+                        std::unordered_set<std::string> &to_explore_back,
                         std::unordered_set<std::string> &visited,
                         const std::unordered_map<std::string, std::unordered_set<std::string>> &neighbour_map,
                         std::unordered_map<std::string, std::unordered_set<std::string>> &graph) {
@@ -108,10 +109,10 @@ namespace word_ladder {
         auto found = false;
         // keep track of words we are exploring in BOTH directions, we don't want to expand nodes in the other direction
         // since we will later explore them, this prevents rediscovering nodes in front that are in back, and vice versa
-        for(const auto &word : to_explore_front){
+        for (const auto &word : to_explore_front) {
             visited.insert(word);
         }
-        for(const auto &word : to_explore_back){
+        for (const auto &word : to_explore_back) {
             visited.insert(word);
         }
         if (to_explore_front.size() < to_explore_back.size()) {
@@ -120,7 +121,7 @@ namespace word_ladder {
                 auto neighbours = get_neighbours(word, neighbour_map);
                 for (const auto &neighbour : neighbours) {
                     // if the backward direction has this neighbour we have found an intersection
-                    if (to_explore_back.count(neighbour)) {
+                    if (to_explore_back.contains(neighbour)) {
                         found = true;
                         graph[word].insert(neighbour);
                     }
@@ -141,7 +142,7 @@ namespace word_ladder {
                 auto neighbours = get_neighbours(word, neighbour_map);
                 for (const auto &neighbour : neighbours) {
                     // if the forward direction has this neighbour we have found an intersection
-                    if (to_explore_front.count(neighbour)) {
+                    if (to_explore_front.contains(neighbour)) {
                         found = true;
                         graph[neighbour].insert(word);
                     }
@@ -208,7 +209,7 @@ namespace word_ladder {
                   std::string const &to,
                   std::unordered_set<std::string>
                   const &lexicon) -> std::vector<std::vector<std::string>> {
-        if (from.size() != to.size()) {
+        if (from.size() != to.size() || not lexicon.contains(from) || not lexicon.contains(to) || from == to) {
             return std::vector<std::vector<std::string>>();
         }
 

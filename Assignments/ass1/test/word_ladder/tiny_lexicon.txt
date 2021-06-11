@@ -3870,3 +3870,11 @@ dam
 fan
 com
 bom
+
+onewordhop
+onewordhep
+onewerdhep
+tnewerdhep
+twewerdhep
+twewordhep
+twowordhop
