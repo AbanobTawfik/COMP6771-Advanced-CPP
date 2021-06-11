@@ -13,9 +13,6 @@
 namespace word_ladder {
     [[nodiscard]] auto read_lexicon(std::string const &path) -> std::unordered_set<std::string>;
 
-    [[nodiscard]] auto generate_all_1nn(std::unordered_set<std::string> lexicon,
-                                        int length) -> std::unordered_map<std::string, std::unordered_set<std::string>>;
-
     // Given a start word and destination word, returns all the shortest possible paths from the
     // start word to the destination, where each word in an individual path is a valid word per the
     // provided lexicon. Pre: ranges::size(from) == ranges::size(to) Pre: valid_words.contains(from)
@@ -25,5 +22,12 @@ namespace word_ladder {
                                 std::unordered_set<std::string> const &lexicon)
     -> std::vector<std::vector<std::string>>;
 } // namespace word_ladder
+
+namespace word_ladder_slow {
+    [[nodiscard]] auto generate_accurate(std::string const &from,
+                                         std::string const &to,
+                                         std::unordered_set<std::string> const &lexicon)
+    -> std::vector<std::vector<std::string>>;
+}
 
 #endif // COMP6771_WORD_LADDER_HPP

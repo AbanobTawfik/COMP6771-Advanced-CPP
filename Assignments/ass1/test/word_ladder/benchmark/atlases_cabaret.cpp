@@ -19,14 +19,12 @@
 #include <vector>
 
 #include "catch2/catch.hpp"
-#include "comp6771/testing/range/contain.hpp"
+#include "comp6771/testing/range/same_length.hpp"
 
-TEST_CASE("at -> it") {
-	auto const english_lexicon = word_ladder::read_lexicon("./english.txt");
-	auto const ladders = word_ladder::generate("at", "it", english_lexicon);
 
-	CHECK(std::size(ladders) == 1);
-	CHECK(std::is_sorted(ladders));
-
-	CHECK(std::any_of(ladders, testing::contain({"at", "it"})));
+TEST_CASE("atlases -> cabaret") {
+	auto const english_lexicon = ::word_ladder::read_lexicon("./english.txt");
+	auto const ladders = ::word_ladder::generate("atlases", "cabaret", english_lexicon);
+    CHECK(testing::ladders_same_length(ladders));
+	CHECK(std::size(ladders) != 0);
 }
