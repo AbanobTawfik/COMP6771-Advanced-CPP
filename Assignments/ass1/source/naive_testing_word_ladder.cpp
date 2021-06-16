@@ -20,8 +20,8 @@ namespace word_ladder_slow {
     // valid words that fill the underscore for: w_rd all valid words that fill the underscore for:
     // wo_d all valid words that fill the underscore for: woo_
     auto
-    get_neighbours(const std::string& word,
-                   const std::unordered_map<std::string, std::unordered_set<std::string>>& neighbour_map)
+    get_neighbours(const std::string &word,
+                   const std::unordered_map<std::string, std::unordered_set<std::string>> &neighbour_map)
     -> std::unordered_set<std::string> {
         auto neighbours = std::unordered_set<std::string>();
         for (std::vector<std::string>::size_type i = 0; i < word.size(); i++) {
@@ -38,17 +38,16 @@ namespace word_ladder_slow {
 
     // a simplified modification of DFS that will simply go through all paths from start node to end
     // node and append all of the paths into the final solution list.
-    void DFS(const std::string& start,
-             const std::string& goal,
-             std::vector<std::string>& path,
-             const std::unordered_map<std::string, std::unordered_set<std::string>>& graph,
-             std::vector<std::vector<std::string>>& all_solutions) {
+    void DFS(const std::string &start,
+             const std::string &goal,
+             std::vector<std::string> &path,
+             const std::unordered_map<std::string, std::unordered_set<std::string>> &graph,
+             std::vector<std::vector<std::string>> &all_solutions) {
         if (start == goal) {
             all_solutions.push_back(path);
-        }
-        else {
+        } else {
             if (graph.contains(start)) {
-                for (const auto& child : graph.at(start)) {
+                for (const auto &child : graph.at(start)) {
                     path.push_back(child);
                     DFS(child, goal, path, graph, all_solutions);
                     path.pop_back();
@@ -62,10 +61,10 @@ namespace word_ladder_slow {
     // paths from the start to end node. this works in our case as all neighbourings done are from
     // the shortest path from start -> end, discovered during the Bi-Directional BFS
     void reconstruct_solutions_from_graph(
-            const std::string& from,
-            const std::string& to,
-            const std::unordered_map<std::string, std::unordered_set<std::string>>& graph,
-            std::vector<std::vector<std::string>>& solutions) {
+            const std::string &from,
+            const std::string &to,
+            const std::unordered_map<std::string, std::unordered_set<std::string>> &graph,
+            std::vector<std::vector<std::string>> &solutions) {
         auto path = std::vector<std::string>{from};
         DFS(from, to, path, graph, solutions);
     }
@@ -105,35 +104,43 @@ namespace word_ladder_slow {
     // search. Halving the search space more than halves the speed of execution as the complexity
     // grows exponentially
     bool
-    expand_layer(std::unordered_set<std::string>& to_explore_front,
-                 const std::string& goal,
-                 std::unordered_set<std::string>& visited,
-                 const std::unordered_map<std::string, std::unordered_set<std::string>>& neighbour_map,
-                 std::unordered_map<std::string, std::unordered_set<std::string>>& graph) {
+    expand_layer(std::unordered_set<std::string> &to_explore_front,
+                 const std::string &goal,
+                 std::unordered_set<std::string> &visited,
+                 const std::unordered_map<std::string, std::unordered_set<std::string>> &neighbour_map,
+                 std::unordered_map<std::string, std::unordered_set<std::string>> &graph) {
         auto new_layer = std::unordered_set<std::string>();
         // expand the smaller layer first, overall this will lead to a much more refined search space
         auto found = false;
         // keep track of words we are exploring in BOTH directions, we don't want to expand nodes in
         // the other direction since we will later explore them, this prevents rediscovering nodes in
         // front that are in back, and vice versa
-        for (const auto& word : to_explore_front) {
+        for (const auto &word : to_explore_front) {
             visited.insert(word);
         }
 
-        for (const auto& word : to_explore_front) {
+        for (const auto &word : to_explore_front) {
             auto neighbours = get_neighbours(word, neighbour_map);
-            for (const auto& neighbour : neighbours) {
+            for (const auto &neighbour : neighbours) {
                 // if the backward direction has this neighbour we have found an intersection
                 if (word == goal) {
                     found = true;
-                    graph.at(word).insert(neighbour);
+                    if (not graph.contains(word)) {
+                        graph.emplace(word, std::unordered_set<std::string>{neighbour});
+                    } else {
+                        graph.at(word).insert(neighbour);
+                    }
                 }
                 // check if the word already seen before, if so we can ignore it
                 if (not found and not visited.contains(neighbour)) {
                     new_layer.insert(neighbour);
                     // we want to add the connection into our graph now with this neighbour, since we are
                     // forward we want the PARENT to be the origin word, and child to be the neighbour
-                    graph.at(word).insert(neighbour);
+                    if (not graph.contains(word)) {
+                        graph.emplace(word, std::unordered_set<std::string>{neighbour});
+                    } else {
+                        graph.at(word).insert(neighbour);
+                    }
                 }
             }
         }
@@ -159,17 +166,21 @@ namespace word_ladder_slow {
     // neighbours we would take the word hat, modify each letter with the filler space, and get all
     // words linked to that modified word for example _at -> returns cat and bat as neighbours in
     // O(1) h_t -> returns hot in O(1) ha_ -> returns ham in O(1)
-    auto generate_all_1nn(const std::unordered_set<std::string>& lexicon, const size_t& length)
+    auto generate_all_1nn(const std::unordered_set<std::string> &lexicon, const size_t &length)
     -> std::unordered_map<std::string, std::unordered_set<std::string>> {
         std::unordered_map<std::string, std::unordered_set<std::string>> all_1nn;
-        for (const auto& word : lexicon) {
+        for (const auto &word : lexicon) {
             if (word.size() != length) {
                 continue;
             }
             for (std::vector<std::string>::size_type i = 0; i < word.length(); i++) {
                 auto cloned_word = word;
                 cloned_word[i] = '_';
-                all_1nn[cloned_word].insert(word);
+                if (not all_1nn.contains(cloned_word)) {
+                    all_1nn.emplace(cloned_word, std::unordered_set<std::string>{word});
+                } else {
+                    all_1nn.at(cloned_word).insert(word);
+                }
             }
         }
         return all_1nn;
@@ -182,13 +193,12 @@ namespace word_ladder_slow {
     //                                                                                            //
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    auto generate_accurate(std::string const& from,
-                           std::string const& to,
-                           std::unordered_set<std::string> const& lexicon)
+    auto generate_accurate(std::string const &from,
+                           std::string const &to,
+                           std::unordered_set<std::string> const &lexicon)
     -> std::vector<std::vector<std::string>> {
         if (from.size() != to.size() || not lexicon.contains(from) || not lexicon.contains(to)
-            || from == to)
-        {
+            || from == to) {
             return std::vector<std::vector<std::string>>();
         }
 
