@@ -130,7 +130,7 @@ namespace word_ladder {
                     // if the backward direction has this neighbour we have found an intersection
                     if (to_explore_back.contains(neighbour)) {
                         found = true;
-                        graph[word].insert(neighbour);
+                        graph.at(word).insert(neighbour);
                     }
                     // check if the word already seen before, if so we can ignore it
                     if (not found and not visited.contains(neighbour)) {
@@ -138,7 +138,7 @@ namespace word_ladder {
                         // we want to add the connection into our graph now with this neighbour, since we
                         // are forward we want the PARENT to be the origin word, and child to be the
                         // neighbour
-                        graph[word].insert(neighbour);
+                        graph.at(word).insert(neighbour);
                     }
                 }
             }
@@ -153,7 +153,7 @@ namespace word_ladder {
                     // if the forward direction has this neighbour we have found an intersection
                     if (to_explore_front.contains(neighbour)) {
                         found = true;
-                        graph[neighbour].insert(word);
+                        graph.at(neighbour).insert(word);
                     }
                     // check if the word already seen before, if so we can ignore it
                     if (not found and not visited.contains(neighbour)) {
@@ -161,7 +161,7 @@ namespace word_ladder {
                         // we want to add the connection into our graph now with this neighbour, since we
                         // are backward we want the PARENT to be the NEIGHBOUR word, and child to be the
                         // ORIGIN
-                        graph[neighbour].insert(word);
+                        graph.at(neighbour).insert(word);
                     }
                 }
             }
@@ -198,7 +198,7 @@ namespace word_ladder {
             for (std::vector<std::string>::size_type i = 0; i < word.length(); i++) {
                 auto cloned_word = word;
                 cloned_word[i] = '_';
-                all_1nn[cloned_word].insert(word);
+                all_1nn.at(cloned_word).insert(word);
             }
         }
         return all_1nn;

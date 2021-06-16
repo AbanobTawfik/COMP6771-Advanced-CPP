@@ -14,7 +14,8 @@
 // limitations under the License.
 //
 
-// making this test more robust by checking exactly expected output
+// making this test more robust by checking exactly expected output for a
+// extremely simple base case with 1 letter change, expecting 1 path
 #include "comp6771/word_ladder.hpp"
 
 #include <string>

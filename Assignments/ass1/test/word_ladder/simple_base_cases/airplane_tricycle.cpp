@@ -14,7 +14,8 @@
 // limitations under the License.
 //
 
-// making this test more robust by checking exactly expected output
+// making this simple case where no path exists from the origin to end word, just to make sure no path
+// inputs behave correctly.
 #include "comp6771/word_ladder.hpp"
 
 #include <string>
@@ -26,16 +27,12 @@
 
 TEST_CASE("airplane -> tricycle") {
     auto const english_lexicon = word_ladder::read_lexicon("./english.txt");
-    auto const ladders_efficient = ::word_ladder::generate("at", "it", english_lexicon);
-    auto const ladders_correct = ::word_ladder_slow::generate_accurate("at", "it", english_lexicon);
+    auto const ladders_efficient = ::word_ladder::generate("airplane", "tricycle", english_lexicon);
+    auto const ladders_correct = ::word_ladder_slow::generate_accurate("airplane", "tricycle", english_lexicon);
 
-    // checks the correct solution for validity
-    CHECK(std::size(ladders_correct) == 1);
-    CHECK(testing::unique_ladders(ladders_correct));
-    CHECK(testing::ladders_same_length(ladders_correct));
-    CHECK(std::is_sorted(ladders_correct.begin(), ladders_correct.end()));
-    CHECK(std::any_of(ladders_correct.begin(), ladders_correct.end(), testing::contain({"at", "it"})));
+// checks the correct solution for validity
+    CHECK(std::size(ladders_correct) == 0);
 
-    //  now since we checked the correct solution, we just need to see if the optimal solution is the same!
+// now since we checked the correct solution, we just need to see if the optimal solution is the same!
     CHECK(std::equal(ladders_correct.begin(), ladders_correct.end(), ladders_efficient.begin()));
 }

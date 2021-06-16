@@ -126,14 +126,14 @@ namespace word_ladder_slow {
                 // if the backward direction has this neighbour we have found an intersection
                 if (word == goal) {
                     found = true;
-                    graph[word].insert(neighbour);
+                    graph.at(word).insert(neighbour);
                 }
                 // check if the word already seen before, if so we can ignore it
                 if (not found and not visited.contains(neighbour)) {
                     new_layer.insert(neighbour);
                     // we want to add the connection into our graph now with this neighbour, since we are
                     // forward we want the PARENT to be the origin word, and child to be the neighbour
-                    graph[word].insert(neighbour);
+                    graph.at(word).insert(neighbour);
                 }
             }
         }
