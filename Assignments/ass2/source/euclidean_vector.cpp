@@ -17,13 +17,13 @@ namespace comp6771 {
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
     euclidean_vector::euclidean_vector() noexcept:
-            length_{1}{
+            length_{1}, euclidean_norm_{-1} {
         magnitude_ = std::make_unique<double[]>(static_cast<size_t>(length_));
         magnitude_[0] = 0;
     }
 
     euclidean_vector::euclidean_vector(const int size) noexcept:
-            length_{size}{
+            length_{size}, euclidean_norm_{-1} {
         magnitude_ = std::make_unique<double[]>(static_cast<size_t>(length_));
         std::fill_n(magnitude_.get(), length_, 0);
     }
@@ -50,12 +50,14 @@ namespace comp6771 {
     }
 
     euclidean_vector::euclidean_vector(euclidean_vector &&vector_reference) noexcept:
-            magnitude_{std::move(vector_reference.magnitude_)}, length_{vector_reference.length_} {
+            magnitude_{std::move(vector_reference.magnitude_)}, length_{vector_reference.length_},
+            euclidean_norm_{vector_reference.euclidean_norm_} {
         vector_reference.length_ = 0;
     }
 
     euclidean_vector &euclidean_vector::operator=(const euclidean_vector &vector) {
         length_ = vector.length_;
+        euclidean_norm_ = vector.euclidean_norm_;
         magnitude_ = std::make_unique<double[]>(static_cast<size_t>(length_));
         std::copy(vector.magnitude_.get(), vector.magnitude_.get() + length_, magnitude_.get());
         return *this;
@@ -64,7 +66,9 @@ namespace comp6771 {
     auto euclidean_vector::operator=(euclidean_vector &&vector) -> euclidean_vector & {
         length_ = vector.length_;
         magnitude_ = std::move(vector.magnitude_);
+        vector.euclidean_norm_ = -1;
         vector.length_ = 0;
+        euclidean_norm_ = vector.euclidean_norm_;
         return *this;
     }
 
@@ -72,6 +76,7 @@ namespace comp6771 {
         if (index >= length_ or index < 0) {
             throw euclidean_vector_error("Index" + std::to_string(index) + " is out of bounds!\n");
         }
+        euclidean_norm_ = -1;
         return magnitude_[static_cast<size_t>(index)];
     }
 
@@ -92,6 +97,7 @@ namespace comp6771 {
                       [](double x) {
                           return -x;
                       });
+        negated_vector.euclidean_norm_ = this->euclidean_norm_;
         return negated_vector;
     }
 
@@ -105,6 +111,7 @@ namespace comp6771 {
         std::transform(magnitude_.get(), magnitude_.get() + length_, magnitude_.get(), [&](double x) {
             return x + vector[index++];
         });
+        euclidean_norm_ = -1;
         return *this;
     }
 
@@ -118,6 +125,7 @@ namespace comp6771 {
         std::transform(magnitude_.get(), magnitude_.get() + length_, magnitude_.get(), [&](double x) {
             return x - vector[index++];
         });
+        euclidean_norm_ = -1;
         return *this;
     }
 
@@ -125,6 +133,7 @@ namespace comp6771 {
         std::transform(magnitude_.get(), magnitude_.get() + length_, magnitude_.get(), [&](double x) {
             return x * scale;
         });
+        euclidean_norm_ = -1;
         return *this;
     }
 
@@ -135,6 +144,7 @@ namespace comp6771 {
         std::transform(magnitude_.get(), magnitude_.get() + length_, magnitude_.get(), [&](double x) {
             return x / scale;
         });
+        euclidean_norm_ = -1;
         return *this;
     }
 
@@ -162,6 +172,8 @@ namespace comp6771 {
         return length_;
     }
 
+    // we don't want to check if euclidean norms are equal since its only changed from -1
+    // once its called the get_euclidean_norm, so we check all other fields are equal
     auto operator==(const euclidean_vector &vector1, const euclidean_vector &vector2) -> bool {
         return vector1.length_ == vector2.length_ &&
                std::equal(vector1.magnitude_.get(), vector1.magnitude_.get() + vector1.length_,
@@ -175,18 +187,21 @@ namespace comp6771 {
     auto operator+(const euclidean_vector &vector1, const euclidean_vector &vector2) -> euclidean_vector {
         auto sum_vector = euclidean_vector(vector1);
         sum_vector += vector2;
+        sum_vector.euclidean_norm_ = -1;
         return sum_vector;
     }
 
     auto operator-(const euclidean_vector &vector1, const euclidean_vector &vector2) -> euclidean_vector {
         auto sum_vector = euclidean_vector(vector1);
         sum_vector -= vector2;
+        sum_vector.euclidean_norm_ = -1;
         return sum_vector;
     }
 
     auto operator*(const euclidean_vector &vector, double scale) -> euclidean_vector {
         auto multiple_vector = euclidean_vector(vector);
         multiple_vector *= scale;
+        multiple_vector.euclidean_norm_ = -1;
         return multiple_vector;
     }
 
@@ -200,7 +215,7 @@ namespace comp6771 {
         return division_vector;
     }
 
-    std::ostream &operator<<(std::ostream &os, const euclidean_vector &vector) {
+    auto operator<<(std::ostream &os, const euclidean_vector &vector) -> std::ostream & {
         os << "[";
         for (int i = 0; i < vector.length_ - 1; ++i) {
             os << vector.magnitude_[static_cast<size_t>(i)] << " ";
@@ -209,16 +224,24 @@ namespace comp6771 {
         return os;
     }
 
+    auto euclidean_vector::check_cached_norm() const -> double {
+        return euclidean_norm_;
+    }
+
+    void euclidean_vector::set_cached_norm(const double euclidean_norm) const {
+        euclidean_norm_ = euclidean_norm;
+    }
+
     auto euclidean_norm(euclidean_vector const &vector) -> double {
-        auto cached_norm = comp6771::cache.find(vector);
-        if(cached_norm != comp6771::cache.end()){
-            return cached_norm->second;
+        auto cached_norm = vector.check_cached_norm();
+        if (cached_norm != -1) {
+            return cached_norm;
         }
         auto vector_casted = static_cast<std::vector<double>>(vector);
         auto euclidean_norm = std::sqrt(
                 std::accumulate(vector_casted.begin(), vector_casted.end(), 0.0,
                                 [](double sum, double x) { return sum + x * x; }));
-        comp6771::cache.emplace(vector, euclidean_norm);
+        vector.set_cached_norm(euclidean_norm);
         return vector.dimensions() == 0 ? 0 : euclidean_norm;
     }
 
@@ -245,7 +268,8 @@ namespace comp6771 {
         auto casted_vector2 = static_cast<std::vector<double>>(vector2);
         return vector1.dimensions() == 0 ? 0 : std::accumulate(casted_vector1.begin(), casted_vector1.end(), 0,
                                                                [&](double sum, double value) {
-                                                                   return sum + (value) * casted_vector2.at(static_cast<size_t>(index++));
+                                                                   return sum + (value) * casted_vector2.at(
+                                                                           static_cast<size_t>(index++));
                                                                });
 //        return euclidean_vector(vector) / e_norm;
     }
