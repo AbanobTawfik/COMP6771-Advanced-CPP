@@ -79,35 +79,32 @@ namespace comp6771 {
 
         friend std::ostream &operator<<(std::ostream &os, euclidean_vector const &vector);
 
-        template<typename EuclideanVector>
-        struct container_hash {
-            std::size_t operator()(euclidean_vector const &vector) const {
-                size_t h = 7;
-                h = 31 * h + std::hash<int>{}(vector.length_);
-                for(auto i = vector.magnitude_.get(); i != vector.magnitude_.get() + vector.length_; ++i){
-                    h = 31 * h + std::hash<double>{}(*i);
-                }
-                return h;
-            }
-        };
-        inline static auto cache = std::unordered_map<euclidean_vector, double, container_hash<euclidean_vector>>();
 
     private:
         // ass2 spec requires we use double[]
         // NOLINTNEXTLINE(modernize-avoid-c-arrays)
         std::unique_ptr<double[]> magnitude_;
         int length_;
-        //int size;
-        // TODO more if needed
-        template<typename> friend struct container_hash;
+        // since euclidean norm is always > 0 since its the sqrt of the sum of squares, we just use -1 as the default
+        template<typename EuclideanVector> friend struct container_hash;
     };
-    // hash method used from the default java hashcode (used in previous assignments)
-    // reference: https://www.baeldung.com/java-hashcode
 
+    template<typename EuclideanVector>
+    struct container_hash {
+        std::size_t operator()(euclidean_vector const &vector) const {
+            size_t h = 7;
+            h = 31 * h + std::hash<int>{}(vector.length_);
+            for (auto i = vector.magnitude_.get(); i != vector.magnitude_.get() + vector.length_; ++i) {
+                h = 31 * h + std::hash<double>{}(*i);
+            }
+            return h;
+        }
+    };
 
-
+    inline static auto cache = std::unordered_map<euclidean_vector, double, container_hash<euclidean_vector>>();
 
     auto euclidean_norm(euclidean_vector const &vector) -> double;
+
 
     auto unit(euclidean_vector const &vector) -> euclidean_vector;
 
