@@ -8,20 +8,16 @@
 TEST_CASE("negation_empty_case") {
     auto vector = comp6771::euclidean_vector(0);
     REQUIRE(vector.dimensions() == 0);
-    REQUIRE(vector.check_cached_norm() == -1);
-    -vector;
+    vector = -vector;
     REQUIRE(vector.dimensions() == 0);
-    REQUIRE(vector.check_cached_norm() == -1);
 }
 
 TEST_CASE("negation_base_case") {
     auto vector = comp6771::euclidean_vector();
     REQUIRE(vector.dimensions() == 1);
-    REQUIRE(vector.check_cached_norm() == -1);
     REQUIRE(vector[0] == 0);
-    -vector;
+    vector = -vector;
     REQUIRE(vector.dimensions() == 1);
-    REQUIRE(vector.check_cached_norm() == -1);
     REQUIRE(vector[0] == 0);
 }
 
@@ -34,7 +30,6 @@ TEST_CASE("negation_with_values") {
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     REQUIRE(vector.dimensions() == stdvector.size());
     REQUIRE(vector.dimensions() == size);
-    REQUIRE(vector.check_cached_norm() == -1);
     bool all_values_same = true;
     for (auto i = 0; i < size; i++) {
         if (vector.at(i) != stdvector.at(i)) {
@@ -46,7 +41,6 @@ TEST_CASE("negation_with_values") {
 
     // call in the negation
     vector = -vector;
-
     bool all_negatives_now = true;
     for (auto i = 0; i < size; i++) {
         if (vector.at(i) != stdvector.at(i)*-1) {
@@ -58,21 +52,17 @@ TEST_CASE("negation_with_values") {
 }
 
 
-TEST_CASE("unary_changes") {
-    auto vector = comp6771::euclidean_vector();
+TEST_CASE("negation_changes") {
+    auto vector = comp6771::euclidean_vector(1,1);
     REQUIRE(vector.dimensions() == 1);
-    REQUIRE(vector.check_cached_norm() == -1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == 1);
 
-    +vector;
+    vector = -vector;
     REQUIRE(vector.dimensions() == 1);
-    REQUIRE(vector.check_cached_norm() == -1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == -1);
 
     // make sure changes give desired results
     vector[0] = 1;
     REQUIRE(vector.dimensions() == 1);
-    REQUIRE(vector.check_cached_norm() == -1);
     REQUIRE(vector[0] == 1);
-
 }

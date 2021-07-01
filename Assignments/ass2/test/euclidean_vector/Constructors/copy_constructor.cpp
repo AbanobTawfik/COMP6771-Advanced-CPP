@@ -28,8 +28,6 @@ TEST_CASE("copy_with_values_no_change") {
 
     REQUIRE(vector.dimensions() == size);
     REQUIRE(vector.dimensions() == copy_vector.dimensions());
-    REQUIRE(vector.check_cached_norm() == -1);
-    REQUIRE(copy_vector.check_cached_norm() == -1);
     bool all_values_same = true;
     for (auto i = 0; i < size; i++) {
         if (vector.at(i) != copy_vector.at(i)) {
@@ -51,8 +49,6 @@ TEST_CASE("copy_with_values_change_after") {
     auto copy_vector = comp6771::euclidean_vector(vector);
     REQUIRE(vector.dimensions() == size);
     REQUIRE(vector.dimensions() == copy_vector.dimensions());
-    REQUIRE(vector.check_cached_norm() == -1);
-    REQUIRE(copy_vector.check_cached_norm() == -1);
     bool all_values_same = true;
     for (auto i = 0; i < size; i++) {
         if (vector.at(i) != copy_vector.at(i)) {

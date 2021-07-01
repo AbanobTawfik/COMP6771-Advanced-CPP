@@ -8,6 +8,5 @@
 TEST_CASE("default_constructor") {
     const auto vector = comp6771::euclidean_vector();
     REQUIRE(vector.dimensions() == 1);
-    REQUIRE(vector.check_cached_norm() == -1);
     REQUIRE(vector[0] == 0);
 }

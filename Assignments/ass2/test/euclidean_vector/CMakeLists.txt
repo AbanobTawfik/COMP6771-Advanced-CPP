@@ -75,3 +75,9 @@ cxx_test(
         FILENAME "Operations/negation.cpp"
         LINK euclidean_vector
 )
+
+cxx_test(
+        TARGET compound_addition
+        FILENAME "Operations/compound_addition.cpp"
+        LINK euclidean_vector
+)

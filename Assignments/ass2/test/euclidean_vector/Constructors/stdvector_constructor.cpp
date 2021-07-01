@@ -12,7 +12,6 @@ TEST_CASE("empty_vector_constructor") {
     const auto stdvec = std::vector<double>();
     const auto euclidean_vec = comp6771::euclidean_vector(stdvec.begin(), stdvec.end());
     REQUIRE(euclidean_vec.dimensions() == 0);
-    REQUIRE(euclidean_vec.check_cached_norm() == -1);
 }
 
 TEST_CASE("normal_vector_with_different_values") {
@@ -24,7 +23,6 @@ TEST_CASE("normal_vector_with_different_values") {
     const auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     REQUIRE(vector.dimensions() == stdvector.size());
     REQUIRE(vector.dimensions() == size);
-    REQUIRE(vector.check_cached_norm() == -1);
     bool all_values_same = true;
     for (auto i = 0; i < size; i++) {
         if (vector.at(i) != stdvector.at(i)) {

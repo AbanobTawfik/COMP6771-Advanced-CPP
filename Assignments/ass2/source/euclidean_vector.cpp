@@ -113,19 +113,9 @@ namespace comp6771 {
     }
 
     auto euclidean_vector::operator-=(const euclidean_vector &vector) -> euclidean_vector & {
-//        if (length_ != vector.length_) {
-//            throw euclidean_vector_error(
-//                    "Dimensions of LHS(" + std::to_string(length_) + ") and RHS (" + std::to_string(vector.length_) +
-//                    ") do not match\n");
-//        }
-//        auto index = 0;
-//        std::transform(magnitude_.get(), magnitude_.get() + length_, magnitude_.get(), [&](double x) {
-//            return x - vector[index++];
-//        });
-//        euclidean_norm_ = -1;
+        euclidean_norm_ = -1;
         auto vector_copy = euclidean_vector(vector);
-        vector_copy = -1* vector_copy;
-        return *this += vector_copy;
+        return *this += -1 * vector_copy;
     }
 
     auto euclidean_vector::operator*=(const double scale) -> euclidean_vector & {
@@ -140,11 +130,8 @@ namespace comp6771 {
         if (scale == 0) {
             throw euclidean_vector_error("Invalid vector division by 0");
         }
-        std::transform(magnitude_.get(), magnitude_.get() + length_, magnitude_.get(), [&](double x) {
-            return x / scale;
-        });
         euclidean_norm_ = -1;
-        return *this;
+        return *this *= 1 / scale;
     }
 
     euclidean_vector::operator std::vector<double>() const {
@@ -218,6 +205,7 @@ namespace comp6771 {
     auto operator/(const euclidean_vector &vector, double scale) -> euclidean_vector {
         auto division_vector = euclidean_vector(vector);
         division_vector /= scale;
+        division_vector.euclidean_norm_ = -1;
         return division_vector;
     }
 
@@ -238,11 +226,27 @@ namespace comp6771 {
         euclidean_norm_ = euclidean_norm;
     }
 
+    auto euclidean_vector::cbegin() const -> const std::unique_ptr<double[]>::pointer {
+        return magnitude_.get();
+    }
+
+    auto euclidean_vector::cend() const -> const std::unique_ptr<double[]>::pointer {
+        return magnitude_.get() + length_;
+    }
+
+    auto euclidean_vector::begin() -> std::unique_ptr<double[]>::pointer {
+        return magnitude_.get();
+    }
+
+    auto euclidean_vector::end() -> std::unique_ptr<double[]>::pointer {
+        return magnitude_.get() + length_;
+    }
+
     euclidean_vector::~euclidean_vector() = default;
 
     auto euclidean_norm(euclidean_vector const &vector) -> double {
         auto cached_norm = vector.check_cached_norm();
-        if (cached_norm != -1) {
+        if (cached_norm != -1 && cached_norm >= 0) {
             return cached_norm;
         }
         auto vector_casted = static_cast<std::vector<double>>(vector);

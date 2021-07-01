@@ -16,7 +16,6 @@ TEST_CASE("default_move_constructor") {
     REQUIRE(move_empty_constructor[0] == 0);
     // check what we moved from was also removed, i.e length 0
     REQUIRE(empty_constructor.dimensions() == 0);
-    REQUIRE(empty_constructor.check_cached_norm() == -1);
 }
 
 TEST_CASE("contains_values_move_constructor") {
@@ -28,7 +27,6 @@ TEST_CASE("contains_values_move_constructor") {
 
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     REQUIRE(vector.dimensions() == size);
-    REQUIRE(vector.check_cached_norm() == -1);
     bool all_values_same = true;
     for (auto i = 0; i < size; i++) {
         if (vector.at(i) != stdvector.at(i)) {
@@ -41,7 +39,6 @@ TEST_CASE("contains_values_move_constructor") {
     const auto moved_vector = comp6771::euclidean_vector(std::move(vector));
 
     REQUIRE(moved_vector.dimensions() == size);
-    REQUIRE(moved_vector.check_cached_norm() == -1);
     all_values_same = true;
     for (auto i = 0; i < size; i++) {
         if (moved_vector.at(i) != stdvector.at(i)) {
@@ -53,6 +50,5 @@ TEST_CASE("contains_values_move_constructor") {
 
     // check what we moved from was also removed, i.e length 0
     REQUIRE(vector.dimensions() == 0);
-    REQUIRE(vector.check_cached_norm() == -1);
 }
 

@@ -85,6 +85,14 @@ namespace comp6771 {
 
         void set_cached_norm(double) const;
 
+        [[nodiscard]]auto cbegin() const -> const std::unique_ptr<double[]>::pointer;
+
+        [[nodiscard]]auto cend() const -> const std::unique_ptr<double[]>::pointer;
+
+        [[nodiscard]]auto begin() -> std::unique_ptr<double[]>::pointer;
+
+        [[nodiscard]]auto end() -> std::unique_ptr<double[]>::pointer;
+
     private:
         // ass2 spec requires we use double[]
         // NOLINTNEXTLINE(modernize-avoid-c-arrays)

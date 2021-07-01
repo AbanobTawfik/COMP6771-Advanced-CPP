@@ -8,16 +8,13 @@
 TEST_CASE("move_assignment_default") {
     auto vector = comp6771::euclidean_vector();
     REQUIRE(vector.dimensions() == 1);
-    REQUIRE(vector.check_cached_norm() == -1);
     REQUIRE(vector[0] == 0);
 
     const auto copy_vector = std::move(vector);
     REQUIRE(copy_vector.dimensions() == 1);
-    REQUIRE(copy_vector.check_cached_norm() == -1);
     REQUIRE(copy_vector[0] == 0);
     // check what we moved from is dealt with correctly
     REQUIRE(vector.dimensions() == 0);
-    REQUIRE(vector.check_cached_norm() == -1);
 }
 
 TEST_CASE("move_assignment_contains_values") {
@@ -29,7 +26,6 @@ TEST_CASE("move_assignment_contains_values") {
 
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     REQUIRE(vector.dimensions() == size);
-    REQUIRE(vector.check_cached_norm() == -1);
     bool all_values_same = true;
     for (auto i = 0; i < size; i++) {
         if (vector.at(i) != stdvector.at(i)) {
@@ -42,7 +38,6 @@ TEST_CASE("move_assignment_contains_values") {
     const auto moved_vector = std::move(vector);
 
     REQUIRE(moved_vector.dimensions() == size);
-    REQUIRE(moved_vector.check_cached_norm() == -1);
     all_values_same = true;
     for (auto i = 0; i < size; i++) {
         if (moved_vector.at(i) != stdvector.at(i)) {
@@ -54,5 +49,4 @@ TEST_CASE("move_assignment_contains_values") {
 
     // check what we moved from was also removed, i.e length 0
     REQUIRE(vector.dimensions() == 0);
-    REQUIRE(vector.check_cached_norm() == -1);
 }
