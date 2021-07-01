@@ -81,3 +81,33 @@ cxx_test(
         FILENAME "Operations/compound_addition.cpp"
         LINK euclidean_vector
 )
+
+cxx_test(
+        TARGET compound_subtraction
+        FILENAME "Operations/compound_subtraction.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET compound_multiplication
+        FILENAME "Operations/compound_multiplication.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET compound_divison
+        FILENAME "Operations/compound_division.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET list_cast
+        FILENAME "Operations/list_cast.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET vector_cast
+        FILENAME "Operations/vector_cast.cpp"
+        LINK euclidean_vector
+)

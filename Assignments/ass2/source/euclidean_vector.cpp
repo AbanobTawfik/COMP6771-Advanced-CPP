@@ -128,7 +128,7 @@ namespace comp6771 {
 
     auto euclidean_vector::operator/=(const double scale) -> euclidean_vector & {
         if (scale == 0) {
-            throw euclidean_vector_error("Invalid vector division by 0");
+            throw euclidean_vector_error("Invalid vector division by 0\n");
         }
         euclidean_norm_ = -1;
         return *this *= 1 / scale;
