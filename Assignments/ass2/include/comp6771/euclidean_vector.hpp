@@ -33,6 +33,8 @@ namespace comp6771 {
 
         euclidean_vector(euclidean_vector &&) noexcept;
 
+        ~euclidean_vector();
+
         auto operator=(euclidean_vector const &) -> euclidean_vector &;
 
         auto operator=(euclidean_vector &&) -> euclidean_vector &;

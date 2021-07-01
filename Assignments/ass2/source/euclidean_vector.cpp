@@ -6,6 +6,7 @@
 #include <numeric>
 #include <cmath>
 #include <iostream>
+#include <cassert>
 
 namespace comp6771 {
     // Implement solution here
@@ -35,7 +36,7 @@ namespace comp6771 {
 
     euclidean_vector::euclidean_vector(const std::vector<double>::const_iterator begin,
                                        const std::vector<double>::const_iterator end) noexcept:
-            euclidean_vector(static_cast<int>(distance(begin, end))) {
+            euclidean_vector(static_cast<int>(std::distance(begin, end))) {
         std::copy(begin, end, magnitude_.get());
     }
 
@@ -73,17 +74,13 @@ namespace comp6771 {
     }
 
     auto euclidean_vector::operator[](const int index) -> double & {
-        if (index >= length_ or index < 0) {
-            throw euclidean_vector_error("Index" + std::to_string(index) + " is out of bounds!\n");
-        }
+        assert(index < length_ and index >= 0);
         euclidean_norm_ = -1;
         return magnitude_[static_cast<size_t>(index)];
     }
 
     auto euclidean_vector::operator[](const int index) const -> const double & {
-        if (index >= length_ or index < 0) {
-            throw euclidean_vector_error("Index" + std::to_string(index) + " is out of bounds!\n");
-        }
+        assert(index < length_ and index >= 0);
         return magnitude_[static_cast<size_t>(index)];
     }
 
@@ -161,11 +158,18 @@ namespace comp6771 {
     }
 
     auto euclidean_vector::at(const int index) const -> const double & {
-        return reinterpret_cast<const double &>(this[index]);
+        if (index >= length_ or index < 0) {
+            throw euclidean_vector_error("Index" + std::to_string(index) + " is out of bounds!\n");
+        }
+        return magnitude_[static_cast<size_t>(index)];
     }
 
     auto euclidean_vector::at(const int index) -> double & {
-        return reinterpret_cast<double &>(this[index]);
+        if (index >= length_ or index < 0) {
+            throw euclidean_vector_error("Index" + std::to_string(index) + " is out of bounds!\n");
+        }
+        euclidean_norm_ = -1;
+        return magnitude_[static_cast<size_t>(index)];
     }
 
     auto euclidean_vector::dimensions() const -> int {
@@ -232,6 +236,8 @@ namespace comp6771 {
         euclidean_norm_ = euclidean_norm;
     }
 
+    euclidean_vector::~euclidean_vector() = default;
+
     auto euclidean_norm(euclidean_vector const &vector) -> double {
         auto cached_norm = vector.check_cached_norm();
         if (cached_norm != -1) {
@@ -271,7 +277,6 @@ namespace comp6771 {
                                                                    return sum + (value) * casted_vector2.at(
                                                                            static_cast<size_t>(index++));
                                                                });
-//        return euclidean_vector(vector) / e_norm;
     }
 
 
