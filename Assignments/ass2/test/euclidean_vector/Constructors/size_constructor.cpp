@@ -28,4 +28,12 @@ TEST_CASE("size_constructor_explicit") {
     }
 }
 
-
+TEST_CASE("size_constructor_empty"){
+    const auto vector = comp6771::euclidean_vector(0);
+    REQUIRE(vector.dimensions() == 0);
+    REQUIRE(vector.check_cached_norm() == -1);
+    // check all values defaulting to 0
+    for(auto i = 0; i < vector.dimensions(); i++){
+        REQUIRE(vector[i] == 0);
+    }
+}

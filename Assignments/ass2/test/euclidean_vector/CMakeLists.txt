@@ -57,3 +57,21 @@ cxx_test(
         FILENAME "Operations/move_assignment.cpp"
         LINK euclidean_vector
 )
+
+cxx_test(
+        TARGET subscripts
+        FILENAME "Operations/subscript.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET unary
+        FILENAME "Operations/unary.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET negation
+        FILENAME "Operations/negation.cpp"
+        LINK euclidean_vector
+)

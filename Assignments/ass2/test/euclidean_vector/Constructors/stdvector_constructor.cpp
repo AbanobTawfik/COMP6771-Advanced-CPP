@@ -27,7 +27,7 @@ TEST_CASE("normal_vector_with_different_values") {
     REQUIRE(vector.check_cached_norm() == -1);
     bool all_values_same = true;
     for (auto i = 0; i < size; i++) {
-        if (vector.at(i) != vector.at(i)) {
+        if (vector.at(i) != stdvector.at(i)) {
             all_values_same = false;
             break;
         }

@@ -36,7 +36,7 @@ TEST_CASE("copy_assignment_changes") {
     auto copy_vector = vector;
     REQUIRE(copy_vector.dimensions() == 1);
     REQUIRE(copy_vector.check_cached_norm() == -1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(copy_vector[0] == 0);
 
     copy_vector[0] = 1;
     REQUIRE(copy_vector.dimensions() == 1);

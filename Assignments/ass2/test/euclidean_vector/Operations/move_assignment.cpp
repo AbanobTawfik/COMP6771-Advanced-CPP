@@ -5,46 +5,54 @@
 #include <iostream>
 #include <vector>
 
-TEST_CASE("copy_assignment_const") {
-    const auto vector = comp6771::euclidean_vector();
-    REQUIRE(vector.dimensions() == 1);
-    REQUIRE(vector.check_cached_norm() == -1);
-    REQUIRE(vector[0] == 0);
-    const auto copy_vector = std::move(vector);
-    REQUIRE(copy_vector.dimensions() == 1);
-    REQUIRE(copy_vector.check_cached_norm() == -1);
-    REQUIRE(vector[0] == 0);
-}
-
-TEST_CASE("copy_assignment_non_const") {
-    const auto vector = comp6771::euclidean_vector();
-    REQUIRE(vector.dimensions() == 1);
-    REQUIRE(vector.check_cached_norm() == -1);
-    REQUIRE(vector[0] == 0);
-    auto copy_vector = vector;
-    REQUIRE(copy_vector.dimensions() == 1);
-    REQUIRE(copy_vector.check_cached_norm() == -1);
-    REQUIRE(vector[0] == 0);
-}
-
-TEST_CASE("copy_assignment_changes") {
+TEST_CASE("move_assignment_default") {
     auto vector = comp6771::euclidean_vector();
     REQUIRE(vector.dimensions() == 1);
     REQUIRE(vector.check_cached_norm() == -1);
     REQUIRE(vector[0] == 0);
 
-    auto copy_vector = vector;
+    const auto copy_vector = std::move(vector);
     REQUIRE(copy_vector.dimensions() == 1);
     REQUIRE(copy_vector.check_cached_norm() == -1);
-    REQUIRE(vector[0] == 0);
-
-    copy_vector[0] = 1;
-    REQUIRE(copy_vector.dimensions() == 1);
-    REQUIRE(copy_vector.check_cached_norm() == -1);
-    REQUIRE(copy_vector[0] == 1);
-    // original stays unchanged!
-    REQUIRE(vector.dimensions() == 1);
+    REQUIRE(copy_vector[0] == 0);
+    // check what we moved from is dealt with correctly
+    REQUIRE(vector.dimensions() == 0);
     REQUIRE(vector.check_cached_norm() == -1);
-    REQUIRE(vector[0] == 0);
+}
 
+TEST_CASE("move_assignment_contains_values") {
+    const auto size = 500;
+    const auto value = -500.434;
+    auto stdvector = std::vector<double>(size);
+    // values using iota will be steadily increasing so all different
+    std::iota(stdvector.begin(), stdvector.end(), value);
+
+    auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
+    REQUIRE(vector.dimensions() == size);
+    REQUIRE(vector.check_cached_norm() == -1);
+    bool all_values_same = true;
+    for (auto i = 0; i < size; i++) {
+        if (vector.at(i) != stdvector.at(i)) {
+            all_values_same = false;
+            break;
+        }
+    }
+    REQUIRE(all_values_same);
+
+    const auto moved_vector = std::move(vector);
+
+    REQUIRE(moved_vector.dimensions() == size);
+    REQUIRE(moved_vector.check_cached_norm() == -1);
+    all_values_same = true;
+    for (auto i = 0; i < size; i++) {
+        if (moved_vector.at(i) != stdvector.at(i)) {
+            all_values_same = false;
+            break;
+        }
+    }
+    REQUIRE(all_values_same);
+
+    // check what we moved from was also removed, i.e length 0
+    REQUIRE(vector.dimensions() == 0);
+    REQUIRE(vector.check_cached_norm() == -1);
 }

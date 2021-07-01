@@ -90,11 +90,11 @@ namespace comp6771 {
 
     auto euclidean_vector::operator-() -> euclidean_vector {
         auto negated_vector = euclidean_vector(*this);
-        std::for_each(negated_vector.magnitude_.get(), negated_vector.magnitude_.get() + negated_vector.length_,
-                      [](double x) {
-                          return -x;
-                      });
-        negated_vector.euclidean_norm_ = this->euclidean_norm_;
+        std::transform(negated_vector.magnitude_.get(), negated_vector.magnitude_.get() + negated_vector.length_,
+                       negated_vector.magnitude_.get(),
+                       [](auto x) {
+                           return -x;
+                       });
         return negated_vector;
     }
 
@@ -113,17 +113,19 @@ namespace comp6771 {
     }
 
     auto euclidean_vector::operator-=(const euclidean_vector &vector) -> euclidean_vector & {
-        if (length_ != vector.length_) {
-            throw euclidean_vector_error(
-                    "Dimensions of LHS(" + std::to_string(length_) + ") and RHS (" + std::to_string(vector.length_) +
-                    ") do not match\n");
-        }
-        auto index = 0;
-        std::transform(magnitude_.get(), magnitude_.get() + length_, magnitude_.get(), [&](double x) {
-            return x - vector[index++];
-        });
-        euclidean_norm_ = -1;
-        return *this;
+//        if (length_ != vector.length_) {
+//            throw euclidean_vector_error(
+//                    "Dimensions of LHS(" + std::to_string(length_) + ") and RHS (" + std::to_string(vector.length_) +
+//                    ") do not match\n");
+//        }
+//        auto index = 0;
+//        std::transform(magnitude_.get(), magnitude_.get() + length_, magnitude_.get(), [&](double x) {
+//            return x - vector[index++];
+//        });
+//        euclidean_norm_ = -1;
+        auto vector_copy = euclidean_vector(vector);
+        vector_copy = -1* vector_copy;
+        return *this += vector_copy;
     }
 
     auto euclidean_vector::operator*=(const double scale) -> euclidean_vector & {

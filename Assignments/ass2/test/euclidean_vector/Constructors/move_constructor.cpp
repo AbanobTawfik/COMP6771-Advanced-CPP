@@ -8,7 +8,7 @@
 // when we copy constructor, we want the created vector to be detatched from the original vector, this means
 // changes to the copied vector do not carry through the original, however they start off the same!
 
-TEST_CASE("empty_move_constructor") {
+TEST_CASE("default_move_constructor") {
     auto empty_constructor = comp6771::euclidean_vector();
     const auto move_empty_constructor = comp6771::euclidean_vector(std::move(empty_constructor));
     // we want to make sure that our new vector is the same as the one that moved into it (Default constructor)
