@@ -6,18 +6,19 @@
 #include <vector>
 
 // normal correct cases
-TEST_CASE("basic_compound_multiplication_empty_vectors") {
+TEST_CASE("basic_multiplication_empty_vectors") {
     auto left_vector = comp6771::euclidean_vector(0);
-    auto left_vector_copy = left_vector;
     const auto scale = 0;
     REQUIRE(left_vector.dimensions() == 0);
-    left_vector *= scale;
-    // make sure no changes
+    const auto multiplied_vector = left_vector * scale;
+    // make sure no changes to left vector
     REQUIRE(left_vector.dimensions() == 0);
-    REQUIRE(left_vector == left_vector_copy);
+    // make sure multiplied vector has the results we want
+    REQUIRE(multiplied_vector.dimensions() == 0);
+    REQUIRE(multiplied_vector == left_vector);
 }
 
-TEST_CASE("basic_compound_multiplication_case_all_same") {
+TEST_CASE("basic_multiplication_case_all_same") {
     auto scale = 3;
     auto size = 5;
     auto val = 3;
@@ -27,15 +28,21 @@ TEST_CASE("basic_compound_multiplication_case_all_same") {
                                        [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
 
-    vector *= scale;
+    const auto multiplied_vector = vector * scale;
+
+    // check original vector is unchanged
     REQUIRE(vector.dimensions() == size);
-    // check the compound_multiplication worked correctly
     auto values_updated_correctly = std::all_of(vector.begin(), vector.end(),
-                                                [&](auto value) { return value == val * scale; });
+                                                [&](auto value) { return value == val; });
+    REQUIRE(values_updated_correctly);
+    // check the multiplication worked correctly
+    REQUIRE(multiplied_vector.dimensions() == size);
+    values_updated_correctly = std::all_of(multiplied_vector.begin(), multiplied_vector.end(),
+                                           [&](auto value) { return value == val * scale; });
     REQUIRE(values_updated_correctly);
 }
 
-TEST_CASE("basic_compound_multiplication_case_different_values") {
+TEST_CASE("basic_multiplication_case_different_values") {
     const auto size = 500;
     const auto value = -500.434;
     const auto scale = -34.9845;
@@ -50,52 +57,66 @@ TEST_CASE("basic_compound_multiplication_case_different_values") {
                                        [&](auto value) { return value == stdvector.at(count++); });
     REQUIRE(all_values_same);
 
-    vector *= scale;
-    // check the compound_multiplication worked correctly
+    const auto multiplied_vector = vector * scale;
+    // check original vector is unchanged
+    REQUIRE(vector.dimensions() == size);
     count = 0;
-    auto values_updated_correctly = std::all_of(vector.begin(), vector.end(),
+    all_values_same = std::all_of(vector.begin(), vector.end(),
+                                  [&](auto value) { return value == stdvector.at(count++); });
+    REQUIRE(all_values_same);
+    // check the multiplication worked correctly
+    count = 0;
+    auto values_updated_correctly = std::all_of(multiplied_vector.begin(), multiplied_vector.end(),
                                                 [&](auto value) { return value == stdvector.at(count++) * scale; });
     REQUIRE(values_updated_correctly);
 }
 
-TEST_CASE("compound_multiplication_negation_same") {
+TEST_CASE("multiplication_negation_same") {
     auto scale = -1;
     auto size = 5;
     auto val = 3;
     auto vector = comp6771::euclidean_vector(size, val);
-    auto pre_compound_multiplication = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
     bool all_values_same = std::all_of(vector.begin(), vector.end(),
                                        [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
-    REQUIRE(vector == pre_compound_multiplication);
 
-    vector *= scale;
+    const auto multiplied_vector = vector * scale;
+    // check original vector is unchanged
     REQUIRE(vector.dimensions() == size);
-    // check the compound_multiplication worked correctly
-    auto values_updated_correctly = std::all_of(vector.begin(), vector.end(),
+    all_values_same = std::all_of(vector.begin(), vector.end(),
+                                  [&](auto value) { return value == val; });
+    REQUIRE(all_values_same);
+
+    // check the multiplication worked correctly
+    REQUIRE(multiplied_vector.dimensions() == size);
+    auto values_updated_correctly = std::all_of(multiplied_vector.begin(), multiplied_vector.end(),
                                                 [&](auto value) { return value == val * scale; });
     REQUIRE(values_updated_correctly);
-    REQUIRE(vector == -pre_compound_multiplication);
+    REQUIRE(multiplied_vector == -vector);
 }
 
-TEST_CASE("compound_multiplication_unary_same") {
+TEST_CASE("multiplication_unary_same") {
     auto scale = 1;
     auto size = 5;
     auto val = 3;
     auto vector = comp6771::euclidean_vector(size, val);
-    auto pre_compound_multiplication = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
     bool all_values_same = std::all_of(vector.begin(), vector.end(),
                                        [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
-    REQUIRE(vector == pre_compound_multiplication);
 
-    vector *= scale;
+    const auto multiplied_vector = vector * scale;
+    // check original vector is unchanged
     REQUIRE(vector.dimensions() == size);
-    // check the compound_multiplication worked correctly
-    auto values_updated_correctly = std::all_of(vector.begin(), vector.end(),
+    all_values_same = std::all_of(vector.begin(), vector.end(),
+                                                [&](auto value) { return value == val; });
+    REQUIRE(all_values_same);
+
+    // check the multiplication worked correctly
+    REQUIRE(multiplied_vector.dimensions() == size);
+    auto values_updated_correctly = std::all_of(multiplied_vector.begin(), multiplied_vector.end(),
                                                 [&](auto value) { return value == val * scale; });
     REQUIRE(values_updated_correctly);
-    REQUIRE(vector == +pre_compound_multiplication);
+    REQUIRE(multiplied_vector == +vector);
 }

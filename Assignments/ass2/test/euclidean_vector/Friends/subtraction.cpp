@@ -6,46 +6,51 @@
 #include <vector>
 
 // normal correct cases
-TEST_CASE("basic_compound_subtraction_empty_vectors") {
+TEST_CASE("basic_subtraction_empty_vectors") {
     auto left_vector = comp6771::euclidean_vector(0);
     auto right_vector = comp6771::euclidean_vector(0);
     REQUIRE(left_vector.dimensions() == 0);
     REQUIRE(right_vector.dimensions() == 0);
 
-    left_vector -= right_vector;
+    const auto subtracted_vector = left_vector - right_vector;
     // make sure dimensions dont change, nothing should happen, [] + [] = []
-    REQUIRE(left_vector.dimensions() == 0);
-    REQUIRE(right_vector.dimensions() == 0);
+    REQUIRE(subtracted_vector.dimensions() == 0);
+    REQUIRE(subtracted_vector.dimensions() == 0);
 }
 
-TEST_CASE("basic_compound_subtraction_case_all_same") {
+TEST_CASE("basic_subtraction_case_all_same") {
     auto size = 3;
     auto l_value = 3;
     auto r_value = 4;
-    auto left_vector = comp6771::euclidean_vector(size, l_value);
+    const auto left_vector = comp6771::euclidean_vector(size, l_value);
     REQUIRE(left_vector.dimensions() == size);
     bool all_values_same = std::all_of(left_vector.begin(), left_vector.end(),
                                        [&](auto value) { return value == l_value; });
     REQUIRE(all_values_same);
-    auto right_vector = comp6771::euclidean_vector(size, r_value);
+    const auto right_vector = comp6771::euclidean_vector(size, r_value);
     REQUIRE(right_vector.dimensions() == size);
     all_values_same = std::all_of(right_vector.begin(), right_vector.end(),
                                   [&](auto value) { return value == r_value; });
     REQUIRE(all_values_same);
-    left_vector -= right_vector;
+    const auto subtracted_vector = left_vector - right_vector;
     REQUIRE(left_vector.dimensions() == 3);
     REQUIRE(right_vector.dimensions() == 3);
-    // make sure right hand side is unaffected
+    // make sure both vectors are  unaffected
+    all_values_same = std::all_of(left_vector.begin(), left_vector.end(),
+                                  [&](auto value) { return value == l_value; });
+    REQUIRE(all_values_same);
     all_values_same = std::all_of(right_vector.begin(), right_vector.end(),
                                   [&](auto value) { return value == r_value; });
     REQUIRE(all_values_same);
-    // check the compound_subtraction worked correctly
-    auto values_updated_correctly = std::all_of(left_vector.begin(), left_vector.end(),
+
+    // check the subtraction worked correctly
+    REQUIRE(subtracted_vector.dimensions() == size);
+    auto values_updated_correctly = std::all_of(subtracted_vector.begin(), subtracted_vector.end(),
                                                 [&](auto value) { return value == l_value - r_value; });
     REQUIRE(values_updated_correctly);
 }
 
-TEST_CASE("basic_compound_subtraction_case_different_values") {
+TEST_CASE("basic_subtraction_case_different_values") {
     const auto size = 500;
     const auto value = -500.434;
     auto left_stdvector = std::vector<double>(size);
@@ -72,11 +77,21 @@ TEST_CASE("basic_compound_subtraction_case_different_values") {
                                   [&](auto value) { return value == right_stdvector.at(count++); });
     REQUIRE(all_values_same);
     // keep in mind our original 2 std vectors stay the same, so we will compare the values in them to the result below
-    left_vector -= right_vector;
+    const auto subtracted_vector = left_vector - right_vector;
     REQUIRE(right_vector.dimensions() == size);
     REQUIRE(left_vector.dimensions() == size);
+    REQUIRE(subtracted_vector.dimensions() == size);
+    // make sure the 2 vectors dont change!
     count = 0;
-    bool values_updated_correctly = std::all_of(left_vector.begin(), left_vector.end(),
+    all_values_same = std::all_of(left_vector.begin(), left_vector.end(),
+                                  [&](auto value) { return value == left_stdvector.at(count++); });
+    REQUIRE(all_values_same);
+    count = 0;
+    all_values_same = std::all_of(right_vector.begin(), right_vector.end(),
+                                  [&](auto value) { return value == right_stdvector.at(count++); });
+    REQUIRE(all_values_same);
+    count = 0;
+    bool values_updated_correctly = std::all_of(subtracted_vector.begin(), subtracted_vector.end(),
                                                 [&](auto value) {
                                                     return value == left_stdvector.at(count++) -
                                                                     right_stdvector.at(count2++);
@@ -84,8 +99,49 @@ TEST_CASE("basic_compound_subtraction_case_different_values") {
     REQUIRE(values_updated_correctly);
 }
 
+TEST_CASE("basic_subtraction_case_multiple_vectors") {
+    auto size = 3;
+    auto l_value = 3;
+    auto r_value = 4;
+    auto m_value = 5;
+    const auto left_vector = comp6771::euclidean_vector(size, l_value);
+    REQUIRE(left_vector.dimensions() == size);
+    bool all_values_same = std::all_of(left_vector.begin(), left_vector.end(),
+                                       [&](auto value) { return value == l_value; });
+    REQUIRE(all_values_same);
+    const auto right_vector = comp6771::euclidean_vector(size, r_value);
+    REQUIRE(right_vector.dimensions() == size);
+    all_values_same = std::all_of(right_vector.begin(), right_vector.end(),
+                                  [&](auto value) { return value == r_value; });
+    REQUIRE(all_values_same);
+    const auto middle_vector = comp6771::euclidean_vector(size, m_value);
+    REQUIRE(middle_vector.dimensions() == size);
+    all_values_same = std::all_of(middle_vector.begin(), middle_vector.end(),
+                                  [&](auto value) { return value == m_value; });
+    REQUIRE(all_values_same);
+    const auto added_vector = left_vector - right_vector - middle_vector;
+    REQUIRE(left_vector.dimensions() == 3);
+    REQUIRE(right_vector.dimensions() == 3);
+    REQUIRE(middle_vector.dimensions() == 3);
+    // make sure both vectors are  unaffected
+    all_values_same = std::all_of(left_vector.begin(), left_vector.end(),
+                                  [&](auto value) { return value == l_value; });
+    REQUIRE(all_values_same);
+    all_values_same = std::all_of(right_vector.begin(), right_vector.end(),
+                                  [&](auto value) { return value == r_value; });
+    REQUIRE(all_values_same);
+    all_values_same = std::all_of(middle_vector.begin(), middle_vector.end(),
+                                  [&](auto value) { return value == m_value; });
+    REQUIRE(all_values_same);
+    // check the addition worked correctly
+    REQUIRE(added_vector.dimensions() == size);
+    auto values_updated_correctly = std::all_of(added_vector.begin(), added_vector.end(),
+                                                [&](auto value) { return value == l_value - r_value - m_value; });
+    REQUIRE(values_updated_correctly);
+}
+
 // HANDLE EXCEPTIONS NOW
-TEST_CASE("compound_subtraction_different_size") {
+TEST_CASE("subtraction_different_size") {
     const auto size1 = 3;
     const auto size2 = 5;
     REQUIRE(size1 != size2);
@@ -100,7 +156,8 @@ TEST_CASE("compound_subtraction_different_size") {
     all_values_same = std::all_of(right_vector.begin(), right_vector.end(),
                                   [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
-    REQUIRE_THROWS_WITH(left_vector -= right_vector,
+    comp6771::euclidean_vector subtracted_vector;
+    REQUIRE_THROWS_WITH(subtracted_vector = left_vector - right_vector,
                         "Dimensions of LHS(" + std::to_string(size1) + ") and RHS (" + std::to_string(size2) +
                         ") do not match\n");
     // NO CHANGES!

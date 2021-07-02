@@ -111,3 +111,75 @@ cxx_test(
         FILENAME "Operations/vector_cast.cpp"
         LINK euclidean_vector
 )
+
+cxx_test(
+        TARGET at
+        FILENAME "member_functions/at.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET dimensions
+        FILENAME "member_functions/dimensions.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET equals
+        FILENAME "Friends/equals.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET not_equals
+        FILENAME "Friends/not_equals.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET addition
+        FILENAME "Friends/addition.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET subtraction
+        FILENAME "Friends/subtraction.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET multiplication
+        FILENAME "Friends/multiplication.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET division
+        FILENAME "Friends/division.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET ostream
+        FILENAME "Friends/ostream.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET euclidean_norm
+        FILENAME "utility_functions/euclidean_norm.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET unit
+        FILENAME "utility_functions/unit.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET dot
+        FILENAME "utility_functions/dot.cpp"
+        LINK euclidean_vector
+)

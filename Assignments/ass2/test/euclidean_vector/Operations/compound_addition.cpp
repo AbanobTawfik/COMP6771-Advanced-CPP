@@ -6,7 +6,7 @@
 #include <vector>
 
 // normal correct cases
-TEST_CASE("basic_addition_empty_vectors") {
+TEST_CASE("basic_compound_addition_empty_vectors") {
     auto left_vector = comp6771::euclidean_vector(0);
     auto right_vector = comp6771::euclidean_vector(0);
     REQUIRE(left_vector.dimensions() == 0);
@@ -18,7 +18,7 @@ TEST_CASE("basic_addition_empty_vectors") {
     REQUIRE(right_vector.dimensions() == 0);
 }
 
-TEST_CASE("basic_addition_case_all_same") {
+TEST_CASE("basic_compound_addition_case_all_same") {
     auto size = 3;
     auto l_value = 3;
     auto r_value = 4;
@@ -45,7 +45,7 @@ TEST_CASE("basic_addition_case_all_same") {
     REQUIRE(values_updated_correctly);
 }
 
-TEST_CASE("basic_addition_case_different_values") {
+TEST_CASE("basic_compound_addition_case_different_values") {
     const auto size = 500;
     const auto value = -500.434;
     auto left_stdvector = std::vector<double>(size);
@@ -75,6 +75,11 @@ TEST_CASE("basic_addition_case_different_values") {
     left_vector += right_vector;
     REQUIRE(right_vector.dimensions() == size);
     REQUIRE(left_vector.dimensions() == size);
+    // make sure right vector doesn't change
+    count = 0;
+    all_values_same = std::all_of(right_vector.begin(), right_vector.end(),
+                                  [&](auto value) { return value == right_stdvector.at(count++); });
+    REQUIRE(all_values_same);
     count = 0;
     bool values_updated_correctly = std::all_of(left_vector.begin(), left_vector.end(),
                                                 [&](auto value) {
@@ -85,7 +90,7 @@ TEST_CASE("basic_addition_case_different_values") {
 }
 
 // HANDLE EXCEPTIONS NOW
-TEST_CASE("addition_different_size") {
+TEST_CASE("compound_addition_different_size") {
     const auto size1 = 3;
     const auto size2 = 5;
     REQUIRE(size1 != size2);

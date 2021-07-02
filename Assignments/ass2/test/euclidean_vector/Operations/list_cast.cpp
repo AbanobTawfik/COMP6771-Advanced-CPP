@@ -22,12 +22,12 @@ TEST_CASE("same_values_vector_to_list") {
     const auto val = 3;
     const auto vector = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
-    bool all_values_same = std::all_of(vector.cbegin(), vector.cend(), [&](auto value) { return value == val; });
+    bool all_values_same = std::all_of(vector.begin(), vector.end(), [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
 
     const auto casted_list = static_cast<std::list<double>>(vector);
     REQUIRE(casted_list.size() == size);
-    all_values_same = std::all_of(casted_list.cbegin(), casted_list.cend(),
+    all_values_same = std::all_of(casted_list.begin(), casted_list.end(),
                                   [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
 }

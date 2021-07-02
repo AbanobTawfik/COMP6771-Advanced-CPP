@@ -22,19 +22,19 @@ TEST_CASE("same_values_vector_to_vec") {
     const auto val = 3;
     const auto vector = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
-    bool all_values_same = std::all_of(vector.cbegin(), vector.cend(), [&](auto value) { return value == val; });
+    bool all_values_same = std::all_of(vector.begin(), vector.end(), [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
 
     const auto casted_vector = static_cast<std::vector<double>>(vector);
     REQUIRE(casted_vector.size() == size);
-    all_values_same = std::all_of(casted_vector.cbegin(), casted_vector.cend(),
+    all_values_same = std::all_of(casted_vector.begin(), casted_vector.end(),
                                   [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
 
     // now we cast back and see if we get the same result
     const auto recreated_from_cast = comp6771::euclidean_vector(casted_vector.begin(), casted_vector.end());
     REQUIRE(recreated_from_cast.dimensions() == 5);
-    all_values_same = std::all_of(recreated_from_cast.cbegin(), recreated_from_cast.cend(),
+    all_values_same = std::all_of(recreated_from_cast.begin(), recreated_from_cast.end(),
                                   [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
 }
@@ -52,7 +52,7 @@ TEST_CASE("vector_recasts") {
     const auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     REQUIRE(vector.dimensions() == stdvector.size());
     REQUIRE(vector.dimensions() == size);
-    bool all_values_same = std::all_of(vector.cbegin(), vector.cend(),
+    bool all_values_same = std::all_of(vector.begin(), vector.end(),
                                        [&](auto value) { return value == stdvector.at(count++); });
     REQUIRE(all_values_same);
     // now we will cast that euclidean vector we verified was the same as the standard vector used to create it

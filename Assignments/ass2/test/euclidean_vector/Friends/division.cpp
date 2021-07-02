@@ -6,18 +6,19 @@
 #include <vector>
 
 // normal correct cases
-TEST_CASE("basic_compound_division_empty_vectors") {
+TEST_CASE("basic_division_empty_vectors") {
     auto left_vector = comp6771::euclidean_vector(0);
-    auto left_vector_copy = left_vector;
-    const auto scale = 1.34;
+    const auto scale = 1;
     REQUIRE(left_vector.dimensions() == 0);
-    left_vector /= scale;
-    // make sure no changes
+    const auto divided_vector = left_vector / scale;
+    // make sure no changes to left vector
     REQUIRE(left_vector.dimensions() == 0);
-    REQUIRE(left_vector == left_vector_copy);
+    // make sure divided vector has the results we want
+    REQUIRE(divided_vector.dimensions() == 0);
+    REQUIRE(divided_vector == left_vector);
 }
 
-TEST_CASE("basic_compound_division_case_all_same") {
+TEST_CASE("basic_division_case_all_same") {
     auto scale = 3;
     auto size = 5;
     auto val = 3;
@@ -27,15 +28,21 @@ TEST_CASE("basic_compound_division_case_all_same") {
                                        [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
 
-    vector /= scale;
+    const auto divided_vector = vector / scale;
+
+    // check original vector is unchanged
     REQUIRE(vector.dimensions() == size);
-    // check the compound_division worked correctly
     auto values_updated_correctly = std::all_of(vector.begin(), vector.end(),
-                                                [&](auto value) { return value == val / scale; });
+                                                [&](auto value) { return value == val; });
+    REQUIRE(values_updated_correctly);
+    // check the division worked correctly
+    REQUIRE(divided_vector.dimensions() == size);
+    values_updated_correctly = std::all_of(divided_vector.begin(), divided_vector.end(),
+                                           [&](auto value) { return value == val / scale; });
     REQUIRE(values_updated_correctly);
 }
 
-TEST_CASE("basic_compound_division_case_different_values") {
+TEST_CASE("basic_division_case_different_values") {
     const auto size = 500;
     const auto value = -500.434;
     const auto scale = -34.9845;
@@ -50,13 +57,17 @@ TEST_CASE("basic_compound_division_case_different_values") {
                                        [&](auto value) { return value == stdvector.at(count++); });
     REQUIRE(all_values_same);
 
-    vector /= scale;
-    // check the compound_division worked correctly
+    const auto divided_vector = vector / scale;
+    // check original vector is unchanged
+    REQUIRE(vector.dimensions() == size);
     count = 0;
-    // for this example since conversions are precise and there is arithmetic rounding errors, dividing by 34.9845
-    // and values are 3 decimal places too, this checks values are atleast within 4 decimal places
+    all_values_same = std::all_of(vector.begin(), vector.end(),
+                                  [&](auto value) { return value == stdvector.at(count++); });
+    REQUIRE(all_values_same);
+    // check the division worked correctly
+    count = 0;
     const auto difference = 0.00001;
-    auto values_updated_correctly = std::all_of(vector.begin(), vector.end(),
+    auto values_updated_correctly = std::all_of(divided_vector.begin(), divided_vector.end(),
                                                 [&](auto value) {
                                                     return std::abs(value - (stdvector.at(count++) / scale)) <
                                                            difference;
@@ -64,47 +75,56 @@ TEST_CASE("basic_compound_division_case_different_values") {
     REQUIRE(values_updated_correctly);
 }
 
-TEST_CASE("compound_division_negation_same") {
+TEST_CASE("division_negation_same") {
     auto scale = -1;
     auto size = 5;
     auto val = 3;
     auto vector = comp6771::euclidean_vector(size, val);
-    auto pre_compound_division = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
     bool all_values_same = std::all_of(vector.begin(), vector.end(),
                                        [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
-    REQUIRE(vector == pre_compound_division);
 
-    vector /= scale;
+    const auto divided_vector = vector / scale;
+    // check original vector is unchanged
     REQUIRE(vector.dimensions() == size);
-    // check the compound_division worked correctly
-    auto values_updated_correctly = std::all_of(vector.begin(), vector.end(),
+    all_values_same = std::all_of(vector.begin(), vector.end(),
+                                  [&](auto value) { return value == val; });
+    REQUIRE(all_values_same);
+
+    // check the division worked correctly
+    REQUIRE(divided_vector.dimensions() == size);
+    auto values_updated_correctly = std::all_of(divided_vector.begin(), divided_vector.end(),
                                                 [&](auto value) { return value == val / scale; });
     REQUIRE(values_updated_correctly);
-    REQUIRE(vector == -pre_compound_division);
+    REQUIRE(divided_vector == -vector);
 }
 
-TEST_CASE("compound_division_unary_same") {
+TEST_CASE("division_unary_same") {
     auto scale = 1;
     auto size = 5;
     auto val = 3;
     auto vector = comp6771::euclidean_vector(size, val);
-    auto pre_compound_division = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
     bool all_values_same = std::all_of(vector.begin(), vector.end(),
                                        [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
-    REQUIRE(vector == pre_compound_division);
 
-    vector /= scale;
+    const auto divided_vector = vector / scale;
+    // check original vector is unchanged
     REQUIRE(vector.dimensions() == size);
-    // check the multiplication worked correctly
-    auto values_updated_correctly = std::all_of(vector.begin(), vector.end(),
+    all_values_same = std::all_of(vector.begin(), vector.end(),
+                                  [&](auto value) { return value == val; });
+    REQUIRE(all_values_same);
+
+    // check the division worked correctly
+    REQUIRE(divided_vector.dimensions() == size);
+    auto values_updated_correctly = std::all_of(divided_vector.begin(), divided_vector.end(),
                                                 [&](auto value) { return value == val / scale; });
     REQUIRE(values_updated_correctly);
-    REQUIRE(vector == +pre_compound_division);
+    REQUIRE(divided_vector == +vector);
 }
+
 // HANDLE EXCEPTIONS NOW
 // divide by 0 case
 TEST_CASE("compound_division_different_size") {

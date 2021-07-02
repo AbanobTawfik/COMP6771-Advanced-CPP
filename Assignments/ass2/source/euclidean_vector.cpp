@@ -214,7 +214,10 @@ namespace comp6771 {
         for (int i = 0; i < vector.length_ - 1; ++i) {
             os << vector.magnitude_[static_cast<size_t>(i)] << " ";
         }
-        os << vector.magnitude_[static_cast<size_t>(vector.length_ - 1)] << "]";
+        if(vector.length_ > 0) {
+            os << vector.magnitude_[static_cast<size_t>(vector.length_ - 1)];
+        }
+        os << "]";
         return os;
     }
 
@@ -226,19 +229,19 @@ namespace comp6771 {
         euclidean_norm_ = euclidean_norm;
     }
 
-    auto euclidean_vector::cbegin() const -> const std::unique_ptr<double[]>::pointer {
-        return magnitude_.get();
-    }
-
-    auto euclidean_vector::cend() const -> const std::unique_ptr<double[]>::pointer {
-        return magnitude_.get() + length_;
-    }
-
     auto euclidean_vector::begin() -> std::unique_ptr<double[]>::pointer {
         return magnitude_.get();
     }
 
     auto euclidean_vector::end() -> std::unique_ptr<double[]>::pointer {
+        return magnitude_.get() + length_;
+    }
+
+    auto euclidean_vector::begin() const -> std::unique_ptr<double[]>::pointer {
+        return magnitude_.get();
+    }
+
+    auto euclidean_vector::end() const -> std::unique_ptr<double[]>::pointer {
         return magnitude_.get() + length_;
     }
 
