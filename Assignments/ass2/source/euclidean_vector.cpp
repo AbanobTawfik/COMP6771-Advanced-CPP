@@ -262,11 +262,11 @@ namespace comp6771 {
 
     auto unit(const euclidean_vector &vector) -> euclidean_vector {
         if (vector.dimensions() == 0) {
-            throw euclidean_vector_error("euclidean_vector with no dimensions does not have a unit vector");
+            throw euclidean_vector_error("euclidean_vector with no dimensions does not have a unit vector\n");
         }
         auto e_norm = euclidean_norm(vector);
         if (e_norm == 0) {
-            throw euclidean_vector_error("euclidean_vector with zero euclidean normal does not have a unit vector");
+            throw euclidean_vector_error("euclidean_vector with zero euclidean normal does not have a unit vector\n");
         }
         return euclidean_vector(vector) / e_norm;
     }
@@ -279,14 +279,13 @@ namespace comp6771 {
                     ") do not match\n");
         }
         auto index = 0;
+        double start = 0;
         auto casted_vector1 = static_cast<std::vector<double>>(vector1);
         auto casted_vector2 = static_cast<std::vector<double>>(vector2);
-        return vector1.dimensions() == 0 ? 0 : std::accumulate(casted_vector1.begin(), casted_vector1.end(), 0,
+        return vector1.dimensions() == 0 ? 0 : std::accumulate(casted_vector1.begin(), casted_vector1.end(), start,
                                                                [&](double sum, double value) {
                                                                    return sum + (value) * casted_vector2.at(
                                                                            static_cast<size_t>(index++));
                                                                });
     }
-
-
 } // namespace comp6771

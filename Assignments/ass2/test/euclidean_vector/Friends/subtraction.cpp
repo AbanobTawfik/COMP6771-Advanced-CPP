@@ -160,13 +160,4 @@ TEST_CASE("subtraction_different_size") {
     REQUIRE_THROWS_WITH(subtracted_vector = left_vector - right_vector,
                         "Dimensions of LHS(" + std::to_string(size1) + ") and RHS (" + std::to_string(size2) +
                         ") do not match\n");
-    // NO CHANGES!
-    REQUIRE(left_vector.dimensions() == size1);
-    REQUIRE(right_vector.dimensions() == size2);
-    all_values_same = std::all_of(left_vector.begin(), left_vector.end(),
-                                  [&](auto value) { return value == val; });
-    REQUIRE(all_values_same);
-    all_values_same = std::all_of(right_vector.begin(), right_vector.end(),
-                                  [&](auto value) { return value == val; });
-    REQUIRE(all_values_same);
 }

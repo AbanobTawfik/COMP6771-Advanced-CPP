@@ -5,47 +5,23 @@
 #include <iostream>
 #include <vector>
 
-// normal correct cases
-TEST_CASE("basic_compound_addition_empty_vectors") {
-    auto left_vector = comp6771::euclidean_vector(0);
-    auto right_vector = comp6771::euclidean_vector(0);
-    REQUIRE(left_vector.dimensions() == 0);
-    REQUIRE(right_vector.dimensions() == 0);
+TEST_CASE("dot_product_empty_vectors") {
+    const auto left_vector = comp6771::euclidean_vector();
+    REQUIRE(left_vector.dimensions() == 1);
+    REQUIRE(left_vector[0] == 0);
 
-    left_vector += right_vector;
-    // make sure dimensions dont change, nothing should happen, [] + [] = []
-    REQUIRE(left_vector.dimensions() == 0);
-    REQUIRE(right_vector.dimensions() == 0);
+    const auto right_vector = comp6771::euclidean_vector();
+    REQUIRE(right_vector.dimensions() == 1);
+    REQUIRE(right_vector[0] == 0);
+
+    const auto dot_product = comp6771::dot(left_vector, right_vector);
+
+    // make sure dot product is correctly calculated
+    // [0] . [0] = 0 + 0 -> 0
+    REQUIRE(dot_product == 0);
 }
 
-TEST_CASE("basic_compound_addition_case_all_same") {
-    auto size = 3;
-    auto l_value = 3;
-    auto r_value = 4;
-    auto left_vector = comp6771::euclidean_vector(size, l_value);
-    REQUIRE(left_vector.dimensions() == size);
-    bool all_values_same = std::all_of(left_vector.begin(), left_vector.end(),
-                                       [&](auto value) { return value == l_value; });
-    REQUIRE(all_values_same);
-    auto right_vector = comp6771::euclidean_vector(size, r_value);
-    REQUIRE(right_vector.dimensions() == size);
-    all_values_same = std::all_of(right_vector.begin(), right_vector.end(),
-                                  [&](auto value) { return value == r_value; });
-    REQUIRE(all_values_same);
-    left_vector += right_vector;
-    REQUIRE(left_vector.dimensions() == 3);
-    REQUIRE(right_vector.dimensions() == 3);
-    // make sure right hand side is unaffected
-    all_values_same = std::all_of(right_vector.begin(), right_vector.end(),
-                                  [&](auto value) { return value == r_value; });
-    REQUIRE(all_values_same);
-    // check the addition worked correctly
-    auto values_updated_correctly = std::all_of(left_vector.begin(), left_vector.end(),
-                                                [&](auto value) { return value == l_value + r_value; });
-    REQUIRE(values_updated_correctly);
-}
-
-TEST_CASE("basic_compound_addition_case_different_values") {
+TEST_CASE("dot_product_with_different_values") {
     const auto size = 500;
     const auto value = -500.434;
     auto left_stdvector = std::vector<double>(size);
@@ -72,25 +48,30 @@ TEST_CASE("basic_compound_addition_case_different_values") {
                                   [&](auto value) { return value == right_stdvector.at(count++); });
     REQUIRE(all_values_same);
     // keep in mind our original 2 std vectors stay the same, so we will compare the values in them to the result below
-    left_vector += right_vector;
+    const auto dot_product = comp6771::dot(left_vector, right_vector);
     REQUIRE(right_vector.dimensions() == size);
     REQUIRE(left_vector.dimensions() == size);
-    // make sure right vector doesn't change
+    // make sure right vector and left vector doesn't change
+    count = 0;
+    all_values_same = std::all_of(left_vector.begin(), left_vector.end(),
+                                  [&](auto value) { return value == left_vector.at(count++); });
+    REQUIRE(all_values_same);
     count = 0;
     all_values_same = std::all_of(right_vector.begin(), right_vector.end(),
                                   [&](auto value) { return value == right_stdvector.at(count++); });
     REQUIRE(all_values_same);
-    count = 0;
-    bool values_updated_correctly = std::all_of(left_vector.begin(), left_vector.end(),
-                                                [&](auto value) {
-                                                    return value == left_stdvector.at(count++) +
-                                                                    right_stdvector.at(count2++);
-                                                });
-    REQUIRE(values_updated_correctly);
+    // now i need to check the dot product contains, the right value, the dot product is simply just the sum
+    // of all vector values at the same index multiplied together, [1 2 3] [3 2 1] -> 1*3 + 2*2 + 3*1 = 10
+    // so we will manually compute this the long way here and compare to the much more concise solution found in the class
+    double dot_product_compare = 0;
+    for(auto i = 0; i < size; i++){
+        dot_product_compare += left_vector[i] * right_vector[i];
+    }
+    REQUIRE(dot_product == dot_product_compare);
 }
 
-// HANDLE EXCEPTIONS NOW
-TEST_CASE("compound_addition_different_size") {
+// Exception, different sizes
+TEST_CASE("dot_product_different_size") {
     const auto size1 = 3;
     const auto size2 = 5;
     REQUIRE(size1 != size2);
@@ -105,7 +86,7 @@ TEST_CASE("compound_addition_different_size") {
     all_values_same = std::all_of(right_vector.begin(), right_vector.end(),
                                   [&](auto value) { return value == val; });
     REQUIRE(all_values_same);
-    REQUIRE_THROWS_WITH(left_vector += right_vector,
+    REQUIRE_THROWS_WITH(comp6771::dot(left_vector, right_vector),
                         "Dimensions of LHS(" + std::to_string(size1) + ") and RHS (" + std::to_string(size2) +
                         ") do not match\n");
 }

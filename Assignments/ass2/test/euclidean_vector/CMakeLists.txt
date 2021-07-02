@@ -183,3 +183,9 @@ cxx_test(
         FILENAME "utility_functions/dot.cpp"
         LINK euclidean_vector
 )
+
+cxx_test(
+        TARGET cache
+        FILENAME "utility_functions/cache.cpp"
+        LINK euclidean_vector
+)

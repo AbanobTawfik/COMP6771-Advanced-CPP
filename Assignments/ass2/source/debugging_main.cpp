@@ -31,13 +31,13 @@ auto main() -> int {
 //        //std::cout << i << "\n";
 //    }
 
-    auto v = std::vector<double>(100);
-    std::iota(v.begin(), v.end(), 5);
-     auto ev1 = comp6771::euclidean_vector(v.begin(), v.end());
-     auto ev2 = ev1;
-    std::cout << comp6771::euclidean_norm(ev1) << "\n";
-    std::cout << comp6771::euclidean_norm(ev1) << "\n";
-    std::cout << comp6771::euclidean_norm(ev2) << "\n";
-    ev2[3] = 9;
-    std::cout << comp6771::euclidean_norm(ev2) << "\n";
+//    auto v = std::vector<double>(100);
+//    std::iota(v.begin(), v.end(), 5);
+//     auto ev1 = comp6771::euclidean_vector(v.begin(), v.end());
+//     auto ev2 = ev1;
+//    std::cout << comp6771::euclidean_norm(ev1) << "\n";
+//    std::cout << comp6771::euclidean_norm(ev1) << "\n";
+//    std::cout << comp6771::euclidean_norm(ev2) << "\n";
+//    ev2[3] = 9;
+//    std::cout << comp6771::euclidean_norm(ev2) << "\n";
 }

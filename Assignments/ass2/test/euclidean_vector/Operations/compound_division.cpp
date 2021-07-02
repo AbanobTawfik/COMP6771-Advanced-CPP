@@ -114,7 +114,4 @@ TEST_CASE("compound_division_different_size") {
     REQUIRE(vector[0] == 0);
     REQUIRE_THROWS_WITH(vector /= scale,
                         "Invalid vector division by 0\n");
-    // NO CHANGES!
-    REQUIRE(vector.dimensions() == 1);
-    REQUIRE(vector[0] == 0);
 }
