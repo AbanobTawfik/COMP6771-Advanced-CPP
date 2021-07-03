@@ -84,11 +84,11 @@ namespace comp6771 {
         return magnitude_[static_cast<size_t>(index)];
     }
 
-    auto euclidean_vector::operator+() -> euclidean_vector {
+    auto euclidean_vector::operator+() const -> euclidean_vector {
         return euclidean_vector(*this);
     }
 
-    auto euclidean_vector::operator-() -> euclidean_vector {
+    auto euclidean_vector::operator-() const -> euclidean_vector {
         auto negated_vector = euclidean_vector(*this);
         std::transform(negated_vector.magnitude_.get(), negated_vector.magnitude_.get() + negated_vector.length_,
                        negated_vector.magnitude_.get(),
@@ -221,29 +221,29 @@ namespace comp6771 {
         return os;
     }
 
-    auto euclidean_vector::check_cached_norm() const -> double {
-        return euclidean_norm_;
-    }
+//    auto euclidean_vector::check_cached_norm() const -> double {
+//        return euclidean_norm_;
+//    }
 
-    void euclidean_vector::set_cached_norm(const double euclidean_norm) const {
-        euclidean_norm_ = euclidean_norm;
-    }
+//    void euclidean_vector::set_cached_norm(const double euclidean_norm) const {
+//        euclidean_norm_ = euclidean_norm;
+//    }
 
-    auto euclidean_vector::begin() -> std::unique_ptr<double[]>::pointer {
-        return magnitude_.get();
-    }
-
-    auto euclidean_vector::end() -> std::unique_ptr<double[]>::pointer {
-        return magnitude_.get() + length_;
-    }
-
-    auto euclidean_vector::begin() const -> std::unique_ptr<double[]>::pointer {
-        return magnitude_.get();
-    }
-
-    auto euclidean_vector::end() const -> std::unique_ptr<double[]>::pointer {
-        return magnitude_.get() + length_;
-    }
+//    auto euclidean_vector::begin() -> std::unique_ptr<double[]>::pointer {
+//        return magnitude_.get();
+//    }
+//
+//    auto euclidean_vector::end() -> std::unique_ptr<double[]>::pointer {
+//        return magnitude_.get() + length_;
+//    }
+//
+//    auto euclidean_vector::begin() const -> std::unique_ptr<double[]>::pointer {
+//        return magnitude_.get();
+//    }
+//
+//    auto euclidean_vector::end() const -> std::unique_ptr<double[]>::pointer {
+//        return magnitude_.get() + length_;
+//    }
 
     euclidean_vector::~euclidean_vector() = default;
 

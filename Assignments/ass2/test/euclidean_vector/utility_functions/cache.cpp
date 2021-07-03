@@ -234,7 +234,7 @@ TEST_CASE("cache_invalidation_on_compound_division") {
                                        [&](auto value) { return value == count++; });
     REQUIRE(all_values_same);
     auto scale = 5;
-    REQUIRE(scale == 0);
+    REQUIRE(scale != 0);
     // initialised with invalidation
     const auto cached_norm_before_calculation = base_vector.check_cached_norm();
     REQUIRE(cached_norm_before_calculation == -1);

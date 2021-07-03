@@ -38,7 +38,7 @@ TEST_CASE("basic_compound_division_case_all_same") {
 TEST_CASE("basic_compound_division_case_different_values") {
     const auto size = 500;
     const auto value = -500.434;
-    const auto scale = -34.9845;
+    const auto scale = -34.9849;
     auto count = 0;
     auto stdvector = std::vector<double>(size);
     // values using iota will be steadily increasing so all different

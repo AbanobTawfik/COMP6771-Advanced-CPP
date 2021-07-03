@@ -5,8 +5,8 @@
 #include <iostream>
 #include <vector>
 
-// when we copy constructor, we want the created vector to be detatched from the original vector, this means
-// changes to the copied vector do not carry through the original, however they start off the same!
+// Test 1 : tests that creating a copy of an empty vector returns a correct empty vector
+// Test 2 : just makes sure that when copying a vector, all values are identical to the original vector
 
 TEST_CASE("empty_copy_constructor") {
     const auto empty_constructor = comp6771::euclidean_vector();

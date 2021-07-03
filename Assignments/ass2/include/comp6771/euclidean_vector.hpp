@@ -43,9 +43,9 @@ namespace comp6771 {
 
         auto operator[](int index) const -> const double &;
 
-        auto operator+() -> euclidean_vector;
+        auto operator+() const -> euclidean_vector;
 
-        auto operator-() -> euclidean_vector;
+        auto operator-() const -> euclidean_vector;
 
         auto operator+=(euclidean_vector const &) -> euclidean_vector &;
 
@@ -81,17 +81,29 @@ namespace comp6771 {
 
         friend auto operator<<(std::ostream &os, euclidean_vector const &vector) -> std::ostream &;
 
-        auto check_cached_norm() const -> double;
+        void set_cached_norm(const double euclidean_norm) const {
+            euclidean_norm_ = euclidean_norm;
+        }
 
-        void set_cached_norm(double) const;
+        auto check_cached_norm() const -> double {
+            return euclidean_norm_;
+        }
 
-        [[nodiscard]]auto begin() -> std::unique_ptr<double[]>::pointer;
+        [[nodiscard]] auto begin() -> std::unique_ptr<double[]>::pointer {
+            return magnitude_.get();
+        }
 
-        [[nodiscard]]auto begin() const -> std::unique_ptr<double[]>::pointer;
+        [[nodiscard]] auto begin() const -> std::unique_ptr<double[]>::pointer {
+            return magnitude_.get();
+        }
 
-        [[nodiscard]]auto end() -> std::unique_ptr<double[]>::pointer;
+        [[nodiscard]] auto end() -> std::unique_ptr<double[]>::pointer {
+            return magnitude_.get() + length_;
+        }
 
-        [[nodiscard]]auto end() const -> std::unique_ptr<double[]>::pointer;
+        [[nodiscard]] auto end() const -> std::unique_ptr<double[]>::pointer {
+            return magnitude_.get() + length_;
+        }
 
     private:
         // ass2 spec requires we use double[]
