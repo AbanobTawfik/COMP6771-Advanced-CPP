@@ -10,31 +10,31 @@
 
 TEST_CASE("negation_empty_case") {
     auto vector = comp6771::euclidean_vector(0);
-    REQUIRE(vector.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 0);
     vector = -vector;
-    REQUIRE(vector.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 0);
 }
 
 TEST_CASE("negation_base_case") {
     auto vector = comp6771::euclidean_vector();
-    REQUIRE(vector.dimensions() == 1);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
     REQUIRE(vector[0] == 0);
     vector = -vector;
-    REQUIRE(vector.dimensions() == 1);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
     REQUIRE(vector[0] == 0);
 }
 
 TEST_CASE("negation_with_values") {
-    const auto size = 500;
+    const size_t size =500;
     const auto value = -500.434;
     auto stdvector = std::vector<double>(size);
     // values using iota will be steadily increasing so all different
     std::iota(stdvector.begin(), stdvector.end(), value);
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
-    REQUIRE(vector.dimensions() == size);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
     REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
     // call in the negation
     vector = -vector;
-    auto count = 0;
+    size_t count = 0;
     REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) { return value == -1 * stdvector.at(count++); }));
 }

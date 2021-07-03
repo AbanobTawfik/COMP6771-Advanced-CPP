@@ -10,17 +10,17 @@
 
 TEST_CASE("empty_vector_to_vec") {
     const auto vector = comp6771::euclidean_vector(0);
-    REQUIRE(vector.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 0);
     const auto casted_vector = static_cast<std::vector<double>>(vector);
     REQUIRE(casted_vector.empty());
     const auto recreated_from_cast = comp6771::euclidean_vector(casted_vector.begin(), casted_vector.end());
-    REQUIRE(recreated_from_cast.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(recreated_from_cast.dimensions()) == 0);
     REQUIRE(recreated_from_cast == vector);
 }
 
 // create euclidean vector with std vector, then cast it as std vector to see if same result
 TEST_CASE("vector_recasts") {
-    const auto size = 500;
+    const size_t size =500;
     const auto value = -500.434;
     auto stdvector = std::vector<double>(size);
     // values using iota will be steadily increasing so all different

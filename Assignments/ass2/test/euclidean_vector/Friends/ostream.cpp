@@ -26,7 +26,7 @@ auto compare_ostream(std::ostream& os1, std::ostream& os2) -> bool{
 // check that the empty euclidean vector outputs []
 TEST_CASE("os_works_correctly_equal_vectors_empty") {
     const auto vector = comp6771::euclidean_vector(0);
-    REQUIRE(vector.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 0);
     const auto empty_vector_string = "[]";
     std::cout.setstate(std::ios_base::badbit);
     std::ostream& os_vector = std::cout << vector << "\n";
@@ -38,7 +38,7 @@ TEST_CASE("os_works_correctly_equal_vectors_empty") {
 
 TEST_CASE("os_works_correctly_equal_vectors_default_constructor_one_value") {
     const auto vector = comp6771::euclidean_vector();
-    REQUIRE(vector.dimensions() == 1);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
     REQUIRE(vector[0] == 0);
     const auto empty_vector_string = "[0]";
     std::cout.setstate(std::ios_base::badbit);
@@ -51,7 +51,7 @@ TEST_CASE("os_works_correctly_equal_vectors_default_constructor_one_value") {
 TEST_CASE("os_works_correctly_multiple_values") {
     const auto vector = comp6771::euclidean_vector(10, 5);
     // check vectors are equal first by checking properties of internals
-    REQUIRE(vector.dimensions() == 10);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 10);
     REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) { return value == 5; }));
     // check if the equals now does the same thing
     const auto empty_vector_string = "[5 5 5 5 5 5 5 5 5 5]";
@@ -61,4 +61,3 @@ TEST_CASE("os_works_correctly_multiple_values") {
     REQUIRE(compare_ostream(os_vector, os_string));
     std::cout.clear();
 }
-

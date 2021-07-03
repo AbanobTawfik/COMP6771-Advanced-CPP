@@ -9,16 +9,16 @@
 
 TEST_CASE("empty_vector_to_list") {
     const auto vector = comp6771::euclidean_vector(0);
-    REQUIRE(vector.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 0);
     const auto casted_list = static_cast<std::list<double>>(vector);
     REQUIRE(casted_list.empty());
 }
 
 TEST_CASE("same_values_vector_to_list") {
-    const auto size = 5;
+    const size_t size =5;
     const auto val = 3;
     const auto vector = comp6771::euclidean_vector(size, val);
-    REQUIRE(vector.dimensions() == size);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
     REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) { return value == val; }));
 
     const auto casted_list = static_cast<std::list<double>>(vector);

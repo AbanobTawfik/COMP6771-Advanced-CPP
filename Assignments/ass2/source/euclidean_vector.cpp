@@ -262,12 +262,11 @@ namespace comp6771 {
     // i chose to do this rather than making the method allow the user to pass in a input as this could be malicious
     // and give wrong results, so instead i force that the cached norm is ALWAYS correct this way, so if a person
     // calls set_cached_norm outside of this class they cannot set an invalid cache
-    auto euclidean_vector::set_cached_norm() const noexcept -> euclidean_vector &{
+    void euclidean_vector::set_cached_norm() const noexcept {
         auto euclidean_norm = std::sqrt(
                 std::inner_product(magnitude_.get(), magnitude_.get() + length_, magnitude_.get(), 0.0));
         euclidean_norm_ = euclidean_norm;
         auto vector = euclidean_vector(*this);
-        return vector;
     }
 
 

@@ -11,26 +11,26 @@
 // const cases
 TEST_CASE("subscript_in_range_correct_value") {
     const auto vector = comp6771::euclidean_vector(10, 50);
-    REQUIRE(vector.dimensions() == 10);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 10);
     REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value){ return value == 50;}));
     auto value = double{vector[0]};
     REQUIRE(value == 50);
     // make sure no changes to the rest of the array
-    REQUIRE(vector.dimensions() == 10);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 10);
     REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value){ return value == 50;}));
 }
 
 // non const cases (Changing values at indexes)
 TEST_CASE("subscript_change_in_range_default") {
     auto vector = comp6771::euclidean_vector(10, 50);
-    REQUIRE(vector.dimensions() == 10);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 10);
     REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value){ return value == 50;}));
     auto value = double{vector[0]};
     REQUIRE(value == 50);
     vector[0] = value + 1;
     // make sure rest of vector is the same we only modified index 1 so look from beginning + 1 -> end
     REQUIRE(std::all_of(vector.begin() + 1, vector.end(), [&](auto value){ return value == 50;}));
-    REQUIRE(vector.dimensions() == 10);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 10);
     // check the change went through correctly
     REQUIRE(vector[0] == value + 1);
 }

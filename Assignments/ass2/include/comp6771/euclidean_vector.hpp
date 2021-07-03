@@ -90,7 +90,7 @@ namespace comp6771 {
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
         // i implemented this in the source since there is too much code + logic for a header
-        auto set_cached_norm() const noexcept -> euclidean_vector &;
+        void set_cached_norm() const noexcept;
 
         inline auto check_cached_norm() const noexcept -> double {
             return euclidean_norm_;
@@ -100,11 +100,11 @@ namespace comp6771 {
         // std::all_of or std::equals, no other part of the implementation uses this, PLEASE NOTE THIS IS TESTED TOO
         // IM NOT JUST USING AN UNTESTED FUNCTION IN MY TESTS
 
-        [[nodiscard]] inline auto begin() const noexcept -> const std::unique_ptr<double[]>::pointer {
+        [[nodiscard]] inline auto begin() const noexcept -> std::unique_ptr<double[]>::pointer {
             return magnitude_.get();
         }
 
-        [[nodiscard]] inline auto end() const noexcept -> const std::unique_ptr<double[]>::pointer {
+        [[nodiscard]] inline auto end() const noexcept -> std::unique_ptr<double[]>::pointer {
             return magnitude_.get() + length_;
         }
 

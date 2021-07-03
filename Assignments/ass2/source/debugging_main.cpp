@@ -9,5 +9,5 @@
 //  frameworks might be overwhelming for some.
 
 auto main() -> int {
-
+    auto x = comp6771::euclidean_vector();
 }

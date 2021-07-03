@@ -129,13 +129,13 @@ TEST_CASE("cache_invalidation_on_subscript_modify") {
 
 TEST_CASE("cache_invalidation_on_compound_add") {
     auto base_vector = comp6771::euclidean_vector{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    REQUIRE(base_vector.dimensions() == 10);
+    REQUIRE(static_cast<size_t>(base_vector.dimensions()) == 10);
     auto count = 0;
     bool all_values_same = std::all_of(base_vector.begin(), base_vector.end(),
                                        [&](auto value) { return value == count++; });
     REQUIRE(all_values_same);
     auto vector_right = comp6771::euclidean_vector{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    REQUIRE(vector_right.dimensions() == 10);
+    REQUIRE(static_cast<size_t>(vector_right.dimensions()) == 10);
     count = 0;
     all_values_same = std::all_of(vector_right.begin(), vector_right.end(),
                                   [&](auto value) { return value == count++; });
@@ -162,7 +162,7 @@ TEST_CASE("cache_invalidation_on_compound_add") {
 
 TEST_CASE("cache_invalidation_on_compound_subtract") {
     auto base_vector = comp6771::euclidean_vector{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    REQUIRE(base_vector.dimensions() == 10);
+    REQUIRE(static_cast<size_t>(base_vector.dimensions()) == 10);
     auto count = 0;
     bool all_values_same = std::all_of(base_vector.begin(), base_vector.end(),
                                        [&](auto value) { return value == count++; });
@@ -194,7 +194,7 @@ TEST_CASE("cache_invalidation_on_compound_subtract") {
 
 TEST_CASE("cache_invalidation_on_compound_multiplication") {
     auto base_vector = comp6771::euclidean_vector{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    REQUIRE(base_vector.dimensions() == 10);
+    REQUIRE(static_cast<size_t>(base_vector.dimensions()) == 10);
     auto count = 0;
     bool all_values_same = std::all_of(base_vector.begin(), base_vector.end(),
                                        [&](auto value) { return value == count++; });
@@ -221,7 +221,7 @@ TEST_CASE("cache_invalidation_on_compound_multiplication") {
 
 TEST_CASE("cache_invalidation_on_compound_division") {
     auto base_vector = comp6771::euclidean_vector{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    REQUIRE(base_vector.dimensions() == 10);
+    REQUIRE(static_cast<size_t>(base_vector.dimensions()) == 10);
     auto count = 0;
     bool all_values_same = std::all_of(base_vector.begin(), base_vector.end(),
                                        [&](auto value) { return value == count++; });

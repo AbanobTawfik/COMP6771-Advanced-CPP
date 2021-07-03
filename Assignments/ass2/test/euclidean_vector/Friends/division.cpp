@@ -12,32 +12,32 @@
 TEST_CASE("basic_division_empty_vectors") {
     auto left_vector = comp6771::euclidean_vector(0);
     const auto scale = 1;
-    REQUIRE(left_vector.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(left_vector.dimensions()) == 0);
     const auto divided_vector = left_vector / scale;
     // make sure no changes to left vector
-    REQUIRE(left_vector.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(left_vector.dimensions()) == 0);
     // make sure divided vector has the results we want
-    REQUIRE(divided_vector.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(divided_vector.dimensions()) == 0);
     REQUIRE(divided_vector == left_vector);
 }
 
 TEST_CASE("basic_division_case_different_values") {
-    const auto size = 500;
+    const size_t size = 500;
     const auto value = -500.434;
     const auto scale = -34.9845;
     auto stdvector = std::vector<double>(size);
     std::iota(stdvector.begin(), stdvector.end(), value);
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
-    REQUIRE(vector.dimensions() == stdvector.size());
-    REQUIRE(vector.dimensions() == size);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == stdvector.size());
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
     REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
 
     const auto divided_vector = vector / scale;
     // check original vector is unchanged
-    REQUIRE(vector.dimensions() == size);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
     REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
     // check the division worked correctly
-    auto count = 0;
+    size_t count = 0;
     // we check the values are within a range of the difference below as floating point conversion can be lossy and
     // precision errors
     const auto difference = 0.00001;

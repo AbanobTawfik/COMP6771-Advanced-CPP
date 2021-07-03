@@ -11,26 +11,25 @@ TEST_CASE("default_move_constructor") {
     auto empty_constructor = comp6771::euclidean_vector();
     const auto move_empty_constructor = comp6771::euclidean_vector(std::move(empty_constructor));
     // we want to make sure that our new vector is the same as the one that moved into it (Default constructor)
-    REQUIRE(move_empty_constructor.dimensions() == 1);
+    REQUIRE(static_cast<size_t>(move_empty_constructor.dimensions()) == 1);
     REQUIRE(move_empty_constructor[0] == 0);
     // check what we moved from was also removed, i.e length 0
-    REQUIRE(empty_constructor.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(empty_constructor.dimensions()) == 0);
 }
 
 TEST_CASE("contains_values_move_constructor") {
-    const auto size = 500;
+    const size_t size = 500;
     const auto value = -500.434;
     auto stdvector = std::vector<double>(size);
     // values using iota will be steadily increasing so all different
     std::iota(stdvector.begin(), stdvector.end(), value);
 
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
-    REQUIRE(vector.dimensions() == size);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
     REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
     const auto moved_vector = comp6771::euclidean_vector(std::move(vector));
-    REQUIRE(moved_vector.dimensions() == size);
+    REQUIRE(static_cast<size_t>(moved_vector.dimensions()) == size);
     REQUIRE(std::equal(moved_vector.begin(), moved_vector.end(), stdvector.begin(), stdvector.end()));
     // check what we moved from was also removed, i.e length 0
-    REQUIRE(vector.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 0);
 }
-

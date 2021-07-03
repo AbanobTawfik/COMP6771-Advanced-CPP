@@ -21,7 +21,7 @@ TEST_CASE("iterates_correctly_empty") {
 }
 
 TEST_CASE("iterates_correctly_begin_end_no_cast") {
-    const auto size = 100000;
+    const size_t size = 100000;
     const auto value = 5;
     const auto vector = comp6771::euclidean_vector(size, value);
     // to check iterating accross has the correct values i will store the results of pushing into a new array
@@ -31,11 +31,11 @@ TEST_CASE("iterates_correctly_begin_end_no_cast") {
     for(auto i = vector.begin(); i != vector.end(); i++){
         iterate_vector.push_back(*i);
     }
-    REQUIRE(vector.dimensions() == size);
-    REQUIRE(iterate_vector.size() == vector.dimensions());
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
+    REQUIRE(iterate_vector.size() == static_cast<size_t>(vector.dimensions()));
     // now that we ITERATED over the vector using begin and end, we know that we want the new vector to have MATCHING
     // VALUES AT ALL INDEXES TO ORIGINAL VECTOR
-    for(auto i = 0; i < size; i++){
-        REQUIRE(iterate_vector.at(i) == vector.at(i));
+    for(size_t i = 0; i < size; i++){
+        REQUIRE(iterate_vector.at(i) == vector.at(static_cast<int>(i)));
     }
 }

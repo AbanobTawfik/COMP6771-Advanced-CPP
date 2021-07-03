@@ -12,32 +12,32 @@
 TEST_CASE("basic_multiplication_empty_vectors") {
     auto vector = comp6771::euclidean_vector(0);
     const auto scale = 0;
-    REQUIRE(vector.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 0);
     const auto multiplied_vector = vector * scale;
     // make sure no changes to left vector
-    REQUIRE(vector.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == 0);
     // make sure multiplied vector has the results we want
-    REQUIRE(multiplied_vector.dimensions() == 0);
+    REQUIRE(static_cast<size_t>(multiplied_vector.dimensions()) == 0);
     REQUIRE(multiplied_vector == vector);
 }
 
 TEST_CASE("basic_multiplication_case_different_values") {
-    const auto size = 500;
+    const size_t size =500;
     const auto value = -500.434;
     const auto scale = -34.9845;
     auto stdvector = std::vector<double>(size);
     std::iota(stdvector.begin(), stdvector.end(), value);
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
-    REQUIRE(vector.dimensions() == stdvector.size());
-    REQUIRE(vector.dimensions() == size);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == stdvector.size());
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
     REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
 
     const auto multiplied_vector = vector * scale;
     // check original vector is unchanged
-    REQUIRE(vector.dimensions() == size);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
     REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
     // check the multiplication worked correctly
-    auto count = 0;
+    size_t count = 0;
     REQUIRE(std::all_of(multiplied_vector.begin(), multiplied_vector.end(),
                         [&](auto value) { return value == stdvector.at(count++) * scale; }));
 }

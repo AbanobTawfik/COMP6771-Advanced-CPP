@@ -18,7 +18,7 @@ TEST_CASE("empty_copy_constructor") {
 }
 
 TEST_CASE("copy_with_values_no_change") {
-    const auto size = 500;
+    const size_t size = 500;
     const auto value = -500.434;
     auto stdvector = std::vector<double>(size);
     // values using iota will be steadily increasing so all different
@@ -26,15 +26,14 @@ TEST_CASE("copy_with_values_no_change") {
     const auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     const auto copy_vector = comp6771::euclidean_vector(vector);
 
-    REQUIRE(vector.dimensions() == size);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
     REQUIRE(vector.dimensions() == copy_vector.dimensions());
-    auto count = 0;
     REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
 
 }
 
 TEST_CASE("copy_with_values_change_after") {
-    const auto size = 500;
+    const size_t size = 500;
     const auto value = -500.434;
     auto stdvector = std::vector<double>(size);
     // values using iota will be steadily increasing so all different
