@@ -81,9 +81,16 @@ namespace comp6771 {
 
         friend auto operator<<(std::ostream &os, euclidean_vector const &vector) noexcept -> std::ostream &;
 
-        inline void set_cached_norm(const double euclidean_norm) const noexcept {
-            euclidean_norm_ = euclidean_norm;
-        }
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                                                                            //
+        //                                                                                            //
+        //                                EXTRA INTERNAL FUNCTIONS                                    //
+        //                                                                                            //
+        //                                                                                            //
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // i implemented this in the source since there is too much code + logic for a header
+        auto set_cached_norm() const noexcept -> euclidean_vector &;
 
         inline auto check_cached_norm() const noexcept -> double {
             return euclidean_norm_;
@@ -92,19 +99,12 @@ namespace comp6771 {
         // THESE TESTED FUNCTIONS ARE ONLY USED IN TESTING TO MAKE MY LIFE EASIER AND ALLOW ME TO USE THINGS SUCH AS
         // std::all_of or std::equals, no other part of the implementation uses this, PLEASE NOTE THIS IS TESTED TOO
         // IM NOT JUST USING AN UNTESTED FUNCTION IN MY TESTS
-        [[nodiscard]] inline auto begin() noexcept -> std::unique_ptr<double[]>::pointer {
+
+        [[nodiscard]] inline auto begin() const noexcept -> const std::unique_ptr<double[]>::pointer {
             return magnitude_.get();
         }
 
-        [[nodiscard]] inline auto begin() const noexcept -> std::unique_ptr<double[]>::pointer {
-            return magnitude_.get();
-        }
-
-        [[nodiscard]] inline auto end() noexcept -> std::unique_ptr<double[]>::pointer {
-            return magnitude_.get() + length_;
-        }
-
-        [[nodiscard]] inline auto end() const noexcept -> std::unique_ptr<double[]>::pointer {
+        [[nodiscard]] inline auto end() const noexcept -> const std::unique_ptr<double[]>::pointer {
             return magnitude_.get() + length_;
         }
 

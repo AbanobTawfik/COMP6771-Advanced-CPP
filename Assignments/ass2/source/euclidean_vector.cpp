@@ -10,6 +10,7 @@
 
 namespace comp6771 {
     // Implement solution here
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //                                                                                            //
     //                                                                                            //
@@ -17,6 +18,7 @@ namespace comp6771 {
     //                                                                                            //
     //                                                                                            //
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
     euclidean_vector::euclidean_vector() noexcept:
             length_{1}, euclidean_norm_{-1} {
         magnitude_ = std::make_unique<double[]>(static_cast<size_t>(length_));
@@ -55,6 +57,14 @@ namespace comp6771 {
             euclidean_norm_{vector_reference.euclidean_norm_} {
         vector_reference.length_ = 0;
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                                                                            //
+    //                                    Section 2: OPERATORS                                    //
+    //                                                                                            //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     euclidean_vector &euclidean_vector::operator=(const euclidean_vector &vector) noexcept {
         length_ = vector.length_;
@@ -123,7 +133,7 @@ namespace comp6771 {
             return x * scale;
         });
 
-        euclidean_norm_ = (scale == 1) ? euclidean_norm_ : -1;
+        euclidean_norm_ = (scale == 1 or scale == -1) ? euclidean_norm_ : -1;
 
         return *this;
     }
@@ -133,7 +143,7 @@ namespace comp6771 {
             throw euclidean_vector_error("Invalid vector division by 0\n");
         }
 
-        euclidean_norm_ = (scale == 1) ? euclidean_norm_ : -1;
+        euclidean_norm_ = (scale == 1 or scale == -1) ? euclidean_norm_ : -1;
 
         return *this *= 1 / scale;
     }
@@ -149,6 +159,14 @@ namespace comp6771 {
         std::copy(magnitude_.get(), magnitude_.get() + length_, list.begin());
         return list;
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                                                                            //
+    //                             Section 3: MEMBER FUNCTIONS                                    //
+    //                                                                                            //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     auto euclidean_vector::at(const int index) const -> const double & {
         if (index >= length_ or index < 0) {
@@ -168,6 +186,14 @@ namespace comp6771 {
     auto euclidean_vector::dimensions() const noexcept -> int {
         return length_;
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                                                                            //
+    //                                      Section 4: FRIENDS                                    //
+    //                                                                                            //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     // we don't want to check if euclidean norms are equal since its only changed from -1
     // once its called the get_euclidean_norm, so we check all other fields are equal
@@ -225,16 +251,35 @@ namespace comp6771 {
         return os;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                            //
+    //                                                                                            //
+    //                            Section 5: Utility Functions                                    //
+    //                                                                                            //
+    //                                                                                            //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // i chose to do this rather than making the method allow the user to pass in a input as this could be malicious
+    // and give wrong results, so instead i force that the cached norm is ALWAYS correct this way, so if a person
+    // calls set_cached_norm outside of this class they cannot set an invalid cache
+    auto euclidean_vector::set_cached_norm() const noexcept -> euclidean_vector &{
+        auto euclidean_norm = std::sqrt(
+                std::inner_product(magnitude_.get(), magnitude_.get() + length_, magnitude_.get(), 0.0));
+        euclidean_norm_ = euclidean_norm;
+        auto vector = euclidean_vector(*this);
+        return vector;
+    }
+
+
     auto euclidean_norm(euclidean_vector const &vector) noexcept -> double {
         auto cached_norm = vector.check_cached_norm();
         if (cached_norm != -1 && cached_norm >= 0) {
             return cached_norm;
         }
-        auto vector_casted = static_cast<std::vector<double>>(vector);
-        auto euclidean_norm = std::sqrt(
-                std::inner_product(vector_casted.begin(), vector_casted.end(), vector_casted.begin(), 0.0));
-        vector.set_cached_norm(euclidean_norm);
-        return vector.dimensions() == 0 ? 0 : euclidean_norm;
+        // compute and cache
+        vector.set_cached_norm();
+        // return either 0 if length 0 or the cached result we computed above
+        return vector.check_cached_norm();
     }
 
     auto unit(const euclidean_vector &vector) -> euclidean_vector {
