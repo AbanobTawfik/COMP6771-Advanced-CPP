@@ -21,7 +21,7 @@ TEST_CASE("basic_compound_addition_empty_vectors") {
 }
 
 TEST_CASE("basic_compound_addition_case_different_values") {
-    const size_t size =500;
+    const size_t size = 500;
     const auto value = -500.434;
     auto left_stdvector = std::vector<double>(size);
     std::iota(left_stdvector.begin(), left_stdvector.end(), value);
@@ -46,8 +46,8 @@ TEST_CASE("basic_compound_addition_case_different_values") {
     size_t count2 = 0;
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
                         [&](auto value) {
-                            return value == left_stdvector.at(count++) +
-                                            right_stdvector.at(count2++);
+                            return value == Approx(left_stdvector.at(count++) +
+                                                   right_stdvector.at(count2++)).margin(0.000001);
                         }));
 }
 
@@ -62,9 +62,9 @@ TEST_CASE("compound_addition_different_size") {
     REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
     REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size2);
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
     REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
     REQUIRE_THROWS_WITH(left_vector += right_vector,
                         "Dimensions of LHS(" + std::to_string(size1) + ") and RHS (" + std::to_string(size2) +
                         ") do not match\n");
@@ -72,7 +72,7 @@ TEST_CASE("compound_addition_different_size") {
     REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
     REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size2);
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
     REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
 }

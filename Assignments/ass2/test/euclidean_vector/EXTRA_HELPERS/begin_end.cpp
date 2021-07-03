@@ -36,6 +36,6 @@ TEST_CASE("iterates_correctly_begin_end_no_cast") {
     // now that we ITERATED over the vector using begin and end, we know that we want the new vector to have MATCHING
     // VALUES AT ALL INDEXES TO ORIGINAL VECTOR
     for(size_t i = 0; i < size; i++){
-        REQUIRE(iterate_vector.at(i) == vector.at(static_cast<int>(i)));
+        REQUIRE(iterate_vector.at(i) == Approx(vector.at(static_cast<int>(i))).margin(0.000001));
     }
 }

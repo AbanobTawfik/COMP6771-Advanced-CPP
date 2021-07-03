@@ -13,8 +13,8 @@ TEST_CASE("empty_copy_constructor") {
     const auto copy_empty_constructor = comp6771::euclidean_vector(empty_constructor);
     REQUIRE(empty_constructor.dimensions() == 1);
     REQUIRE(copy_empty_constructor.dimensions() == 1);
-    REQUIRE(empty_constructor[0] == 0);
-    REQUIRE(copy_empty_constructor[0] == empty_constructor[0]);
+    REQUIRE(empty_constructor[0] == Approx(0).margin(0.000001));
+    REQUIRE(copy_empty_constructor[0] == Approx(empty_constructor[0]).margin(0.000001));
 }
 
 TEST_CASE("copy_with_values_no_change") {
@@ -55,5 +55,5 @@ TEST_CASE("copy_with_values_change_after") {
     // check changed vector is modified properly, not original values, but incremented by 1 from original
     auto count = 0;
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == (copy_vector.at(count++) - 1); }));
+                        [&](auto value) { return value == Approx(copy_vector.at(count++) - 1).margin(0.000001); }));
 }

@@ -54,8 +54,8 @@ TEST_CASE("basic_addition_case_different_values") {
     size_t count2 = 0;
     REQUIRE(std::all_of(added_vector.begin(), added_vector.end(),
                         [&](auto value) {
-                            return value == left_stdvector.at(count++) +
-                                            right_stdvector.at(count2++);
+                            return value ==
+                                   Approx(left_stdvector.at(count++) + right_stdvector.at(count2++)).margin(0.000001);
                         }));
 }
 
@@ -67,30 +67,30 @@ TEST_CASE("basic_addition_case_multiple_vectors") {
     const auto left_vector = comp6771::euclidean_vector(size, l_value);
     REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size);
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == l_value; }));
+                        [&](auto value) { return value == Approx(l_value).margin(0.000001); }));
     const auto right_vector = comp6771::euclidean_vector(size, r_value);
     REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size);
     REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == r_value; }));
+                        [&](auto value) { return value == Approx(r_value).margin(0.000001); }));
     const auto middle_vector = comp6771::euclidean_vector(size, m_value);
     REQUIRE(static_cast<size_t>(middle_vector.dimensions()) == size);
     REQUIRE(std::all_of(middle_vector.begin(), middle_vector.end(),
-                        [&](auto value) { return value == m_value; }));
+                        [&](auto value) { return value == Approx(m_value).margin(0.000001); }));
     const auto added_vector = left_vector + right_vector + middle_vector;
     REQUIRE(static_cast<size_t>(left_vector.dimensions()) == 3);
     REQUIRE(static_cast<size_t>(right_vector.dimensions()) == 3);
     REQUIRE(static_cast<size_t>(middle_vector.dimensions()) == 3);
     // make sure both vectors are  unaffected
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == l_value; }));
+                        [&](auto value) { return value == Approx(l_value).margin(0.000001); }));
     REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == r_value; }));
+                        [&](auto value) { return value == Approx(r_value).margin(0.000001); }));
     REQUIRE(std::all_of(middle_vector.begin(), middle_vector.end(),
-                        [&](auto value) { return value == m_value; }));
+                        [&](auto value) { return value == Approx(m_value).margin(0.000001); }));
     // check the addition worked correctly
     REQUIRE(static_cast<size_t>(added_vector.dimensions()) == size);
     REQUIRE(std::all_of(added_vector.begin(), added_vector.end(),
-                        [&](auto value) { return value == l_value + r_value + m_value; }));
+                        [&](auto value) { return value == Approx(l_value + r_value + m_value).margin(0.000001); }));
 }
 
 TEST_CASE("basic_addition_subtraction_mix_case_multiple_vectors") {
@@ -101,30 +101,30 @@ TEST_CASE("basic_addition_subtraction_mix_case_multiple_vectors") {
     const auto left_vector = comp6771::euclidean_vector(size, l_value);
     REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size);
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == l_value; }));
+                        [&](auto value) { return value == Approx(l_value).margin(0.000001); }));
     const auto right_vector = comp6771::euclidean_vector(size, r_value);
     REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size);
     REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == r_value; }));
+                        [&](auto value) { return value == Approx(r_value).margin(0.000001); }));
     const auto middle_vector = comp6771::euclidean_vector(size, m_value);
     REQUIRE(static_cast<size_t>(middle_vector.dimensions()) == size);
     REQUIRE(std::all_of(middle_vector.begin(), middle_vector.end(),
-                        [&](auto value) { return value == m_value; }));
+                        [&](auto value) { return value == Approx(m_value).margin(0.000001); }));
     const auto added_vector = left_vector + right_vector - middle_vector;
     REQUIRE(static_cast<size_t>(left_vector.dimensions()) == 3);
     REQUIRE(static_cast<size_t>(right_vector.dimensions()) == 3);
     REQUIRE(static_cast<size_t>(middle_vector.dimensions()) == 3);
     // make sure both vectors are  unaffected
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == l_value; }));
+                        [&](auto value) { return value == Approx(l_value).margin(0.000001); }));
     REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == r_value; }));
+                        [&](auto value) { return value == Approx(r_value).margin(0.000001); }));
     REQUIRE(std::all_of(middle_vector.begin(), middle_vector.end(),
-                        [&](auto value) { return value == m_value; }));
+                        [&](auto value) { return value == Approx(m_value).margin(0.000001); }));
     // check the addition worked correctly
     REQUIRE(static_cast<size_t>(added_vector.dimensions()) == size);
     REQUIRE(std::all_of(added_vector.begin(), added_vector.end(),
-                        [&](auto value) { return value == l_value + r_value - m_value; }));
+                        [&](auto value) { return value == Approx(l_value + r_value - m_value).margin(0.000001); }));
 }
 
 // HANDLE EXCEPTIONS NOW
@@ -138,9 +138,9 @@ TEST_CASE("addition_different_size") {
     REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
     REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size2);
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
     REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
     comp6771::euclidean_vector added_vector;
     REQUIRE_THROWS_WITH(added_vector = left_vector + right_vector,
                         "Dimensions of LHS(" + std::to_string(size1) + ") and RHS (" + std::to_string(size2) +
@@ -148,8 +148,8 @@ TEST_CASE("addition_different_size") {
     // NO CHANGES!
     REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
     REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size2);
     REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
 }

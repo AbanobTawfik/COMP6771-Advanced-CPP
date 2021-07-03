@@ -9,23 +9,23 @@
 TEST_CASE("unary_base_case") {
     auto vector = comp6771::euclidean_vector();
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == Approx(0).margin(0.000001));
     vector = +vector;
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == Approx(0).margin(0.000001));
 }
 
 TEST_CASE("unary_changes") {
     auto vector = comp6771::euclidean_vector();
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == Approx(0).margin(0.000001));
 
     vector = +vector;
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == Approx(0).margin(0.000001));
 
     // make sure changes give desired results
     vector[0] = 1;
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
-    REQUIRE(vector[0] == 1);
+    REQUIRE(vector[0] == Approx(0).margin(0.000001));
 }

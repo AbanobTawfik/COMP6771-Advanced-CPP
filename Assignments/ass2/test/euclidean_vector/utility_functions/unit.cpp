@@ -13,10 +13,10 @@
 TEST_CASE("unit_vector_size1") {
     const auto vector = comp6771::euclidean_vector(1, 1);
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
-    REQUIRE(vector[0] == 1);
+    REQUIRE(vector[0] == Approx(1).margin(0.000001));
     const auto euclidean_norm = comp6771::euclidean_norm(vector);
     // sqrt(1*1) = 1
-    REQUIRE(euclidean_norm == 1);
+    REQUIRE(euclidean_norm == Approx(1).margin(0.000001));
     const auto unit_vector = comp6771::unit(vector);
     REQUIRE(static_cast<size_t>(unit_vector.dimensions() == vector.dimensions()));
     // now we need to check the unit vector gave us the correct value, since the unit vector is just
@@ -42,7 +42,7 @@ TEST_CASE("euclidean_vector_alot_of_values") {
     }
     actual_euclidean_norm = std::sqrt(actual_euclidean_norm);
     // comparing actual euclidean norm computed by hand with the internal one from the comp6771 namespace
-    REQUIRE(euclidean_norm == actual_euclidean_norm);
+    REQUIRE(euclidean_norm == Approx(actual_euclidean_norm).margin(0.000001));
     const auto unit_vector = comp6771::unit(vector);
     REQUIRE(static_cast<size_t>(unit_vector.dimensions() == vector.dimensions()));
     REQUIRE(unit_vector == vector / euclidean_norm);
@@ -53,19 +53,19 @@ TEST_CASE("unit_vector_0_euclidean_norm") {
     // creating 0 vector, dimension 1 aka default vector
     const auto vector = comp6771::euclidean_vector();
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == Approx(0).margin(0.000001));
     // euclidean norm will be 0
     auto euclidean_norm = comp6771::euclidean_norm(vector);
     // sqrt(0*0) = 0
-    REQUIRE(euclidean_norm == 0);
+    REQUIRE(euclidean_norm == Approx(0).margin(0.000001));
 
     REQUIRE_THROWS_WITH(comp6771::unit(vector),
                         "euclidean_vector with zero euclidean normal does not have a unit vector\n");
     // original vector is unmodified!
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == Approx(0).margin(0.000001));
     euclidean_norm = comp6771::euclidean_norm(vector);
-    REQUIRE(euclidean_norm == 0);
+    REQUIRE(euclidean_norm == Approx(0).margin(0.000001));
 }
 
 // empty unit vector case dimensionless takes precedence over 0 euclidean norm error case

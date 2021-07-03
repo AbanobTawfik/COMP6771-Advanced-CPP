@@ -13,16 +13,16 @@
 TEST_CASE("default_constructor_euclidean_vector") {
     const auto vector = comp6771::euclidean_vector();
     REQUIRE(static_cast<size_t>(static_cast<size_t>(vector.dimensions())) == 1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == Approx(0).margin(0.000001));
     const auto euclidean_norm = comp6771::euclidean_norm(vector);
-    REQUIRE(euclidean_norm == 0);
+    REQUIRE(euclidean_norm == Approx(0).margin(0.000001));
 }
 
 TEST_CASE("empty_constructor_euclidean_vector") {
     const auto vector = comp6771::euclidean_vector(0);
     REQUIRE(static_cast<size_t>(static_cast<size_t>(vector.dimensions())) == 0);
     const auto euclidean_norm = comp6771::euclidean_norm(vector);
-    REQUIRE(euclidean_norm == 0);
+    REQUIRE(euclidean_norm == Approx(0).margin(0.000001));
 }
 
 TEST_CASE("euclidean_vector_with_values") {
@@ -43,5 +43,5 @@ TEST_CASE("euclidean_vector_with_values") {
         actual_euclidean_norm += val * val;
     }
     actual_euclidean_norm = std::sqrt(actual_euclidean_norm);
-    REQUIRE(euclidean_norm == actual_euclidean_norm);
+    REQUIRE(euclidean_norm == Approx(actual_euclidean_norm).margin(0.000001));
 }

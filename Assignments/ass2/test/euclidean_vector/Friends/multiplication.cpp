@@ -22,7 +22,7 @@ TEST_CASE("basic_multiplication_empty_vectors") {
 }
 
 TEST_CASE("basic_multiplication_case_different_values") {
-    const size_t size =500;
+    const size_t size = 500;
     const auto value = -500.434;
     const auto scale = -34.9845;
     auto stdvector = std::vector<double>(size);
@@ -39,7 +39,7 @@ TEST_CASE("basic_multiplication_case_different_values") {
     // check the multiplication worked correctly
     size_t count = 0;
     REQUIRE(std::all_of(multiplied_vector.begin(), multiplied_vector.end(),
-                        [&](auto value) { return value == stdvector.at(count++) * scale; }));
+                        [&](auto value) { return value == Approx(stdvector.at(count++) * scale).margin(0.000001); }));
 }
 
 TEST_CASE("multiplication_negation_same") {
@@ -49,18 +49,18 @@ TEST_CASE("multiplication_negation_same") {
     auto vector = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
 
     const auto multiplied_vector = vector * scale;
     // check original vector is unchanged
     REQUIRE(vector.dimensions() == size);
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
 
     // check the multiplication worked correctly
     REQUIRE(multiplied_vector.dimensions() == size);
     REQUIRE(std::all_of(multiplied_vector.begin(), multiplied_vector.end(),
-                        [&](auto value) { return value == val * scale; }));
+                        [&](auto value) { return value == Approx(val * scale).margin(0.000001); }));
     REQUIRE(multiplied_vector == -vector);
 }
 
@@ -71,17 +71,17 @@ TEST_CASE("multiplication_unary_same") {
     auto vector = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
 
     const auto multiplied_vector = vector * scale;
     // check original vector is unchanged
     REQUIRE(vector.dimensions() == size);
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
 
     // check the multiplication worked correctly
     REQUIRE(multiplied_vector.dimensions() == size);
     REQUIRE(std::all_of(multiplied_vector.begin(), multiplied_vector.end(),
-                        [&](auto value) { return value == val * scale; }));
+                        [&](auto value) { return value == Approx(val * scale).margin(0.000001); }));
     REQUIRE(multiplied_vector == +vector);
 }

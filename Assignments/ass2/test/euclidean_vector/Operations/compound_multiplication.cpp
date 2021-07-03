@@ -21,10 +21,9 @@ TEST_CASE("basic_compound_multiplication_empty_vectors") {
 }
 
 TEST_CASE("basic_compound_multiplication_case_different_values") {
-    const size_t size =500;
+    const size_t size = 500;
     const auto value = -500.434;
     const auto scale = -34.9845;
-    size_t count = 0;
     auto stdvector = std::vector<double>(size);
     std::iota(stdvector.begin(), stdvector.end(), value);
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
@@ -34,45 +33,53 @@ TEST_CASE("basic_compound_multiplication_case_different_values") {
 
     vector *= scale;
     // check the compound_multiplication worked correctly
-    count = 0;
+    size_t count = 0;
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == stdvector.at(count++) * scale; }));
+                        [&](auto val) { return val == Approx(stdvector.at(count++) * scale).margin(0.000001); }));
 }
 
 TEST_CASE("compound_multiplication_negation_same") {
     auto scale = -1;
-    const size_t size =5;
+    const size_t size = 5;
     auto val = 3;
     auto vector = comp6771::euclidean_vector(size, val);
     auto pre_compound_multiplication = comp6771::euclidean_vector(size, val);
     REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) {
+                            return value == Approx(val).margin(0.000001);
+                        }));
     REQUIRE(vector == pre_compound_multiplication);
 
     vector *= scale;
     REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
     // check the compound_multiplication worked correctly
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == val * scale; }));
+                        [&](auto value) {
+                            return value == Approx(val * scale).margin(0.000001);
+                        }));
     REQUIRE(vector == -pre_compound_multiplication);
 }
 
 TEST_CASE("compound_multiplication_unary_same") {
     auto scale = 1;
-    const size_t size =5;
+    const size_t size = 5;
     auto val = 3;
     auto vector = comp6771::euclidean_vector(size, val);
     auto pre_compound_multiplication = comp6771::euclidean_vector(size, val);
     REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) {
+                            return value == Approx(val).margin(0.000001);
+                        }));
     REQUIRE(vector == pre_compound_multiplication);
 
     vector *= scale;
     REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
     // check the compound_multiplication worked correctly
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == val * scale; }));
+                        [&](auto value) {
+                            return value == Approx(val * scale).margin(0.000001);
+                        }));
     REQUIRE(vector == +pre_compound_multiplication);
 }

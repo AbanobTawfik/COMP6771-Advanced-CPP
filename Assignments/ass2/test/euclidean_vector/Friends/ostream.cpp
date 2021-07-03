@@ -39,7 +39,7 @@ TEST_CASE("os_works_correctly_equal_vectors_empty") {
 TEST_CASE("os_works_correctly_equal_vectors_default_constructor_one_value") {
     const auto vector = comp6771::euclidean_vector();
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == Approx(0).margin(0.000001));
     const auto empty_vector_string = "[0]";
     std::cout.setstate(std::ios_base::badbit);
     std::ostream& os_vector = std::cout << vector << "\n";
@@ -52,7 +52,7 @@ TEST_CASE("os_works_correctly_multiple_values") {
     const auto vector = comp6771::euclidean_vector(10, 5);
     // check vectors are equal first by checking properties of internals
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 10);
-    REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) { return value == 5; }));
+    REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) { return value == Approx(5).margin(0.000001); }));
     // check if the equals now does the same thing
     const auto empty_vector_string = "[5 5 5 5 5 5 5 5 5 5]";
     std::cout.setstate(std::ios_base::badbit);

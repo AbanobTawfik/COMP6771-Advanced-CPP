@@ -12,7 +12,7 @@ TEST_CASE("default_move_constructor") {
     const auto move_empty_constructor = comp6771::euclidean_vector(std::move(empty_constructor));
     // we want to make sure that our new vector is the same as the one that moved into it (Default constructor)
     REQUIRE(static_cast<size_t>(move_empty_constructor.dimensions()) == 1);
-    REQUIRE(move_empty_constructor[0] == 0);
+    REQUIRE(move_empty_constructor[0] == Approx(0).margin(0.000001));
     // check what we moved from was also removed, i.e length 0
     REQUIRE(static_cast<size_t>(empty_constructor.dimensions()) == 0);
 }

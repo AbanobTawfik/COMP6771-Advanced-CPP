@@ -38,12 +38,9 @@ TEST_CASE("basic_division_case_different_values") {
     REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
     // check the division worked correctly
     size_t count = 0;
-    // we check the values are within a range of the difference below as floating point conversion can be lossy and
-    // precision errors
-    const auto difference = 0.00001;
     REQUIRE(std::all_of(divided_vector.begin(), divided_vector.end(),
                         [&](auto value) {
-                            return std::abs(value - (stdvector.at(count++) / scale)) < difference;
+                            return value == Approx(stdvector.at(count++) / scale).template margin(0.000001);
                         }));
 }
 
@@ -54,18 +51,18 @@ TEST_CASE("division_negation_same") {
     auto vector = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
 
     const auto divided_vector = vector / scale;
     // check original vector is unchanged
     REQUIRE(vector.dimensions() == size);
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
 
     // check the division worked correctly
     REQUIRE(divided_vector.dimensions() == size);
     REQUIRE(std::all_of(divided_vector.begin(), divided_vector.end(),
-                        [&](auto value) { return value == val / scale; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
     REQUIRE(divided_vector == -vector);
 }
 
@@ -76,18 +73,18 @@ TEST_CASE("division_unary_same") {
     auto vector = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
 
     const auto divided_vector = vector / scale;
     // check original vector is unchanged
     REQUIRE(vector.dimensions() == size);
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
 
     // check the division worked correctly
     REQUIRE(divided_vector.dimensions() == size);
     REQUIRE(std::all_of(divided_vector.begin(), divided_vector.end(),
-                        [&](auto value) { return value == val / scale; }));
+                        [&](auto value) { return value == Approx(val/scale).margin(0.000001); }));
     REQUIRE(divided_vector == +vector);
 }
 
@@ -97,10 +94,10 @@ TEST_CASE("compound_division_different_size") {
     const auto scale = 0;
     auto vector = comp6771::euclidean_vector();
     REQUIRE(vector.dimensions() == 1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == Approx(0.0).margin(0.000001));
     REQUIRE_THROWS_WITH(vector /= scale,
                         "Invalid vector division by 0\n");
     // CHECK NO CHANGES
     REQUIRE(vector.dimensions() == 1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == Approx(0).margin(0.000001));
 }

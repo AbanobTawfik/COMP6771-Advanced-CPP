@@ -9,7 +9,7 @@
 TEST_CASE("empty_initialiser_list") {
     const auto euclidean_vec = comp6771::euclidean_vector{};
     REQUIRE(static_cast<size_t>(euclidean_vec.dimensions()) == 1);
-    REQUIRE(euclidean_vec[0] == 0);
+    REQUIRE(euclidean_vec[0] == Approx(0).margin(0.000001));
     // now we want to check if a default constructed euclidean vector gives the same result
     const auto default_euclidean_vec = comp6771::euclidean_vector();
     REQUIRE(default_euclidean_vec == euclidean_vec);
@@ -21,5 +21,5 @@ TEST_CASE("normal_initialiser_list_with_different_values") {
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 10);
     auto count = 0;
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == count++; }));
+                        [&](auto value) { return value == Approx(count++).margin(0.000001); }));
 }

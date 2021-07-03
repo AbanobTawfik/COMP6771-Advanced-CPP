@@ -10,7 +10,7 @@ TEST_CASE("size_constructor_implicit") {
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 10);
     // check all values defaulting to 0
     REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == 0; }));
+                        [&](auto value) { return value == Approx(0).margin(0.000001); }));
 }
 
 TEST_CASE("size_constructor_explicit") {
@@ -18,7 +18,7 @@ TEST_CASE("size_constructor_explicit") {
     auto vector_object_initialised = comp6771::euclidean_vector(dimension);
     REQUIRE(static_cast<size_t>(vector_object_initialised.dimensions()) == 3);
     REQUIRE(std::all_of(vector_object_initialised.begin(), vector_object_initialised.end(),
-                        [&](auto value) { return value == 0; }));
+                        [&](auto value) { return value == Approx(0).margin(0.000001); }));
 }
 
 TEST_CASE("size_constructor_empty") {

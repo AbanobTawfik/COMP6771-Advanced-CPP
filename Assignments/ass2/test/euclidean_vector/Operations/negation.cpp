@@ -18,14 +18,14 @@ TEST_CASE("negation_empty_case") {
 TEST_CASE("negation_base_case") {
     auto vector = comp6771::euclidean_vector();
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == Approx(0).margin(0.000001));
     vector = -vector;
     REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
-    REQUIRE(vector[0] == 0);
+    REQUIRE(vector[0] == Approx(0).margin(0.000001));
 }
 
 TEST_CASE("negation_with_values") {
-    const size_t size =500;
+    const size_t size = 500;
     const auto value = -500.434;
     auto stdvector = std::vector<double>(size);
     // values using iota will be steadily increasing so all different
@@ -36,5 +36,6 @@ TEST_CASE("negation_with_values") {
     // call in the negation
     vector = -vector;
     size_t count = 0;
-    REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) { return value == -1 * stdvector.at(count++); }));
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == Approx(-1 * stdvector.at(count++)).margin(0.000001); }));
 }

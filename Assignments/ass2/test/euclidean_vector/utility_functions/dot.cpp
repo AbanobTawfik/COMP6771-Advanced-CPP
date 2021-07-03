@@ -11,17 +11,17 @@
 TEST_CASE("dot_product_empty_vectors") {
     const auto left_vector = comp6771::euclidean_vector();
     REQUIRE(static_cast<size_t>(left_vector.dimensions()) == 1);
-    REQUIRE(left_vector[0] == 0);
+    REQUIRE(left_vector[0] == Approx(0).margin(0.000001));
 
     const auto right_vector = comp6771::euclidean_vector();
     REQUIRE(static_cast<size_t>(right_vector.dimensions()) == 1);
-    REQUIRE(right_vector[0] == 0);
+    REQUIRE(right_vector[0] == Approx(0).margin(0.000001));
 
     const auto dot_product = comp6771::dot(left_vector, right_vector);
 
     // make sure dot product is correctly calculated
     // [0] . [0] = 0 + 0 -> 0
-    REQUIRE(dot_product == 0);
+    REQUIRE(dot_product == Approx(0).margin(0.000001));
 }
 
 TEST_CASE("dot_product_with_different_values") {
@@ -58,7 +58,7 @@ TEST_CASE("dot_product_with_different_values") {
     for (auto i = 0; i < static_cast<int>(size); i++) {
         dot_product_compare += left_vector[static_cast<int>(i)] * right_vector[static_cast<int>(i)];
     }
-    REQUIRE(dot_product == dot_product_compare);
+    REQUIRE(dot_product == Approx(dot_product_compare).margin(0.000001));
 }
 
 // Exception, different sizes
@@ -72,9 +72,9 @@ TEST_CASE("dot_product_different_size") {
     REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
     REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size2);
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
     REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
     REQUIRE_THROWS_WITH(comp6771::dot(left_vector, right_vector),
                         "Dimensions of LHS(" + std::to_string(size1) + ") and RHS (" + std::to_string(size2) +
                         ") do not match\n");
@@ -82,7 +82,7 @@ TEST_CASE("dot_product_different_size") {
     REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
     REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size2);
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
     REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == val; }));
+                        [&](auto value) { return value == Approx(val).margin(0.000001); }));
 }

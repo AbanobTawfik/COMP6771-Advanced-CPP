@@ -43,9 +43,9 @@ TEST_CASE("equals_works_correctly_equal_vectors_default_constructor") {
     const auto vector_one = comp6771::euclidean_vector();
     const auto vector_two = comp6771::euclidean_vector();
     REQUIRE(static_cast<size_t>(vector_one.dimensions()) == 1);
-    REQUIRE(vector_one[0] == 0);
+    REQUIRE(vector_one[0] == Approx(0).margin(0.000001));
     REQUIRE(static_cast<size_t>(vector_two.dimensions()) == 1);
-    REQUIRE(vector_two[0] == 0);
+    REQUIRE(vector_two[0] == Approx(0).margin(0.000001));
     auto equal = (vector_one == vector_two);
     REQUIRE(equal);
 }
@@ -56,9 +56,11 @@ TEST_CASE("equals_works_correctly_equal_vectors") {
     const auto vector_two = comp6771::euclidean_vector(10, 5);
     // check vectors are equal first by checking properties of internals
     REQUIRE(static_cast<size_t>(vector_one.dimensions()) == 10);
-    REQUIRE(std::all_of(vector_one.begin(), vector_one.end(), [&](auto value) { return value == 5; }));
+    REQUIRE(std::all_of(vector_one.begin(), vector_one.end(),
+                        [&](auto value) { return value == Approx(5).margin(0.000001); }));
     REQUIRE(static_cast<size_t>(vector_two.dimensions()) == 10);
-    REQUIRE(std::all_of(vector_two.begin(), vector_two.end(), [&](auto value) { return value == 5; }));
+    REQUIRE(std::all_of(vector_two.begin(), vector_two.end(),
+                        [&](auto value) { return value == Approx(5).margin(0.000001); }));
     // check if the equals now does the same thing
     auto equal = (vector_one == vector_two);
     REQUIRE(equal);
@@ -69,9 +71,9 @@ TEST_CASE("equals_works_correctly_equal_vectors_assigned1") {
     const auto vector_one = comp6771::euclidean_vector(10, 5);
     const auto vector_two = comp6771::euclidean_vector(vector_one);
     REQUIRE(static_cast<size_t>(vector_one.dimensions()) == 10);
-    REQUIRE(std::all_of(vector_one.begin(), vector_one.end(), [&](auto value) { return value == 5; }));
+    REQUIRE(std::all_of(vector_one.begin(), vector_one.end(), [&](auto value) { return value == Approx(5).margin(0.000001); }));
     REQUIRE(static_cast<size_t>(vector_two.dimensions()) == 10);
-    REQUIRE(std::all_of(vector_two.begin(), vector_two.end(), [&](auto value) { return value == 5; }));
+    REQUIRE(std::all_of(vector_two.begin(), vector_two.end(), [&](auto value) { return value == Approx(5).margin(0.000001); }));
     auto equal = (vector_one == vector_two);
     REQUIRE(equal);
 }
@@ -81,9 +83,9 @@ TEST_CASE("equals_works_correctly_equal_vectors_assigned2") {
     const auto vector_one = comp6771::euclidean_vector(10, 5);
     const auto vector_two = vector_one;
     REQUIRE(static_cast<size_t>(vector_one.dimensions()) == 10);
-    REQUIRE(std::all_of(vector_one.begin(), vector_one.end(), [&](auto value) { return value == 5; }));
+    REQUIRE(std::all_of(vector_one.begin(), vector_one.end(), [&](auto value) { return value == Approx(5).margin(0.000001); }));
     REQUIRE(static_cast<size_t>(vector_two.dimensions()) == 10);
-    REQUIRE(std::all_of(vector_two.begin(), vector_two.end(), [&](auto value) { return value == 5; }));
+    REQUIRE(std::all_of(vector_two.begin(), vector_two.end(), [&](auto value) { return value == Approx(5).margin(0.000001); }));
     auto equal = (vector_one == vector_two);
     REQUIRE(equal);
 }
@@ -93,9 +95,9 @@ TEST_CASE("equals_works_correctly_unequal_vectors") {
     const auto vector_one = comp6771::euclidean_vector(10, 5);
     const auto vector_two = comp6771::euclidean_vector(15, 5);
     REQUIRE(static_cast<size_t>(vector_one.dimensions()) == 10);
-    REQUIRE(std::all_of(vector_one.begin(), vector_one.end(), [&](auto value) { return value == 5; }));
+    REQUIRE(std::all_of(vector_one.begin(), vector_one.end(), [&](auto value) { return value == Approx(5).margin(0.000001); }));
     REQUIRE(static_cast<size_t>(vector_two.dimensions()) == 15);
-    REQUIRE(std::all_of(vector_two.begin(), vector_two.end(), [&](auto value) { return value == 5; }));
+    REQUIRE(std::all_of(vector_two.begin(), vector_two.end(), [&](auto value) { return value == Approx(5).margin(0.000001); }));
     auto equal = (vector_one == vector_two);
     REQUIRE(!equal);
 }
