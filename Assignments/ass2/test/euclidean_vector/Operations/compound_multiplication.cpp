@@ -1,11 +1,15 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <sstream>
 #include <iostream>
 #include <vector>
 
-// normal correct cases
+// for testing multiplication a few things were tested for the sake of completeness
+// 1. multiplication on empty vector [] * scale = []
+// 2. multiplication on vector with values should multiply each index value by scale correctly
+// 3. checking multiplying by 1 is the same as unary
+// 3. checking multiplying by -1 is the same as negation
+
 TEST_CASE("basic_compound_multiplication_empty_vectors") {
     auto left_vector = comp6771::euclidean_vector(0);
     auto left_vector_copy = left_vector;
@@ -15,24 +19,6 @@ TEST_CASE("basic_compound_multiplication_empty_vectors") {
     // make sure no changes
     REQUIRE(left_vector.dimensions() == 0);
     REQUIRE(left_vector == left_vector_copy);
-}
-
-TEST_CASE("basic_compound_multiplication_case_all_same") {
-    auto scale = 3;
-    auto size = 5;
-    auto val = 3;
-    auto vector = comp6771::euclidean_vector(size, val);
-    REQUIRE(vector.dimensions() == size);
-    bool all_values_same = std::all_of(vector.begin(), vector.end(),
-                                       [&](auto value) { return value == val; });
-    REQUIRE(all_values_same);
-
-    vector *= scale;
-    REQUIRE(vector.dimensions() == size);
-    // check the compound_multiplication worked correctly
-    auto values_updated_correctly = std::all_of(vector.begin(), vector.end(),
-                                                [&](auto value) { return value == val * scale; });
-    REQUIRE(values_updated_correctly);
 }
 
 TEST_CASE("basic_compound_multiplication_case_different_values") {
@@ -46,16 +32,14 @@ TEST_CASE("basic_compound_multiplication_case_different_values") {
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     REQUIRE(vector.dimensions() == stdvector.size());
     REQUIRE(vector.dimensions() == size);
-    bool all_values_same = std::all_of(vector.begin(), vector.end(),
-                                       [&](auto value) { return value == stdvector.at(count++); });
-    REQUIRE(all_values_same);
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == stdvector.at(count++); }));
 
     vector *= scale;
     // check the compound_multiplication worked correctly
     count = 0;
-    auto values_updated_correctly = std::all_of(vector.begin(), vector.end(),
-                                                [&](auto value) { return value == stdvector.at(count++) * scale; });
-    REQUIRE(values_updated_correctly);
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == stdvector.at(count++) * scale; }));
 }
 
 TEST_CASE("compound_multiplication_negation_same") {
@@ -65,17 +49,15 @@ TEST_CASE("compound_multiplication_negation_same") {
     auto vector = comp6771::euclidean_vector(size, val);
     auto pre_compound_multiplication = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
-    bool all_values_same = std::all_of(vector.begin(), vector.end(),
-                                       [&](auto value) { return value == val; });
-    REQUIRE(all_values_same);
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == val; }));
     REQUIRE(vector == pre_compound_multiplication);
 
     vector *= scale;
     REQUIRE(vector.dimensions() == size);
     // check the compound_multiplication worked correctly
-    auto values_updated_correctly = std::all_of(vector.begin(), vector.end(),
-                                                [&](auto value) { return value == val * scale; });
-    REQUIRE(values_updated_correctly);
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == val * scale; }));
     REQUIRE(vector == -pre_compound_multiplication);
 }
 
@@ -86,16 +68,14 @@ TEST_CASE("compound_multiplication_unary_same") {
     auto vector = comp6771::euclidean_vector(size, val);
     auto pre_compound_multiplication = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
-    bool all_values_same = std::all_of(vector.begin(), vector.end(),
-                                       [&](auto value) { return value == val; });
-    REQUIRE(all_values_same);
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == val; }));
     REQUIRE(vector == pre_compound_multiplication);
 
     vector *= scale;
     REQUIRE(vector.dimensions() == size);
     // check the compound_multiplication worked correctly
-    auto values_updated_correctly = std::all_of(vector.begin(), vector.end(),
-                                                [&](auto value) { return value == val * scale; });
-    REQUIRE(values_updated_correctly);
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == val * scale; }));
     REQUIRE(vector == +pre_compound_multiplication);
 }

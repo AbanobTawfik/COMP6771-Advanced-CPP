@@ -1,12 +1,13 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <sstream>
 #include <iostream>
 #include <vector>
 
+// i wrote 3 tests to check all possible behaviour and expected outcome of using copy constructor
 // Test 1 : tests that creating a copy of an empty vector returns a correct empty vector
 // Test 2 : just makes sure that when copying a vector, all values are identical to the original vector
+// Test 3 : makes sure that when changing a value, the other vector it was copied from is unaffected
 
 TEST_CASE("empty_copy_constructor") {
     const auto empty_constructor = comp6771::euclidean_vector();
@@ -28,14 +29,9 @@ TEST_CASE("copy_with_values_no_change") {
 
     REQUIRE(vector.dimensions() == size);
     REQUIRE(vector.dimensions() == copy_vector.dimensions());
-    bool all_values_same = true;
-    for (auto i = 0; i < size; i++) {
-        if (vector.at(i) != copy_vector.at(i)) {
-            all_values_same = false;
-            break;
-        }
-    }
-    REQUIRE(all_values_same);
+    auto count = 0;
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == stdvector.at(count++); }));
 }
 
 TEST_CASE("copy_with_values_change_after") {
@@ -49,37 +45,22 @@ TEST_CASE("copy_with_values_change_after") {
     auto copy_vector = comp6771::euclidean_vector(vector);
     REQUIRE(vector.dimensions() == size);
     REQUIRE(vector.dimensions() == copy_vector.dimensions());
-    bool all_values_same = true;
-    for (auto i = 0; i < size; i++) {
-        if (vector.at(i) != copy_vector.at(i)) {
-            all_values_same = false;
-            break;
-        }
-    }
-    REQUIRE(all_values_same);
+    auto count = 0;
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == copy_vector.at(count++); }));
     for (auto i = 0; i < size; i++) {
         copy_vector[i]++;
     }
     // first check all values are unchanged on original vector, then check changes occured
-    for (auto i = 0; i < size; i++) {
-        if (vector.at(i) != check_no_changes.at(i)) {
-            all_values_same = false;
-            break;
-        }
-    }
-    REQUIRE(all_values_same);
-    bool all_values_different = true;
-    bool all_values_modified_by_1 = true;
-    for (auto i = 0; i < size; i++) {
-        if (vector.at(i) == copy_vector.at(i)) {
-            all_values_different = false;
-            break;
-        }
-        if (vector.at(i) != copy_vector.at(i) - 1) {
-            all_values_modified_by_1 = false;
-            break;
-        }
-    }
-    REQUIRE(all_values_different);
-    REQUIRE(all_values_modified_by_1);
+    count = 0;
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == check_no_changes.at(count++); }));
+
+    // check changed vector is modified properly, not original values, but incremented by 1 from original
+    count = 0;
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value != copy_vector.at(count++); }));
+    count = 0;
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == (copy_vector.at(count++) - 1); }));
 }

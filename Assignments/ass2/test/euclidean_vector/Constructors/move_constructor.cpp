@@ -1,12 +1,11 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <sstream>
-#include <iostream>
 #include <vector>
 
-// when we copy constructor, we want the created vector to be detatched from the original vector, this means
-// changes to the copied vector do not carry through the original, however they start off the same!
+// when testing move we want to make sure that the original vector moved from is correctly dealt with
+// this means setting the dimensions to 0 (i.e. clearing it ready for deletion)
+// the other case handled is just on the default constructor
 
 TEST_CASE("default_move_constructor") {
     auto empty_constructor = comp6771::euclidean_vector();
@@ -27,27 +26,14 @@ TEST_CASE("contains_values_move_constructor") {
 
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     REQUIRE(vector.dimensions() == size);
-    bool all_values_same = true;
-    for (auto i = 0; i < size; i++) {
-        if (vector.at(i) != stdvector.at(i)) {
-            all_values_same = false;
-            break;
-        }
-    }
-    REQUIRE(all_values_same);
-
+    auto count = 0;
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == stdvector.at(count++); }));
     const auto moved_vector = comp6771::euclidean_vector(std::move(vector));
-
     REQUIRE(moved_vector.dimensions() == size);
-    all_values_same = true;
-    for (auto i = 0; i < size; i++) {
-        if (moved_vector.at(i) != stdvector.at(i)) {
-            all_values_same = false;
-            break;
-        }
-    }
-    REQUIRE(all_values_same);
-
+    count = 0;
+    REQUIRE(std::all_of(moved_vector.begin(), moved_vector.end(),
+                        [&](auto value) { return value == stdvector.at(count++); }));
     // check what we moved from was also removed, i.e length 0
     REQUIRE(vector.dimensions() == 0);
 }

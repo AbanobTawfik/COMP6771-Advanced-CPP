@@ -1,12 +1,10 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <sstream>
-#include <iostream>
-#include <vector>
 
-// since we can assume the integer passed into single arguement constructor can always be assumed to be non-negative
-// we don't have any other edge cases
+// Only two test case needed, first is with empty initaliser list, we expect the default constructor
+// reference: https://edstem.org/courses/5921/discussion/519507?comment=1190795
+// other case just checks all values line up in the correct indicies for the list passed in
 
 TEST_CASE("empty_initialiser_list") {
     const auto euclidean_vec = comp6771::euclidean_vector{};
@@ -21,12 +19,7 @@ TEST_CASE("normal_initialiser_list_with_different_values") {
 
     const auto vector = comp6771::euclidean_vector{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     REQUIRE(vector.dimensions() == 10);
-    bool all_values_same = true;
-    for (auto i = 0; i < vector.dimensions(); i++) {
-        if (vector.at(i) != i) {
-            all_values_same = false;
-            break;
-        }
-    }
-    REQUIRE(all_values_same);
+    auto count = 0;
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == count++; }));
 }

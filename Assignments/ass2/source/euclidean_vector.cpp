@@ -221,30 +221,6 @@ namespace comp6771 {
         return os;
     }
 
-//    auto euclidean_vector::check_cached_norm() const -> double {
-//        return euclidean_norm_;
-//    }
-
-//    void euclidean_vector::set_cached_norm(const double euclidean_norm) const {
-//        euclidean_norm_ = euclidean_norm;
-//    }
-
-//    auto euclidean_vector::begin() -> std::unique_ptr<double[]>::pointer {
-//        return magnitude_.get();
-//    }
-//
-//    auto euclidean_vector::end() -> std::unique_ptr<double[]>::pointer {
-//        return magnitude_.get() + length_;
-//    }
-//
-//    auto euclidean_vector::begin() const -> std::unique_ptr<double[]>::pointer {
-//        return magnitude_.get();
-//    }
-//
-//    auto euclidean_vector::end() const -> std::unique_ptr<double[]>::pointer {
-//        return magnitude_.get() + length_;
-//    }
-
     euclidean_vector::~euclidean_vector() = default;
 
     auto euclidean_norm(euclidean_vector const &vector) -> double {

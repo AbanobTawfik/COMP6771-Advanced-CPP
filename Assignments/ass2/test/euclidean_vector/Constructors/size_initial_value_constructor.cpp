@@ -1,12 +1,9 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <sstream>
 #include <iostream>
-#include <vector>
 
-// since we can assume the integer passed into single arguement constructor can always be assumed to be non-negative
-// we don't have any other edge cases
+// similar case to size constructor, testing the empty case, and using explicit and implicit values as seen in spec
 
 TEST_CASE("size_constructor_magnitude_empty") {
     const auto vector = comp6771::euclidean_vector(0, 4);
@@ -16,10 +13,9 @@ TEST_CASE("size_constructor_magnitude_empty") {
 TEST_CASE("size_constructor_magnitude_implicit") {
     const auto vector = comp6771::euclidean_vector(10, 4);
     REQUIRE(vector.dimensions() == 10);
-    // check all values defaulting to 0
-    for (auto i = 0; i < vector.dimensions(); i++) {
-        REQUIRE(vector[i] == 4);
-    }
+    // check all values defaulting to initial value of 4
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == 4; }));
 }
 
 TEST_CASE("size_constructor_magnitude_explicit") {
@@ -27,7 +23,6 @@ TEST_CASE("size_constructor_magnitude_explicit") {
     auto magnitude = double{3.24};
     auto vector_object_initialised = comp6771::euclidean_vector(dimension, magnitude);
     REQUIRE(vector_object_initialised.dimensions() == 3);
-    for (auto i = 0; i < dimension; i++) {
-        REQUIRE(vector_object_initialised[i] == magnitude);
-    }
+    REQUIRE(std::all_of(vector_object_initialised.begin(), vector_object_initialised.end(),
+                        [&](auto value) { return value == magnitude; }));
 }

@@ -1,7 +1,6 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <sstream>
 #include <iostream>
 #include <vector>
 
@@ -16,39 +15,6 @@ TEST_CASE("cache_storing_correctly") {
     // O(1)
     const auto cached_norm = vector.check_cached_norm();
     REQUIRE(cached_norm == euclidean_norm);
-}
-
-// we will see how many more nanoseconds caching saves as to not caching on a VERY LARGE VECTOR
-TEST_CASE("cache_speeds_up_code") {
-    const auto size = 1000000;
-    const auto value = -459.34234978;
-    auto stdvector = std::vector<double>(size);
-    std::iota(stdvector.begin(), stdvector.end(), value);
-    auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
-
-    auto cache_before_call = vector.check_cached_norm();
-    REQUIRE(cache_before_call == -1);
-
-    auto start = std::chrono::high_resolution_clock::now();
-    auto norm = comp6771::euclidean_norm(vector);
-    auto end = std::chrono::high_resolution_clock::now();
-    auto cache_after_call = vector.check_cached_norm();
-    REQUIRE(norm == cache_after_call);
-    auto duration_uncached = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-
-    auto start_cached = std::chrono::high_resolution_clock::now();
-    auto norm_after_one_call = comp6771::euclidean_norm(vector);
-    auto end_cached = std::chrono::high_resolution_clock::now();
-    auto duration_cached = std::chrono::duration_cast<std::chrono::nanoseconds>(end_cached - start_cached);
-    REQUIRE(norm == norm_after_one_call);
-    REQUIRE(norm_after_one_call == cache_after_call);
-
-    // since this vector is very large we will just make sure it is atleast 1000x more faster in terms of milliseconds
-    // to computer
-    // since caching is meant to be O(1),
-    REQUIRE(duration_cached.count() * 1000 < duration_uncached.count());
-    // for debug purpose if needed
-    //std::cout << "uncached: "<< duration_uncached.count() << std::endl << "cached: " << duration_cached.count() << std::endl;
 }
 
 TEST_CASE("cache_invalidation_on_initialisation") {

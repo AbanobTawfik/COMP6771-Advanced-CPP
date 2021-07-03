@@ -1,12 +1,12 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <sstream>
 #include <iostream>
 #include <vector>
 
-// since we can assume the integer passed into single arguement constructor can always be assumed to be non-negative
-// we don't have any other edge cases
+// the only two types of vectors we can pass in are the empty vector, or a vector populated with values
+// Test case 1: empty vector -> empty euclidean vector
+// test case 2: populated vector -> populated euclidean vector with same values at same indicies
 
 TEST_CASE("empty_vector_constructor") {
     const auto stdvec = std::vector<double>();
@@ -23,12 +23,7 @@ TEST_CASE("normal_vector_with_different_values") {
     const auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     REQUIRE(vector.dimensions() == stdvector.size());
     REQUIRE(vector.dimensions() == size);
-    bool all_values_same = true;
-    for (auto i = 0; i < size; i++) {
-        if (vector.at(i) != stdvector.at(i)) {
-            all_values_same = false;
-            break;
-        }
-    }
-    REQUIRE(all_values_same);
+    auto count = 0;
+    REQUIRE(std::all_of(vector.begin(), vector.end(),
+                        [&](auto value) { return value == stdvector.at(count++); }));
 }
