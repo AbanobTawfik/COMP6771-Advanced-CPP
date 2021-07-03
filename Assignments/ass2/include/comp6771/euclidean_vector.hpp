@@ -33,75 +33,78 @@ namespace comp6771 {
 
         euclidean_vector(euclidean_vector &&) noexcept;
 
-        ~euclidean_vector();
+        inline ~euclidean_vector() = default;
 
-        auto operator=(euclidean_vector const &) -> euclidean_vector &;
+        auto operator=(euclidean_vector const &) noexcept -> euclidean_vector &;
 
-        auto operator=(euclidean_vector &&) -> euclidean_vector &;
+        auto operator=(euclidean_vector &&) noexcept -> euclidean_vector &;
 
         auto operator[](int index) -> double &;
 
         auto operator[](int index) const -> const double &;
 
-        auto operator+() const -> euclidean_vector;
+        auto operator+() const noexcept -> euclidean_vector;
 
-        auto operator-() const -> euclidean_vector;
+        auto operator-() const noexcept -> euclidean_vector;
 
         auto operator+=(euclidean_vector const &) -> euclidean_vector &;
 
         auto operator-=(const euclidean_vector &vector) -> euclidean_vector &;
 
-        auto operator*=(double) -> euclidean_vector &;
+        auto operator*=(double) noexcept -> euclidean_vector &;
 
         auto operator/=(double) -> euclidean_vector &;
 
-        explicit operator std::vector<double>() const;
+        explicit operator std::vector<double>() const noexcept;
 
-        explicit operator std::list<double>() const;
+        explicit operator std::list<double>() const noexcept;
 
         [[nodiscard]] auto at(int) const -> const double &;
 
         [[nodiscard]] auto at(int) -> double &;
 
-        [[nodiscard]] auto dimensions() const -> int;
+        [[nodiscard]] auto dimensions() const noexcept -> int;
 
-        friend auto operator==(euclidean_vector const &, euclidean_vector const &) -> bool;
+        friend auto operator==(euclidean_vector const &, euclidean_vector const &) noexcept -> bool;
 
-        friend auto operator!=(euclidean_vector const &, euclidean_vector const &) -> bool;
+        friend auto operator!=(euclidean_vector const &, euclidean_vector const &) noexcept -> bool;
 
         friend auto operator+(euclidean_vector const &, euclidean_vector const &) -> euclidean_vector;
 
         friend auto operator-(euclidean_vector const &, euclidean_vector const &) -> euclidean_vector;
 
-        friend auto operator*(euclidean_vector const &, double) -> euclidean_vector;
+        friend auto operator*(euclidean_vector const &, double) noexcept -> euclidean_vector;
 
-        friend auto operator*(double, euclidean_vector const &) -> euclidean_vector;
+        friend auto operator*(double, euclidean_vector const &) noexcept -> euclidean_vector;
 
         friend auto operator/(euclidean_vector const &, double) -> euclidean_vector;
 
-        friend auto operator<<(std::ostream &os, euclidean_vector const &vector) -> std::ostream &;
+        friend auto operator<<(std::ostream &os, euclidean_vector const &vector) noexcept -> std::ostream &;
 
-        void set_cached_norm(const double euclidean_norm) const {
+        inline void set_cached_norm(const double euclidean_norm) const noexcept {
             euclidean_norm_ = euclidean_norm;
         }
 
-        auto check_cached_norm() const -> double {
+        inline auto check_cached_norm() const noexcept -> double {
             return euclidean_norm_;
         }
 
-        [[nodiscard]] auto begin() -> std::unique_ptr<double[]>::pointer {
+        // THESE TESTED FUNCTIONS ARE ONLY USED IN TESTING TO MAKE MY LIFE EASIER AND ALLOW ME TO USE THINGS SUCH AS
+        // std::all_of or std::equals, no other part of the implementation uses this, PLEASE NOTE THIS IS TESTED TOO
+        // IM NOT JUST USING AN UNTESTED FUNCTION IN MY TESTS
+        [[nodiscard]] inline auto begin() noexcept -> std::unique_ptr<double[]>::pointer {
             return magnitude_.get();
         }
 
-        [[nodiscard]] auto begin() const -> std::unique_ptr<double[]>::pointer {
+        [[nodiscard]] inline auto begin() const noexcept -> std::unique_ptr<double[]>::pointer {
             return magnitude_.get();
         }
 
-        [[nodiscard]] auto end() -> std::unique_ptr<double[]>::pointer {
+        [[nodiscard]] inline auto end() noexcept -> std::unique_ptr<double[]>::pointer {
             return magnitude_.get() + length_;
         }
 
-        [[nodiscard]] auto end() const -> std::unique_ptr<double[]>::pointer {
+        [[nodiscard]] inline auto end() const noexcept -> std::unique_ptr<double[]>::pointer {
             return magnitude_.get() + length_;
         }
 
@@ -114,7 +117,7 @@ namespace comp6771 {
         mutable double euclidean_norm_;
     };
 
-    auto euclidean_norm(euclidean_vector const &vector) -> double;
+    auto euclidean_norm(euclidean_vector const &vector) noexcept -> double;
 
     auto unit(euclidean_vector const &vector) -> euclidean_vector;
 

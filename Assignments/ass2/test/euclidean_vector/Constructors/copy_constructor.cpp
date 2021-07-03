@@ -1,7 +1,6 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <iostream>
 #include <vector>
 
 // i wrote 3 tests to check all possible behaviour and expected outcome of using copy constructor
@@ -30,8 +29,8 @@ TEST_CASE("copy_with_values_no_change") {
     REQUIRE(vector.dimensions() == size);
     REQUIRE(vector.dimensions() == copy_vector.dimensions());
     auto count = 0;
-    REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == stdvector.at(count++); }));
+    REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
+
 }
 
 TEST_CASE("copy_with_values_change_after") {
@@ -45,22 +44,17 @@ TEST_CASE("copy_with_values_change_after") {
     auto copy_vector = comp6771::euclidean_vector(vector);
     REQUIRE(vector.dimensions() == size);
     REQUIRE(vector.dimensions() == copy_vector.dimensions());
-    auto count = 0;
-    REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == copy_vector.at(count++); }));
-    for (auto i = 0; i < size; i++) {
-        copy_vector[i]++;
-    }
+    REQUIRE(std::equal(vector.begin(), vector.end(), copy_vector.begin(), copy_vector.end()));
+    // add 1 to all values in vector
+    std::transform(copy_vector.begin(), copy_vector.end(), copy_vector.begin(), [&](auto value){
+        return value + 1;
+    });
     // first check all values are unchanged on original vector, then check changes occured
-    count = 0;
-    REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == check_no_changes.at(count++); }));
+    REQUIRE(std::equal(vector.begin(), vector.end(), check_no_changes.begin(), check_no_changes.end()));
+
 
     // check changed vector is modified properly, not original values, but incremented by 1 from original
-    count = 0;
-    REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value != copy_vector.at(count++); }));
-    count = 0;
+    auto count = 0;
     REQUIRE(std::all_of(vector.begin(), vector.end(),
                         [&](auto value) { return value == (copy_vector.at(count++) - 1); }));
 }

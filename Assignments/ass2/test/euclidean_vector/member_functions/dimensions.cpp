@@ -1,9 +1,11 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <sstream>
-#include <iostream>
-#include <vector>
+
+// only had to test 3 simple test cases for dimensions
+// 1. empty vector -> dimensions = 0
+// 2. default vector -> dimensions = 1
+// 3. all other cases, dimensions = size of how it was initialised
 
 // const cases
 TEST_CASE("empty_vector_dimension") {

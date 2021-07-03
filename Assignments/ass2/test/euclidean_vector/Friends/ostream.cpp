@@ -3,12 +3,14 @@
 #include <catch2/catch.hpp>
 #include <sstream>
 #include <iostream>
-#include <vector>
 #include <ostream>
 
-// when we copy constructor, we want the created vector to be detatched from the original vector, this means
-// changes to the copied vector do not carry through the original, however they start off the same!
+// to test ostream works correctly, two ostreams will be made using cout's silenced input silenced by a bad bit
+// the string literal vector (expected result) will be passed into one of the ostream and the other will
+// take the vector in, and these two will be compared for equality. at the end of this, the cout stream is cleared
+// to removed the bad bit.
 
+// this function just compares the strings stored inside the ostream for compairson sake
 auto compare_ostream(std::ostream& os1, std::ostream& os2) -> bool{
     std::stringstream check_os1;
     check_os1 << os1.rdbuf();
@@ -21,6 +23,7 @@ auto compare_ostream(std::ostream& os1, std::ostream& os2) -> bool{
     return check_os1_value == check_os2_value;
 }
 
+// check that the empty euclidean vector outputs []
 TEST_CASE("os_works_correctly_equal_vectors_empty") {
     const auto vector = comp6771::euclidean_vector(0);
     REQUIRE(vector.dimensions() == 0);

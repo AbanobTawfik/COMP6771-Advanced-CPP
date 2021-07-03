@@ -1,12 +1,20 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <sstream>
-#include <iostream>
 #include <vector>
 
-// when we copy constructor, we want the created vector to be detatched from the original vector, this means
-// changes to the copied vector do not carry through the original, however they start off the same!
+// to check equals works correctly, there are two cases to test
+// 1. equals for the case where they are equal -> TRUE
+// 2. equals for the case where they are not equal -> FALSE
+// to test cases where they are equal, we will compare the two vectors to a standard, and if they pass that, then
+// when we check equals gives us true we know it is correct
+// similair for the case where they aren't equal, we will compare the two vectors to a similair standard, and expect them
+// to fail that, then we will check that equals gives us false which we know is correct
+
+// weird cases to also handle, empty vectors which are always equal, [] == []
+// vectors created from each other
+// vectors created from common objects
+// vectors created from different methods expecting the same results
 
 TEST_CASE("equals_works_correctly_equal_vectors_empty") {
     const auto vector_one = comp6771::euclidean_vector(0);
@@ -16,6 +24,9 @@ TEST_CASE("equals_works_correctly_equal_vectors_empty") {
     auto equal = (vector_one == vector_two);
     REQUIRE(equal);
 }
+
+// this specific case tests a euclidean vector with size 0, and a euclidean vector made from an empty standard vector
+// returns equals true
 
 TEST_CASE("equals_works_correctly_equal_vectors_empty2") {
     const auto vector_one = comp6771::euclidean_vector(0);
@@ -27,6 +38,7 @@ TEST_CASE("equals_works_correctly_equal_vectors_empty2") {
     REQUIRE(equal);
 }
 
+// this specific case just checks equals works on default constructor
 TEST_CASE("equals_works_correctly_equal_vectors_default_constructor") {
     const auto vector_one = comp6771::euclidean_vector();
     const auto vector_two = comp6771::euclidean_vector();
@@ -38,6 +50,7 @@ TEST_CASE("equals_works_correctly_equal_vectors_default_constructor") {
     REQUIRE(equal);
 }
 
+// this specific case checks two vectors with values created the same way are also equal
 TEST_CASE("equals_works_correctly_equal_vectors") {
     const auto vector_one = comp6771::euclidean_vector(10, 5);
     const auto vector_two = comp6771::euclidean_vector(10, 5);
@@ -51,6 +64,7 @@ TEST_CASE("equals_works_correctly_equal_vectors") {
     REQUIRE(equal);
 }
 
+// this specific case checks that when you create a vector from another vector, they are equal
 TEST_CASE("equals_works_correctly_equal_vectors_assigned1") {
     const auto vector_one = comp6771::euclidean_vector(10, 5);
     const auto vector_two = comp6771::euclidean_vector(vector_one);
@@ -62,6 +76,7 @@ TEST_CASE("equals_works_correctly_equal_vectors_assigned1") {
     REQUIRE(equal);
 }
 
+// this final equals case checks the copy vector also returns equal as true
 TEST_CASE("equals_works_correctly_equal_vectors_assigned2") {
     const auto vector_one = comp6771::euclidean_vector(10, 5);
     const auto vector_two = vector_one;
@@ -73,6 +88,7 @@ TEST_CASE("equals_works_correctly_equal_vectors_assigned2") {
     REQUIRE(equal);
 }
 
+// check if vector with different size and values are not equal
 TEST_CASE("equals_works_correctly_unequal_vectors") {
     const auto vector_one = comp6771::euclidean_vector(10, 5);
     const auto vector_two = comp6771::euclidean_vector(15, 5);

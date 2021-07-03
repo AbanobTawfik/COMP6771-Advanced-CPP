@@ -1,14 +1,12 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <sstream>
-#include <iostream>
-#include <vector>
+#include <list>
 
-// since we don't have a constructor which lets us take in 2 generic iterators, i can't do as extensive of testing
-// as i did on vector, however the code for both are almost identical, so if vector works, list will also work.
+// these tests will check the 2 cases
+// 1. empty euclidean vector -> list, expecting an empty list
+// 2. euclidean vector with values -> list with values in the same index corresponding to the euclidean vector
 
-// empty array
 TEST_CASE("empty_vector_to_list") {
     const auto vector = comp6771::euclidean_vector(0);
     REQUIRE(vector.dimensions() == 0);
@@ -16,18 +14,15 @@ TEST_CASE("empty_vector_to_list") {
     REQUIRE(casted_list.empty());
 }
 
-// array with values
 TEST_CASE("same_values_vector_to_list") {
     const auto size = 5;
     const auto val = 3;
     const auto vector = comp6771::euclidean_vector(size, val);
     REQUIRE(vector.dimensions() == size);
-    bool all_values_same = std::all_of(vector.begin(), vector.end(), [&](auto value) { return value == val; });
-    REQUIRE(all_values_same);
+    REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) { return value == val; }));
 
     const auto casted_list = static_cast<std::list<double>>(vector);
     REQUIRE(casted_list.size() == size);
-    all_values_same = std::all_of(casted_list.begin(), casted_list.end(),
-                                  [&](auto value) { return value == val; });
-    REQUIRE(all_values_same);
+    REQUIRE(std::all_of(casted_list.begin(), casted_list.end(),
+                        [&](auto value) { return value == val; }));
 }

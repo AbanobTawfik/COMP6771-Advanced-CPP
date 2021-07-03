@@ -1,8 +1,35 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <iostream>
-#include <vector>
+
+// EUCLIDEAN NORM IS ALWAYS >= 0 THIS IS BECAUSE ALL NUMBERS SQUARED ARE POSITIVE, AND TAKING A SUM OF POSITIVE
+// NUMBERS AND SQUARE ROOTING THEM WILL ALWAYS GIVE A POSITIVE NUMBER. SO RATHER THAN USING ANOTHER VARIABLE TO KEEP
+// TRACK OF THE CACHE STATUS (INVALID/VALID) I CAN USE -1 WHICH IS AN IMPOSSIBLE VALUE TO HAVE, SO -1 WILL BE
+// INVALID CACHE VALUE, AND ALL POSITIVE VALUES >= 0 ARE VALID CACHE
+
+// here we are testing the extra functionality of caching, not core to the actual class but provides huge benefits
+// to check caching we need to do the following
+// check the caching is stored correctly, its worth noting i have timed the results of caching, its 100 nanoseconds
+// to retrieve from cache, and over 10 million nanoseconds to compute the euclidean norm of a vector length 100000 on
+// my computer.
+
+// first test cache is storing the correct value of euclidean norm, this is done by calling check cached norm before
+// and after calling euclidean norm, before it is invalid (-1) and after it is the value of euclidean norm
+
+// remainder of test checks the cache invalidaiton works correctly when the vector is mutated or iniitialised
+// this means we check cache invalidation for the following operations
+// 1. initialisation, cache is invalid on new objects
+// 2. before computing euclidean norm (we only compute when we need to)
+// 3. using at operation to MODIFY THE VECTOR
+// 4. using subscript operation to MODIFY THE VECTOR
+// 5. using compound add
+// 6. using compound subtract
+// 7. using compound multiplication IF THE SCALE IS NOT EXACTLY 1
+// 8. using compound division IF THE SCALE IS NOT EXACTLY 1
+
+// to check cache invalidaiton works correctly, we will see whats stored inside the cache AFTER modification, we will
+// then recompute the euclidean norm, and want to see whats now stored in the cache, to make sure it updated the cache
+// correctly and clears the cache correctly on modifications!
 
 TEST_CASE("cache_storing_correctly") {
     const auto vector = comp6771::euclidean_vector();
@@ -41,7 +68,7 @@ TEST_CASE("cache_invalidation_before_calling_norm") {
     REQUIRE(euclidean_norm == cached_norm_before_mutation_calculated);
 }
 
-TEST_CASE("cache_invalidation_on_at") {
+TEST_CASE("cache_invalidation_on_at_modify") {
     auto vector = comp6771::euclidean_vector{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     const auto index_to_change = 3;
     REQUIRE(index_to_change >= 0);
@@ -70,7 +97,7 @@ TEST_CASE("cache_invalidation_on_at") {
     REQUIRE(cached_norm_after_mutation_calculated != cached_norm_before_mutation_calculated);
 }
 
-TEST_CASE("cache_invalidation_on_subscript") {
+TEST_CASE("cache_invalidation_on_subscript_modify") {
     auto vector = comp6771::euclidean_vector{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     const auto index_to_change = 3;
     REQUIRE(index_to_change >= 0);

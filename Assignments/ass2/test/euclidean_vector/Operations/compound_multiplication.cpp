@@ -1,7 +1,6 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <iostream>
 #include <vector>
 
 // for testing multiplication a few things were tested for the sake of completeness
@@ -27,13 +26,11 @@ TEST_CASE("basic_compound_multiplication_case_different_values") {
     const auto scale = -34.9845;
     auto count = 0;
     auto stdvector = std::vector<double>(size);
-    // values using iota will be steadily increasing so all different
     std::iota(stdvector.begin(), stdvector.end(), value);
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     REQUIRE(vector.dimensions() == stdvector.size());
     REQUIRE(vector.dimensions() == size);
-    REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == stdvector.at(count++); }));
+    REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
 
     vector *= scale;
     // check the compound_multiplication worked correctly

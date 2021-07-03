@@ -1,7 +1,6 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <iostream>
 
 // similar case to size constructor, testing the empty case, and using explicit and implicit values as seen in spec
 

@@ -1,9 +1,14 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <sstream>
-#include <iostream>
 #include <vector>
+
+// here we want to test all behaviour of unit vector including all edge cases
+// 1. unit vector of size 1 e.g. [1] -> [1/1] == [1]
+// 2. unit vector that contains many values is computed correctly, to do this we will check the unit vector
+//    is equivalent to the original vector divided by the euclidean norm
+// 3. case where euclidean norm = 0, i.e. 0 vector [0] n times
+// 4. case where vector is dimensionless i.e [] empty vector
 
 TEST_CASE("unit_vector_size1") {
     const auto vector = comp6771::euclidean_vector(1, 1);
@@ -16,7 +21,7 @@ TEST_CASE("unit_vector_size1") {
     REQUIRE(unit_vector.dimensions() == vector.dimensions());
     // now we need to check the unit vector gave us the correct value, since the unit vector is just
     // all values, divided by the euclidean norm, in this case 1, it should return just the same vector
-    REQUIRE(unit_vector == vector / 1); // <-- vector = vector/1
+    REQUIRE(unit_vector == vector / 1); // <-- vector = vector/1, where 1 is the euclidean norm
 }
 
 TEST_CASE("euclidean_vector_alot_of_values") {
@@ -24,15 +29,12 @@ TEST_CASE("euclidean_vector_alot_of_values") {
     const auto value = -500.434;
     auto count = 0;
     auto stdvector = std::vector<double>(size);
-    // values using iota will be steadily increasing so all different
     std::iota(stdvector.begin(), stdvector.end(), value);
-    // creating a euclidean vector with standard vector
     const auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     REQUIRE(vector.dimensions() == stdvector.size());
     REQUIRE(vector.dimensions() == size);
-    bool all_values_same = std::all_of(vector.begin(), vector.end(),
-                                       [&](auto value) { return value == stdvector.at(count++); });
-    REQUIRE(all_values_same);
+    REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
+    // actually computing the euclidean norm to verify its the correct norm
     const auto euclidean_norm = comp6771::euclidean_norm(vector);
     REQUIRE(euclidean_norm >= 0);
     double actual_euclidean_norm = 0;
@@ -40,10 +42,10 @@ TEST_CASE("euclidean_vector_alot_of_values") {
         actual_euclidean_norm += value * value;
     }
     actual_euclidean_norm = std::sqrt(actual_euclidean_norm);
+    // comparing actual euclidean norm computed by hand with the internal one from the comp6771 namespace
     REQUIRE(euclidean_norm == actual_euclidean_norm);
     const auto unit_vector = comp6771::unit(vector);
     REQUIRE(unit_vector.dimensions() == vector.dimensions());
-    // now we need to check the unit vector gave us the correct value, since the unit vector is just
     REQUIRE(unit_vector == vector / euclidean_norm);
 }
 
@@ -54,15 +56,20 @@ TEST_CASE("unit_vector_0_euclidean_norm") {
     REQUIRE(vector.dimensions() == 1);
     REQUIRE(vector[0] == 0);
     // euclidean norm will be 0
-    const auto euclidean_norm = comp6771::euclidean_norm(vector);
+    auto euclidean_norm = comp6771::euclidean_norm(vector);
     // sqrt(0*0) = 0
     REQUIRE(euclidean_norm == 0);
 
     REQUIRE_THROWS_WITH(comp6771::unit(vector),
                         "euclidean_vector with zero euclidean normal does not have a unit vector\n");
+    // original vector is unmodified!
+    REQUIRE(vector.dimensions() == 1);
+    REQUIRE(vector[0] == 0);
+    euclidean_norm = comp6771::euclidean_norm(vector);
+    REQUIRE(euclidean_norm == 0);
 }
 
-// empty unit vector case
+// empty unit vector case dimensionless takes precedence over 0 euclidean norm error case
 TEST_CASE("unit_vector_0_dimensions") {
     // creating 0 vector, dimension 1 aka default vector
     const auto vector = comp6771::euclidean_vector(0);
@@ -73,4 +80,6 @@ TEST_CASE("unit_vector_0_dimensions") {
     REQUIRE(euclidean_norm == 0);
     REQUIRE_THROWS_WITH(comp6771::unit(vector),
                         "euclidean_vector with no dimensions does not have a unit vector\n");
+    // original vector is unmodified
+    REQUIRE(vector.dimensions() == 0);
 }

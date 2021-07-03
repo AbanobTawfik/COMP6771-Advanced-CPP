@@ -1,7 +1,6 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <iostream>
 #include <vector>
 
 // there were 3 cases handled for compound subtraction
@@ -21,29 +20,6 @@ TEST_CASE("basic_compound_subtraction_empty_vectors") {
     REQUIRE(right_vector.dimensions() == 0);
 }
 
-TEST_CASE("basic_compound_subtraction_case_all_same") {
-    auto size = 3;
-    auto l_value = 3;
-    auto r_value = 4;
-    auto left_vector = comp6771::euclidean_vector(size, l_value);
-    REQUIRE(left_vector.dimensions() == size);
-    REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == l_value; }));
-    auto right_vector = comp6771::euclidean_vector(size, r_value);
-    REQUIRE(right_vector.dimensions() == size);
-    REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == r_value; }));
-    left_vector -= right_vector;
-    REQUIRE(left_vector.dimensions() == 3);
-    REQUIRE(right_vector.dimensions() == 3);
-    // make sure right hand side is unaffected
-    REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == r_value; }));
-    // check the compound_subtraction worked correctly
-    REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == l_value - r_value; }));
-}
-
 TEST_CASE("basic_compound_subtraction_case_different_values") {
     const auto size = 500;
     const auto value = -500.434;
@@ -53,10 +29,7 @@ TEST_CASE("basic_compound_subtraction_case_different_values") {
     auto left_vector = comp6771::euclidean_vector(left_stdvector.begin(), left_stdvector.end());
     REQUIRE(left_vector.dimensions() == left_stdvector.size());
     REQUIRE(left_vector.dimensions() == size);
-    auto count = 0;
-    auto count2 = 0;
-    REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == left_stdvector.at(count++); }));
+    REQUIRE(std::equal(left_vector.begin(), left_vector.end(), left_stdvector.begin(), left_stdvector.end()));
 
     const auto value2 = 6342;
     auto right_stdvector = std::vector<double>(size);
@@ -65,14 +38,13 @@ TEST_CASE("basic_compound_subtraction_case_different_values") {
     auto right_vector = comp6771::euclidean_vector(right_stdvector.begin(), right_stdvector.end());
     REQUIRE(right_vector.dimensions() == right_stdvector.size());
     REQUIRE(right_vector.dimensions() == size);
-    count = 0;
-    REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == right_stdvector.at(count++); }));
+    REQUIRE(std::equal(right_vector.begin(), right_vector.end(), right_stdvector.begin(), right_stdvector.end()));
     // keep in mind our original 2 std vectors stay the same, so we will compare the values in them to the result below
     left_vector -= right_vector;
     REQUIRE(right_vector.dimensions() == size);
     REQUIRE(left_vector.dimensions() == size);
-    count = 0;
+    auto count = 0;
+    auto count2 = 0;
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
                         [&](auto value) {
                             return value == left_stdvector.at(count++) -

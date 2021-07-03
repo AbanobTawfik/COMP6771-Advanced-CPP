@@ -1,7 +1,6 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <iostream>
 
 // the only cases handled for this constructor is using integer object or using a implicit integer (seen in spec)
 // and the final case is for the empty constructor (size = 0), we want to return []

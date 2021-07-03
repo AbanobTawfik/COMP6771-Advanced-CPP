@@ -1,7 +1,6 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <iostream>
 #include <vector>
 
 // for testing division a few things were tested for the sake of completeness
@@ -28,13 +27,11 @@ TEST_CASE("basic_compound_division_case_different_values") {
     const auto scale = -34.9849;
     auto count = 0;
     auto stdvector = std::vector<double>(size);
-    // values using iota will be steadily increasing so all different
     std::iota(stdvector.begin(), stdvector.end(), value);
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     REQUIRE(vector.dimensions() == stdvector.size());
     REQUIRE(vector.dimensions() == size);
-    REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == stdvector.at(count++); }));
+    REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
 
     vector /= scale;
     // check the compound_division worked correctly
@@ -86,8 +83,8 @@ TEST_CASE("compound_division_unary_same") {
                         [&](auto value) { return value == val / scale; }));
     REQUIRE(vector == +pre_compound_division);
 }
+
 // HANDLE EXCEPTIONS NOW
-// divide by 0 case
 TEST_CASE("compound_division_scale_0") {
     const auto scale = 0;
     auto vector = comp6771::euclidean_vector();

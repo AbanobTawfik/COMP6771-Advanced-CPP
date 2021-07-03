@@ -186,6 +186,12 @@ cxx_test(
 
 cxx_test(
         TARGET cache
-        FILENAME "utility_functions/cache.cpp"
+        FILENAME "EXTRA_HELPERS/cache.cpp"
+        LINK euclidean_vector
+)
+
+cxx_test(
+        TARGET begin_end
+        FILENAME "EXTRA_HELPERS/begin_end.cpp"
         LINK euclidean_vector
 )

@@ -26,14 +26,10 @@ TEST_CASE("contains_values_move_constructor") {
 
     auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
     REQUIRE(vector.dimensions() == size);
-    auto count = 0;
-    REQUIRE(std::all_of(vector.begin(), vector.end(),
-                        [&](auto value) { return value == stdvector.at(count++); }));
+    REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
     const auto moved_vector = comp6771::euclidean_vector(std::move(vector));
     REQUIRE(moved_vector.dimensions() == size);
-    count = 0;
-    REQUIRE(std::all_of(moved_vector.begin(), moved_vector.end(),
-                        [&](auto value) { return value == stdvector.at(count++); }));
+    REQUIRE(std::equal(moved_vector.begin(), moved_vector.end(), stdvector.begin(), stdvector.end()));
     // check what we moved from was also removed, i.e length 0
     REQUIRE(vector.dimensions() == 0);
 }

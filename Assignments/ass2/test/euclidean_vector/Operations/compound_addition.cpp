@@ -1,7 +1,6 @@
 #include "comp6771/euclidean_vector.hpp"
 
 #include <catch2/catch.hpp>
-#include <iostream>
 #include <vector>
 
 // there were 3 cases handled for compound addition
@@ -29,28 +28,22 @@ TEST_CASE("basic_compound_addition_case_different_values") {
     auto left_vector = comp6771::euclidean_vector(left_stdvector.begin(), left_stdvector.end());
     REQUIRE(left_vector.dimensions() == left_stdvector.size());
     REQUIRE(left_vector.dimensions() == size);
-    auto count = 0;
-    auto count2 = 0;
-    REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
-                        [&](auto value) { return value == left_stdvector.at(count++); }));
+    REQUIRE(std::equal(left_vector.begin(), left_vector.end(), left_stdvector.begin(), left_stdvector.end()));
     const auto value2 = 6342;
     auto right_stdvector = std::vector<double>(size);
     std::iota(right_stdvector.begin(), right_stdvector.end(), value2);
     auto right_vector = comp6771::euclidean_vector(right_stdvector.begin(), right_stdvector.end());
     REQUIRE(right_vector.dimensions() == right_stdvector.size());
     REQUIRE(right_vector.dimensions() == size);
-    count = 0;
-    REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == right_stdvector.at(count++); }));
+    REQUIRE(std::equal(right_vector.begin(), right_vector.end(), right_stdvector.begin(), right_stdvector.end()));
     // keep in mind our original 2 std vectors stay the same, so we will compare the values in them to the result below
     left_vector += right_vector;
     REQUIRE(right_vector.dimensions() == size);
     REQUIRE(left_vector.dimensions() == size);
     // make sure right vector doesn't change
-    count = 0;
-    REQUIRE(std::all_of(right_vector.begin(), right_vector.end(),
-                        [&](auto value) { return value == right_stdvector.at(count++); }));
-    count = 0;
+    REQUIRE(std::equal(right_vector.begin(), right_vector.end(), right_stdvector.begin(), right_stdvector.end()));
+    auto count = 0;
+    auto count2 = 0;
     REQUIRE(std::all_of(left_vector.begin(), left_vector.end(),
                         [&](auto value) {
                             return value == left_stdvector.at(count++) +
