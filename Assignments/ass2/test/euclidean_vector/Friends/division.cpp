@@ -100,7 +100,7 @@ TEST_CASE("compound_division_different_size") {
 	auto vector = comp6771::euclidean_vector();
 	REQUIRE(vector.dimensions() == 1);
 	REQUIRE(vector[0] == Approx(0.0).margin(0.000001));
-	REQUIRE_THROWS_WITH(vector /= scale, "Invalid vector division by 0\n");
+	REQUIRE_THROWS_WITH(vector /= scale, "Invalid vector division by 0");
 	// CHECK NO CHANGES
 	REQUIRE(vector.dimensions() == 1);
 	REQUIRE(vector[0] == Approx(0).margin(0.000001));

@@ -113,7 +113,7 @@ namespace comp6771 {
 	auto euclidean_vector::operator+=(const euclidean_vector& vector) -> euclidean_vector& {
 		if (length_ != vector.length_) {
 			throw euclidean_vector_error("Dimensions of LHS(" + std::to_string(length_) + ") and RHS ("
-			                             + std::to_string(vector.length_) + ") do not match\n");
+			                             + std::to_string(vector.length_) + ") do not match");
 		}
 		auto index = 0;
 		std::transform(magnitude_.get(), magnitude_.get() + length_, magnitude_.get(), [&](double x) {
@@ -141,7 +141,7 @@ namespace comp6771 {
 
 	auto euclidean_vector::operator/=(const double scale) -> euclidean_vector& {
 		if (scale == 0) {
-			throw euclidean_vector_error("Invalid vector division by 0\n");
+			throw euclidean_vector_error("Invalid vector division by 0");
 		}
 
 		euclidean_norm_ = (scale == 1 or scale == -1) ? euclidean_norm_ : -1;
@@ -171,14 +171,14 @@ namespace comp6771 {
 
 	auto euclidean_vector::at(const int index) const -> const double& {
 		if (index >= length_ or index < 0) {
-			throw euclidean_vector_error("Index " + std::to_string(index) + " is out of bounds!\n");
+			throw euclidean_vector_error("Index " + std::to_string(index) + " is out of bounds!");
 		}
 		return magnitude_[static_cast<size_t>(index)];
 	}
 
 	auto euclidean_vector::at(const int index) -> double& {
 		if (index >= length_ or index < 0) {
-			throw euclidean_vector_error("Index " + std::to_string(index) + " is out of bounds!\n");
+			throw euclidean_vector_error("Index " + std::to_string(index) + " is out of bounds!");
 		}
 		euclidean_norm_ = -1;
 		return magnitude_[static_cast<size_t>(index)];
@@ -291,12 +291,12 @@ namespace comp6771 {
 	auto unit(const euclidean_vector& vector) -> euclidean_vector {
 		if (vector.dimensions() == 0) {
 			throw euclidean_vector_error("euclidean_vector with no dimensions does not have a unit "
-			                             "vector\n");
+			                             "vector");
 		}
 		auto e_norm = euclidean_norm(vector);
 		if (e_norm == 0) {
 			throw euclidean_vector_error("euclidean_vector with zero euclidean normal does not have a "
-			                             "unit vector\n");
+			                             "unit vector");
 		}
 		return euclidean_vector(vector) / e_norm;
 	}
@@ -305,7 +305,7 @@ namespace comp6771 {
 		if (vector1.dimensions() != vector2.dimensions()) {
 			throw euclidean_vector_error("Dimensions of LHS(" + std::to_string(vector1.dimensions())
 			                             + ") and RHS (" + std::to_string(vector2.dimensions())
-			                             + ") do not match\n");
+			                             + ") do not match");
 		}
 		auto casted_vector1 = static_cast<std::vector<double>>(vector1);
 		auto casted_vector2 = static_cast<std::vector<double>>(vector2);

@@ -90,7 +90,7 @@ TEST_CASE("dot_product_different_size") {
 	}));
 	REQUIRE_THROWS_WITH(comp6771::dot(left_vector, right_vector),
 	                    "Dimensions of LHS(" + std::to_string(size1) + ") and RHS ("
-	                       + std::to_string(size2) + ") do not match\n");
+	                       + std::to_string(size2) + ") do not match");
 	// make sure the original vectors are unchanged!
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size2);

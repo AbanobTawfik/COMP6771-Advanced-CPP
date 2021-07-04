@@ -63,7 +63,7 @@ TEST_CASE("unit_vector_0_euclidean_norm") {
 	REQUIRE(euclidean_norm == Approx(0).margin(0.000001));
 
 	REQUIRE_THROWS_WITH(comp6771::unit(vector),
-	                    "euclidean_vector with zero euclidean normal does not have a unit vector\n");
+	                    "euclidean_vector with zero euclidean normal does not have a unit vector");
 	// original vector is unmodified!
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
 	REQUIRE(vector[0] == Approx(0).margin(0.000001));
@@ -81,7 +81,7 @@ TEST_CASE("unit_vector_0_dimensions") {
 	// sqrt(0*0) = 0
 	REQUIRE(euclidean_norm == 0);
 	REQUIRE_THROWS_WITH(comp6771::unit(vector),
-	                    "euclidean_vector with no dimensions does not have a unit vector\n");
+	                    "euclidean_vector with no dimensions does not have a unit vector");
 	// original vector is unmodified
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == 0);
 }

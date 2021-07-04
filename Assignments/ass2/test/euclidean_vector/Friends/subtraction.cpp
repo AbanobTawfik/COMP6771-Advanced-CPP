@@ -129,7 +129,7 @@ TEST_CASE("subtraction_different_size") {
 	comp6771::euclidean_vector subtracted_vector;
 	REQUIRE_THROWS_WITH(subtracted_vector = left_vector - right_vector,
 	                    "Dimensions of LHS(" + std::to_string(size1) + ") and RHS ("
-	                       + std::to_string(size2) + ") do not match\n");
+	                       + std::to_string(size2) + ") do not match");
 	// NO CHANGES!
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
 	REQUIRE(std::all_of(left_vector.begin(), left_vector.end(), [&](auto value) {

@@ -35,7 +35,7 @@ TEST_CASE("at_negative_index_access") {
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
 	auto value = double{vector.at(0)};
 	REQUIRE(value == Approx(0).margin(0.000001));
-	REQUIRE_THROWS_WITH(vector.at(-1), "Index " + std::to_string(-1) + " is out of bounds!\n");
+	REQUIRE_THROWS_WITH(vector.at(-1), "Index " + std::to_string(-1) + " is out of bounds!");
 	// MAKE SURE NO CHANGES
 	value = double{vector.at(0)};
 	REQUIRE(value == Approx(0).margin(0.000001));
@@ -49,7 +49,7 @@ TEST_CASE("at_out_of_bounds_access") {
 	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
 		return value == Approx(0).margin(0.000001);
 	}));
-	REQUIRE_THROWS_WITH(vector.at(size), "Index " + std::to_string(size) + " is out of bounds!\n");
+	REQUIRE_THROWS_WITH(vector.at(size), "Index " + std::to_string(size) + " is out of bounds!");
 	// MAKE SURE NO CHANGES
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
 	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
@@ -62,7 +62,7 @@ TEST_CASE("at_negative_index_change") {
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
 	auto value = double{vector.at(0)};
 	REQUIRE(value == Approx(0).margin(0.000001));
-	REQUIRE_THROWS_WITH(vector.at(-1) = 3, "Index " + std::to_string(-1) + " is out of bounds!\n");
+	REQUIRE_THROWS_WITH(vector.at(-1) = 3, "Index " + std::to_string(-1) + " is out of bounds!");
 	// make sure no changes
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
 	value = double{vector.at(0)};
@@ -76,7 +76,7 @@ TEST_CASE("at_out_of_bounds_change") {
 	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
 		return value == Approx(0).margin(0.000001);
 	}));
-	REQUIRE_THROWS_WITH(vector.at(size) = 3, "Index " + std::to_string(size) + " is out of bounds!\n");
+	REQUIRE_THROWS_WITH(vector.at(size) = 3, "Index " + std::to_string(size) + " is out of bounds!");
 	// make sure no changes
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
 	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {

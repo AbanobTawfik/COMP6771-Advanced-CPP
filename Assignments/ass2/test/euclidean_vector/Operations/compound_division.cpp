@@ -92,7 +92,7 @@ TEST_CASE("compound_division_scale_0") {
 	auto vector = comp6771::euclidean_vector();
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
 	REQUIRE(vector[0] == Approx(0).margin(0.000001));
-	REQUIRE_THROWS_WITH(vector /= scale, "Invalid vector division by 0\n");
+	REQUIRE_THROWS_WITH(vector /= scale, "Invalid vector division by 0");
 	// NO CHANGES!
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == 1);
 	REQUIRE(vector[0] == Approx(0).margin(0.000001));
