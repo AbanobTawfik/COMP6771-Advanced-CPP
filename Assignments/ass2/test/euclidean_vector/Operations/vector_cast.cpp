@@ -30,9 +30,9 @@ TEST_CASE("vector_recasts") {
 	std::iota(stdvector.begin(), stdvector.end(), value);
 	// creating a euclidean vector with standard vector
 	const auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
-    const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
 
-    REQUIRE(std::equal(casted_vector.begin(), casted_vector.end(), stdvector.begin(), stdvector.end()));
+	REQUIRE(std::equal(casted_vector.begin(), casted_vector.end(), stdvector.begin(), stdvector.end()));
 	// now we will cast that euclidean vector we verified was the same as the standard vector used to
 	// create it and compare the two vectors
 	auto stdvector_casted = static_cast<std::vector<double>>(vector);

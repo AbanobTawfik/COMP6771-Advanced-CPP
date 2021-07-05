@@ -29,7 +29,7 @@ TEST_CASE("copy_with_values_no_change") {
 
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
 	REQUIRE(vector.dimensions() == copy_vector.dimensions());
-    const auto vector_casted = comp6771_helpers::convert_to_vector_manually(vector);
+	const auto vector_casted = comp6771_helpers::convert_to_vector_manually(vector);
 	REQUIRE(std::equal(vector_casted.begin(), vector_casted.end(), stdvector.begin(), stdvector.end()));
 }
 
@@ -45,14 +45,24 @@ TEST_CASE("copy_with_values_change_after") {
 	REQUIRE(vector.dimensions() == size);
 	REQUIRE(vector.dimensions() == copy_vector.dimensions());
 	const auto vector_casted = comp6771_helpers::convert_to_vector_manually(vector);
-    const auto copy_vector_casted = comp6771_helpers::convert_to_vector_manually(copy_vector);
-    const auto check_no_changed_casted = comp6771_helpers::convert_to_vector_manually(check_no_changes);
-    REQUIRE(std::equal(vector_casted.begin(), vector_casted.end(), copy_vector_casted.begin(), copy_vector_casted.end()));
+	const auto copy_vector_casted = comp6771_helpers::convert_to_vector_manually(copy_vector);
+	const auto check_no_changed_casted =
+	   comp6771_helpers::convert_to_vector_manually(check_no_changes);
+	REQUIRE(std::equal(vector_casted.begin(),
+	                   vector_casted.end(),
+	                   copy_vector_casted.begin(),
+	                   copy_vector_casted.end()));
 	// add 1 to all values in vector
 	copy_vector[0]++;
 	// first check all values are unchanged on original vector, then check changes occured
-	REQUIRE(std::equal(vector_casted.begin(), vector_casted.end(), check_no_changed_casted.begin(), check_no_changed_casted.end()));
+	REQUIRE(std::equal(vector_casted.begin(),
+	                   vector_casted.end(),
+	                   check_no_changed_casted.begin(),
+	                   check_no_changed_casted.end()));
 
-    REQUIRE(copy_vector[0] == Approx(vector[0] + 1).margin(0.000001));
-    REQUIRE(std::equal(vector_casted.begin() + 1, vector_casted.end(), copy_vector_casted.begin() + 1, copy_vector_casted.end()));
+	REQUIRE(copy_vector[0] == Approx(vector[0] + 1).margin(0.000001));
+	REQUIRE(std::equal(vector_casted.begin() + 1,
+	                   vector_casted.end(),
+	                   copy_vector_casted.begin() + 1,
+	                   copy_vector_casted.end()));
 }

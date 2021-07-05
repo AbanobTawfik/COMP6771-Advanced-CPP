@@ -36,7 +36,8 @@ TEST_CASE("euclidean_vector_with_values") {
 	REQUIRE(static_cast<size_t>(static_cast<size_t>(vector.dimensions())) == size);
 	const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
 
-	REQUIRE(std::equal(&vector[0],&vector[0] + vector.dimensions(), stdvector.begin(), stdvector.end()));
+	REQUIRE(
+	   std::equal(&vector[0], &vector[0] + vector.dimensions(), stdvector.begin(), stdvector.end()));
 	const auto euclidean_norm = comp6771::euclidean_norm(vector);
 	REQUIRE(euclidean_norm >= 0);
 	// manual computation of euclidean norm below for comparison

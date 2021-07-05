@@ -33,18 +33,20 @@ TEST_CASE("basic_subtraction_case_different_values") {
 	// values using iota will be steadily increasing so all different
 	std::iota(left_stdvector.begin(), left_stdvector.end(), value);
 	auto left_vector = comp6771::euclidean_vector(left_stdvector.begin(), left_stdvector.end());
-    const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
-    REQUIRE(static_cast<size_t>(left_vector.dimensions()) == left_stdvector.size());
+	const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
+	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == left_stdvector.size());
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size);
-	REQUIRE(
-	   std::equal(casted_left_vector.begin(), casted_left_vector.end(), left_stdvector.begin(), left_stdvector.end()));
+	REQUIRE(std::equal(casted_left_vector.begin(),
+	                   casted_left_vector.end(),
+	                   left_stdvector.begin(),
+	                   left_stdvector.end()));
 
 	const auto value2 = 6342;
 	auto right_stdvector = std::vector<double>(size);
 	std::iota(right_stdvector.begin(), right_stdvector.end(), value2);
 	auto right_vector = comp6771::euclidean_vector(right_stdvector.begin(), right_stdvector.end());
-    const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
-    REQUIRE(static_cast<size_t>(right_vector.dimensions()) == right_stdvector.size());
+	const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
+	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == right_stdvector.size());
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size);
 	REQUIRE(std::equal(casted_right_vector.begin(),
 	                   casted_right_vector.end(),
@@ -53,23 +55,27 @@ TEST_CASE("basic_subtraction_case_different_values") {
 	// keep in mind our original 2 std vectors stay the same, so we will compare the values in them
 	// to the result below
 	const auto subtracted_vector = left_vector - right_vector;
-    const auto casted_subtracted_vector = comp6771_helpers::convert_to_vector_manually(subtracted_vector);
-    REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size);
+	const auto casted_subtracted_vector =
+	   comp6771_helpers::convert_to_vector_manually(subtracted_vector);
+	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size);
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size);
 	REQUIRE(static_cast<size_t>(subtracted_vector.dimensions()) == size);
 	// make sure the 2 vectors dont change!
-	REQUIRE(
-	   std::equal(casted_left_vector.begin(), casted_left_vector.end(), left_stdvector.begin(), left_stdvector.end()));
+	REQUIRE(std::equal(casted_left_vector.begin(),
+	                   casted_left_vector.end(),
+	                   left_stdvector.begin(),
+	                   left_stdvector.end()));
 	REQUIRE(std::equal(casted_right_vector.begin(),
 	                   casted_right_vector.end(),
 	                   right_stdvector.begin(),
 	                   right_stdvector.end()));
 	size_t count = 0;
 	size_t count2 = 0;
-	REQUIRE(std::all_of(casted_subtracted_vector.begin(), casted_subtracted_vector.end(), [&](auto value) {
-		return value
-		       == Approx(left_stdvector.at(count++) - right_stdvector.at(count2++)).margin(0.000001);
-	}));
+	REQUIRE(
+	   std::all_of(casted_subtracted_vector.begin(), casted_subtracted_vector.end(), [&](auto value) {
+		   return value
+		          == Approx(left_stdvector.at(count++) - right_stdvector.at(count2++)).margin(0.000001);
+	   }));
 }
 
 TEST_CASE("basic_subtraction_case_multiple_vectors") {
@@ -78,26 +84,26 @@ TEST_CASE("basic_subtraction_case_multiple_vectors") {
 	auto r_value = 4;
 	auto m_value = 5;
 	const auto left_vector = comp6771::euclidean_vector(size, l_value);
-    const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
-    REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size);
+	const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
+	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size);
 	REQUIRE(std::all_of(casted_left_vector.begin(), casted_left_vector.end(), [&](auto value) {
 		return value == Approx(l_value).margin(0.000001);
 	}));
 	const auto right_vector = comp6771::euclidean_vector(size, r_value);
-    const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
-    REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size);
+	const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
+	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size);
 	REQUIRE(std::all_of(casted_right_vector.begin(), casted_right_vector.end(), [&](auto value) {
 		return value == Approx(r_value).margin(0.000001);
 	}));
 	const auto middle_vector = comp6771::euclidean_vector(size, m_value);
-    const auto casted_middle_vector = comp6771_helpers::convert_to_vector_manually(middle_vector);
-    REQUIRE(static_cast<size_t>(middle_vector.dimensions()) == size);
+	const auto casted_middle_vector = comp6771_helpers::convert_to_vector_manually(middle_vector);
+	REQUIRE(static_cast<size_t>(middle_vector.dimensions()) == size);
 	REQUIRE(std::all_of(casted_middle_vector.begin(), casted_middle_vector.end(), [&](auto value) {
 		return value == Approx(m_value).margin(0.000001);
 	}));
 	const auto added_vector = left_vector - right_vector - middle_vector;
-    const auto casted_added_vector = comp6771_helpers::convert_to_vector_manually(added_vector);
-    REQUIRE(static_cast<size_t>(left_vector.dimensions()) == 3);
+	const auto casted_added_vector = comp6771_helpers::convert_to_vector_manually(added_vector);
+	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == 3);
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == 3);
 	REQUIRE(static_cast<size_t>(middle_vector.dimensions()) == 3);
 	// make sure both vectors are  unaffected
@@ -127,9 +133,9 @@ TEST_CASE("subtraction_different_size") {
 	auto right_vector = comp6771::euclidean_vector(size2, val);
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size2);
-    const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
-    const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
-    REQUIRE(std::all_of(casted_left_vector.begin(), casted_left_vector.end(), [&](auto value) {
+	const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
+	const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
+	REQUIRE(std::all_of(casted_left_vector.begin(), casted_left_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
 	REQUIRE(std::all_of(casted_right_vector.begin(), casted_right_vector.end(), [&](auto value) {

@@ -32,11 +32,13 @@ TEST_CASE("dot_product_with_different_values") {
 
 	std::iota(left_stdvector.begin(), left_stdvector.end(), value);
 	auto left_vector = comp6771::euclidean_vector(left_stdvector.begin(), left_stdvector.end());
-    const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
-    REQUIRE(static_cast<size_t>(left_vector.dimensions()) == left_stdvector.size());
+	const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
+	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == left_stdvector.size());
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size);
-	REQUIRE(
-	   std::equal(casted_left_vector.begin(), casted_left_vector.end(), left_stdvector.begin(), left_stdvector.end()));
+	REQUIRE(std::equal(casted_left_vector.begin(),
+	                   casted_left_vector.end(),
+	                   left_stdvector.begin(),
+	                   left_stdvector.end()));
 
 	const auto value2 = 6342;
 	auto right_stdvector = std::vector<double>(size);
@@ -44,9 +46,9 @@ TEST_CASE("dot_product_with_different_values") {
 	auto right_vector = comp6771::euclidean_vector(right_stdvector.begin(), right_stdvector.end());
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == right_stdvector.size());
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size);
-    const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
-    REQUIRE(std::equal(casted_right_vector.begin(),
-                       casted_right_vector.end(),
+	const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
+	REQUIRE(std::equal(casted_right_vector.begin(),
+	                   casted_right_vector.end(),
 	                   right_stdvector.begin(),
 	                   right_stdvector.end()));
 
@@ -60,8 +62,10 @@ TEST_CASE("dot_product_with_different_values") {
 	                   casted_right_vector.end(),
 	                   right_stdvector.begin(),
 	                   right_stdvector.end()));
-	REQUIRE(
-	   std::equal(casted_left_vector.begin(), casted_left_vector.end(), left_stdvector.begin(), left_stdvector.end()));
+	REQUIRE(std::equal(casted_left_vector.begin(),
+	                   casted_left_vector.end(),
+	                   left_stdvector.begin(),
+	                   left_stdvector.end()));
 
 	// now i need to check the dot product contains, the right value, the dot product is simply just
 	// the sum of all vector values at the same index multiplied together, [1 2 3] [3 2 1] -> 1*3 +
@@ -82,9 +86,9 @@ TEST_CASE("dot_product_different_size") {
 	const auto val = 3;
 	auto left_vector = comp6771::euclidean_vector(size1, val);
 	auto right_vector = comp6771::euclidean_vector(size2, val);
-    const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
-    const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
-    REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
+	const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
+	const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
+	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size2);
 	REQUIRE(std::all_of(casted_left_vector.begin(), casted_left_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);

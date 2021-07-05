@@ -14,8 +14,10 @@
 TEST_CASE("subscript_in_range_correct_value") {
 	const auto vector = comp6771::euclidean_vector(10, 50);
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == 10);
-    const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
-    REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) { return value == 50; }));
+	const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
+		return value == 50;
+	}));
 	auto value = double{vector[0]};
 	REQUIRE(value == Approx(50).margin(0.000001));
 	// make sure no changes to the rest of the array
@@ -30,12 +32,14 @@ TEST_CASE("subscript_change_in_range_default") {
 	auto vector = comp6771::euclidean_vector(10, 50);
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == 10);
 	auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
-    REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) { return value == 50; }));
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
+		return value == 50;
+	}));
 	auto value = double{vector[0]};
 	REQUIRE(value == Approx(50).margin(0.000001));
 	vector[0] = value + 1;
 	casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
-    // make sure rest of vector is the same we only modified index 1 so look from beginning + 1 ->
+	// make sure rest of vector is the same we only modified index 1 so look from beginning + 1 ->
 	// end
 	REQUIRE(std::all_of(casted_vector.begin() + 1, casted_vector.end(), [&](auto value) {
 		return value == Approx(50).margin(0.000001);

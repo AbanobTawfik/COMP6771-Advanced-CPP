@@ -2,11 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 //
 #include "comp6771/euclidean_vector.hpp"
-#include <algorithm>
-#include <cassert>
-#include <cmath>
-#include <iostream>
-#include <numeric>
+#include <vector>
 
 namespace comp6771_helpers {
     auto convert_to_vector_manually(comp6771::euclidean_vector vector) -> std::vector<double>{

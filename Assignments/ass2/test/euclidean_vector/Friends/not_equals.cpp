@@ -24,7 +24,7 @@ TEST_CASE("not_equals_works_correctly_modifications") {
 	auto vector_one = comp6771::euclidean_vector(10, 5);
 	const auto vector_two = comp6771::euclidean_vector(vector_one);
 	auto casted_vector_one = comp6771_helpers::convert_to_vector_manually(vector_one);
-    const auto casted_vector_two = comp6771_helpers::convert_to_vector_manually(vector_two);
+	const auto casted_vector_two = comp6771_helpers::convert_to_vector_manually(vector_two);
 	REQUIRE(static_cast<size_t>(vector_one.dimensions()) == 10);
 	REQUIRE(std::all_of(casted_vector_one.begin(), casted_vector_one.end(), [&](auto value) {
 		return value == Approx(5).margin(0.000001);
@@ -56,8 +56,8 @@ TEST_CASE("not_equals_works_correctly_modifications") {
 TEST_CASE("not_equals_works_correctly_equal_vectors") {
 	const auto vector_one = comp6771::euclidean_vector(10, 5);
 	const auto vector_two = comp6771::euclidean_vector(10, 5);
-    auto casted_vector_one = comp6771_helpers::convert_to_vector_manually(vector_one);
-    const auto casted_vector_two = comp6771_helpers::convert_to_vector_manually(vector_two);
+	auto casted_vector_one = comp6771_helpers::convert_to_vector_manually(vector_one);
+	const auto casted_vector_two = comp6771_helpers::convert_to_vector_manually(vector_two);
 	REQUIRE(static_cast<size_t>(vector_one.dimensions()) == 10);
 	REQUIRE(std::all_of(casted_vector_one.begin(), casted_vector_one.end(), [&](auto value) {
 		return value == Approx(5).margin(0.000001);

@@ -29,21 +29,23 @@ TEST_CASE("basic_multiplication_case_different_values") {
 	auto stdvector = std::vector<double>(size);
 	std::iota(stdvector.begin(), stdvector.end(), value);
 	auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
-    const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
-    REQUIRE(static_cast<size_t>(vector.dimensions()) == stdvector.size());
+	const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	REQUIRE(static_cast<size_t>(vector.dimensions()) == stdvector.size());
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
 	REQUIRE(std::equal(casted_vector.begin(), casted_vector.end(), stdvector.begin(), stdvector.end()));
 
 	const auto multiplied_vector = vector * scale;
 	// check original vector is unchanged
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
-    const auto casted_multiplied_vector = comp6771_helpers::convert_to_vector_manually(multiplied_vector);
-    REQUIRE(std::equal(casted_vector.begin(), casted_vector.end(), stdvector.begin(), stdvector.end()));
+	const auto casted_multiplied_vector =
+	   comp6771_helpers::convert_to_vector_manually(multiplied_vector);
+	REQUIRE(std::equal(casted_vector.begin(), casted_vector.end(), stdvector.begin(), stdvector.end()));
 	// check the multiplication worked correctly
 	size_t count = 0;
-	REQUIRE(std::all_of(casted_multiplied_vector.begin(), casted_multiplied_vector.end(), [&](auto value) {
-		return value == Approx(stdvector.at(count++) * scale).margin(0.000001);
-	}));
+	REQUIRE(
+	   std::all_of(casted_multiplied_vector.begin(), casted_multiplied_vector.end(), [&](auto value) {
+		   return value == Approx(stdvector.at(count++) * scale).margin(0.000001);
+	   }));
 }
 
 TEST_CASE("multiplication_negation_same") {
@@ -52,14 +54,15 @@ TEST_CASE("multiplication_negation_same") {
 	auto val = 3;
 	auto vector = comp6771::euclidean_vector(size, val);
 	REQUIRE(vector.dimensions() == size);
-    const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
-    REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
+	const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
 
 	const auto multiplied_vector = vector * scale;
-    const auto casted_multiplied_vector = comp6771_helpers::convert_to_vector_manually(multiplied_vector);
-    // check original vector is unchanged
+	const auto casted_multiplied_vector =
+	   comp6771_helpers::convert_to_vector_manually(multiplied_vector);
+	// check original vector is unchanged
 	REQUIRE(vector.dimensions() == size);
 	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
@@ -67,9 +70,9 @@ TEST_CASE("multiplication_negation_same") {
 
 	// check the multiplication worked correctly
 	REQUIRE(multiplied_vector.dimensions() == size);
-	REQUIRE(std::all_of(casted_multiplied_vector.begin(), casted_multiplied_vector.end(), [&](auto value) {
-		return value == Approx(val * scale).margin(0.000001);
-	}));
+	REQUIRE(std::all_of(casted_multiplied_vector.begin(),
+	                    casted_multiplied_vector.end(),
+	                    [&](auto value) { return value == Approx(val * scale).margin(0.000001); }));
 	REQUIRE(multiplied_vector == -vector);
 }
 
@@ -79,23 +82,24 @@ TEST_CASE("multiplication_unary_same") {
 	auto val = 3;
 	auto vector = comp6771::euclidean_vector(size, val);
 	REQUIRE(vector.dimensions() == size);
-    const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
-    REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
+	const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
 
 	const auto multiplied_vector = vector * scale;
 	// check original vector is unchanged
 	REQUIRE(vector.dimensions() == size);
-    const auto casted_multiplied_vector = comp6771_helpers::convert_to_vector_manually(multiplied_vector);
-    REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
+	const auto casted_multiplied_vector =
+	   comp6771_helpers::convert_to_vector_manually(multiplied_vector);
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
 
 	// check the multiplication worked correctly
 	REQUIRE(multiplied_vector.dimensions() == size);
-	REQUIRE(std::all_of(casted_multiplied_vector.begin(), casted_multiplied_vector.end(), [&](auto value) {
-		return value == Approx(val * scale).margin(0.000001);
-	}));
+	REQUIRE(std::all_of(casted_multiplied_vector.begin(),
+	                    casted_multiplied_vector.end(),
+	                    [&](auto value) { return value == Approx(val * scale).margin(0.000001); }));
 	REQUIRE(multiplied_vector == +vector);
 }

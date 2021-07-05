@@ -29,12 +29,12 @@ TEST_CASE("basic_compound_division_case_different_values") {
 	auto stdvector = std::vector<double>(size);
 	std::iota(stdvector.begin(), stdvector.end(), value);
 	auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
-    auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == stdvector.size());
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
 	REQUIRE(std::equal(casted_vector.begin(), casted_vector.end(), stdvector.begin(), stdvector.end()));
 	vector /= scale;
-    casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
 	// check the compound_division worked correctly
 	size_t count = 0;
 	// for this example since conversions are precise and there is arithmetic rounding errors,
@@ -52,15 +52,15 @@ TEST_CASE("compound_division_negation_same") {
 	auto vector = comp6771::euclidean_vector(size, val);
 	auto pre_compound_division = comp6771::euclidean_vector(size, val);
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
-    auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
-    REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
+	auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
 	REQUIRE(vector == pre_compound_division);
 
 	vector /= scale;
-    casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
-    REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
+	casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
 	// check the compound_division worked correctly
 	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(val / scale).margin(0.000001);
@@ -75,15 +75,15 @@ TEST_CASE("compound_division_unary_same") {
 	auto vector = comp6771::euclidean_vector(size, val);
 	auto pre_compound_division = comp6771::euclidean_vector(size, val);
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
-    auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
-    REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
+	auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
 	REQUIRE(vector == pre_compound_division);
 
 	vector /= scale;
-    casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
-    REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
+	casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
 	// check the compound_division worked correctly
 	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(val / scale).margin(0.000001);

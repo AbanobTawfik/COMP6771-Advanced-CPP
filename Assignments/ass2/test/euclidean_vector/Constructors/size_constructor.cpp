@@ -19,9 +19,10 @@ TEST_CASE("size_constructor_explicit") {
 	auto dimension = int{3};
 	auto vector_object_initialised = comp6771::euclidean_vector(dimension);
 	REQUIRE(static_cast<size_t>(vector_object_initialised.dimensions()) == 3);
-    const auto casted_vector_object_initialised = comp6771_helpers::convert_to_vector_manually(vector_object_initialised);
-    REQUIRE(std::all_of(casted_vector_object_initialised.begin(),
-                        casted_vector_object_initialised.end(),
+	const auto casted_vector_object_initialised =
+	   comp6771_helpers::convert_to_vector_manually(vector_object_initialised);
+	REQUIRE(std::all_of(casted_vector_object_initialised.begin(),
+	                    casted_vector_object_initialised.end(),
 	                    [&](auto value) { return value == Approx(0).margin(0.000001); }));
 }
 

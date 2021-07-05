@@ -28,28 +28,30 @@ TEST_CASE("basic_compound_subtraction_case_different_values") {
 	// values using iota will be steadily increasing so all different
 	std::iota(left_stdvector.begin(), left_stdvector.end(), value);
 	auto left_vector = comp6771::euclidean_vector(left_stdvector.begin(), left_stdvector.end());
-    auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
-    REQUIRE(static_cast<size_t>(left_vector.dimensions()) == left_stdvector.size());
+	auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
+	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == left_stdvector.size());
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size);
-	REQUIRE(
-	   std::equal(casted_left_vector.begin(), casted_left_vector.end(), left_stdvector.begin(), left_stdvector.end()));
+	REQUIRE(std::equal(casted_left_vector.begin(),
+	                   casted_left_vector.end(),
+	                   left_stdvector.begin(),
+	                   left_stdvector.end()));
 
 	const auto value2 = 6342;
 	auto right_stdvector = std::vector<double>(size);
 	// values using iota will be steadily increasing so all different
 	std::iota(right_stdvector.begin(), right_stdvector.end(), value2);
 	auto right_vector = comp6771::euclidean_vector(right_stdvector.begin(), right_stdvector.end());
-    auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
-    REQUIRE(static_cast<size_t>(right_vector.dimensions()) == right_stdvector.size());
+	auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
+	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == right_stdvector.size());
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size);
 	REQUIRE(std::equal(casted_right_vector.begin(),
-                       casted_right_vector.end(),
+	                   casted_right_vector.end(),
 	                   right_stdvector.begin(),
 	                   right_stdvector.end()));
 	// keep in mind our original 2 std vectors stay the same, so we will compare the values in them
 	// to the result below
 	left_vector -= right_vector;
-    casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
+	casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size);
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size);
 	size_t count = 0;
@@ -70,8 +72,8 @@ TEST_CASE("compound_subtraction_different_size") {
 	auto right_vector = comp6771::euclidean_vector(size2, val);
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size2);
-    const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
-    const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
+	const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
+	const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
 	REQUIRE(std::all_of(casted_left_vector.begin(), casted_left_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
