@@ -22,5 +22,6 @@ TEST_CASE("normal_vector_with_different_values") {
 	const auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == stdvector.size());
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
-	REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
+	const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	REQUIRE(std::equal(casted_vector.begin(), casted_vector.end(), stdvector.begin(), stdvector.end()));
 }

@@ -27,10 +27,12 @@ TEST_CASE("contains_values_move_constructor") {
 
 	auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
-	REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
+	const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	REQUIRE(std::equal(casted_vector.begin(), casted_vector.end(), stdvector.begin(), stdvector.end()));
 	const auto moved_vector = comp6771::euclidean_vector(std::move(vector));
+	const auto moved_vector_casted = comp6771_helpers::convert_to_vector_manually(moved_vector);
 	REQUIRE(static_cast<size_t>(moved_vector.dimensions()) == size);
-	REQUIRE(std::equal(moved_vector.begin(), moved_vector.end(), stdvector.begin(), stdvector.end()));
+	REQUIRE(std::equal(moved_vector_casted.begin(), moved_vector_casted.end(), stdvector.begin(), stdvector.end()));
 	// check what we moved from was also removed, i.e length 0
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == 0);
 }

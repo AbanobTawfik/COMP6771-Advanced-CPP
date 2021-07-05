@@ -52,7 +52,8 @@ TEST_CASE("os_works_correctly_multiple_values") {
 	const auto vector = comp6771::euclidean_vector(10, 5);
 	// check vectors are equal first by checking properties of internals
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == 10);
-	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
+    const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+    REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(5).margin(0.000001);
 	}));
 	// check if the equals now does the same thing

@@ -34,12 +34,14 @@ TEST_CASE("euclidean_vector_with_values") {
 	const auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
 	REQUIRE(static_cast<size_t>(static_cast<size_t>(vector.dimensions())) == stdvector.size());
 	REQUIRE(static_cast<size_t>(static_cast<size_t>(vector.dimensions())) == size);
-	REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
+	const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+
+	REQUIRE(std::equal(&vector[0],&vector[0] + vector.dimensions(), stdvector.begin(), stdvector.end()));
 	const auto euclidean_norm = comp6771::euclidean_norm(vector);
 	REQUIRE(euclidean_norm >= 0);
 	// manual computation of euclidean norm below for comparison
 	double actual_euclidean_norm = 0;
-	for (auto val : vector) {
+	for (auto val : casted_vector) {
 		actual_euclidean_norm += val * val;
 	}
 	actual_euclidean_norm = std::sqrt(actual_euclidean_norm);

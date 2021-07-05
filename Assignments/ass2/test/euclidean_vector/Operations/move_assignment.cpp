@@ -25,9 +25,11 @@ TEST_CASE("move_assignment_contains_values") {
 	auto stdvector = std::vector<double>(size);
 	std::iota(stdvector.begin(), stdvector.end(), value);
 	auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
-	REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
+    const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+    REQUIRE(std::equal(casted_vector.begin(), casted_vector.end(), stdvector.begin(), stdvector.end()));
 	const auto moved_vector = std::move(vector);
-	REQUIRE(std::equal(moved_vector.begin(), moved_vector.end(), stdvector.begin(), stdvector.end()));
+    const auto casted_moved_vector = comp6771_helpers::convert_to_vector_manually(moved_vector);
+    REQUIRE(std::equal(casted_moved_vector.begin(), casted_moved_vector.end(), stdvector.begin(), stdvector.end()));
 	// check what we moved from was also removed, i.e length 0
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == 0);
 }

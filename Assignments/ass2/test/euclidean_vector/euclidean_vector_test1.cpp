@@ -13,4 +13,5 @@ TEST_CASE("basic test") {
 	auto oss = std::ostringstream{};
 	oss << (a1 + a2 + a3);
 	CHECK(oss.str() == "[9 9 9]");
+
 }

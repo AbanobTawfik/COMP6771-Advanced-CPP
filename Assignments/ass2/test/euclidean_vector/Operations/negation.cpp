@@ -31,12 +31,14 @@ TEST_CASE("negation_with_values") {
 	// values using iota will be steadily increasing so all different
 	std::iota(stdvector.begin(), stdvector.end(), value);
 	auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
-	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
-	REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
+    auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	REQUIRE(std::equal(casted_vector.begin(), casted_vector.end(), stdvector.begin(), stdvector.end()));
 	// call in the negation
 	vector = -vector;
 	size_t count = 0;
-	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
+    casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(-1 * stdvector.at(count++)).margin(0.000001);
 	}));
 }

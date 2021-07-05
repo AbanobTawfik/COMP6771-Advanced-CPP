@@ -46,13 +46,14 @@ TEST_CASE("at_out_of_bounds_access") {
 	const size_t size = 100;
 	const auto vector = comp6771::euclidean_vector(size);
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
-	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
+    const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+    REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(0).margin(0.000001);
 	}));
 	REQUIRE_THROWS_WITH(vector.at(size), "Index " + std::to_string(size) + " is out of bounds!");
 	// MAKE SURE NO CHANGES
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
-	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
+    REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(0).margin(0.000001);
 	}));
 }
@@ -73,13 +74,14 @@ TEST_CASE("at_out_of_bounds_change") {
 	const size_t size = 100;
 	auto vector = comp6771::euclidean_vector(size);
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
-	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
+    const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+    REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(0).margin(0.000001);
 	}));
 	REQUIRE_THROWS_WITH(vector.at(size) = 3, "Index " + std::to_string(size) + " is out of bounds!");
 	// make sure no changes
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
-	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(0).margin(0.000001);
 	}));
 }

@@ -28,17 +28,19 @@ TEST_CASE("basic_division_case_different_values") {
 	auto stdvector = std::vector<double>(size);
 	std::iota(stdvector.begin(), stdvector.end(), value);
 	auto vector = comp6771::euclidean_vector(stdvector.begin(), stdvector.end());
-	REQUIRE(static_cast<size_t>(vector.dimensions()) == stdvector.size());
+    const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+    REQUIRE(static_cast<size_t>(vector.dimensions()) == stdvector.size());
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
-	REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
+	REQUIRE(std::equal(casted_vector.begin(), casted_vector.end(), stdvector.begin(), stdvector.end()));
 
 	const auto divided_vector = vector / scale;
-	// check original vector is unchanged
+    const auto casted_divided_vector = comp6771_helpers::convert_to_vector_manually(divided_vector);
+    // check original vector is unchanged
 	REQUIRE(static_cast<size_t>(vector.dimensions()) == size);
-	REQUIRE(std::equal(vector.begin(), vector.end(), stdvector.begin(), stdvector.end()));
+	REQUIRE(std::equal(casted_vector.begin(), casted_vector.end(), stdvector.begin(), stdvector.end()));
 	// check the division worked correctly
 	size_t count = 0;
-	REQUIRE(std::all_of(divided_vector.begin(), divided_vector.end(), [&](auto value) {
+	REQUIRE(std::all_of(casted_divided_vector.begin(), casted_divided_vector.end(), [&](auto value) {
 		return value == Approx(stdvector.at(count++) / scale).template margin(0.000001);
 	}));
 }
@@ -48,21 +50,23 @@ TEST_CASE("division_negation_same") {
 	auto size = 5;
 	auto val = 3;
 	auto vector = comp6771::euclidean_vector(size, val);
-	REQUIRE(vector.dimensions() == size);
-	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
+    const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+    REQUIRE(vector.dimensions() == size);
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
 
 	const auto divided_vector = vector / scale;
-	// check original vector is unchanged
+    const auto casted_divided_vector = comp6771_helpers::convert_to_vector_manually(divided_vector);
+    // check original vector is unchanged
 	REQUIRE(vector.dimensions() == size);
-	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
 
 	// check the division worked correctly
 	REQUIRE(divided_vector.dimensions() == size);
-	REQUIRE(std::all_of(divided_vector.begin(), divided_vector.end(), [&](auto value) {
+	REQUIRE(std::all_of(casted_divided_vector.begin(), casted_divided_vector.end(), [&](auto value) {
 		return value == Approx(val / scale).margin(0.000001);
 	}));
 	REQUIRE(divided_vector == -vector);
@@ -73,21 +77,23 @@ TEST_CASE("division_unary_same") {
 	auto size = 5;
 	auto val = 3;
 	auto vector = comp6771::euclidean_vector(size, val);
-	REQUIRE(vector.dimensions() == size);
-	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
+    const auto casted_vector = comp6771_helpers::convert_to_vector_manually(vector);
+    REQUIRE(vector.dimensions() == size);
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
 
 	const auto divided_vector = vector / scale;
-	// check original vector is unchanged
+    const auto casted_divided_vector = comp6771_helpers::convert_to_vector_manually(divided_vector);
+    // check original vector is unchanged
 	REQUIRE(vector.dimensions() == size);
-	REQUIRE(std::all_of(vector.begin(), vector.end(), [&](auto value) {
+	REQUIRE(std::all_of(casted_vector.begin(), casted_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
 
 	// check the division worked correctly
 	REQUIRE(divided_vector.dimensions() == size);
-	REQUIRE(std::all_of(divided_vector.begin(), divided_vector.end(), [&](auto value) {
+	REQUIRE(std::all_of(casted_divided_vector.begin(), casted_divided_vector.end(), [&](auto value) {
 		return value == Approx(val / scale).margin(0.000001);
 	}));
 	REQUIRE(divided_vector == +vector);

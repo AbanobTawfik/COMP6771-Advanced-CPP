@@ -28,30 +28,33 @@ TEST_CASE("basic_compound_subtraction_case_different_values") {
 	// values using iota will be steadily increasing so all different
 	std::iota(left_stdvector.begin(), left_stdvector.end(), value);
 	auto left_vector = comp6771::euclidean_vector(left_stdvector.begin(), left_stdvector.end());
-	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == left_stdvector.size());
+    auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
+    REQUIRE(static_cast<size_t>(left_vector.dimensions()) == left_stdvector.size());
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size);
 	REQUIRE(
-	   std::equal(left_vector.begin(), left_vector.end(), left_stdvector.begin(), left_stdvector.end()));
+	   std::equal(casted_left_vector.begin(), casted_left_vector.end(), left_stdvector.begin(), left_stdvector.end()));
 
 	const auto value2 = 6342;
 	auto right_stdvector = std::vector<double>(size);
 	// values using iota will be steadily increasing so all different
 	std::iota(right_stdvector.begin(), right_stdvector.end(), value2);
 	auto right_vector = comp6771::euclidean_vector(right_stdvector.begin(), right_stdvector.end());
-	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == right_stdvector.size());
+    auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
+    REQUIRE(static_cast<size_t>(right_vector.dimensions()) == right_stdvector.size());
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size);
-	REQUIRE(std::equal(right_vector.begin(),
-	                   right_vector.end(),
+	REQUIRE(std::equal(casted_right_vector.begin(),
+                       casted_right_vector.end(),
 	                   right_stdvector.begin(),
 	                   right_stdvector.end()));
 	// keep in mind our original 2 std vectors stay the same, so we will compare the values in them
 	// to the result below
 	left_vector -= right_vector;
+    casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size);
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size);
 	size_t count = 0;
 	size_t count2 = 0;
-	REQUIRE(std::all_of(left_vector.begin(), left_vector.end(), [&](auto val) {
+	REQUIRE(std::all_of(casted_left_vector.begin(), casted_left_vector.end(), [&](auto val) {
 		return val
 		       == Approx(left_stdvector.at(count++) - right_stdvector.at(count2++)).margin(0.000001);
 	}));
@@ -67,10 +70,12 @@ TEST_CASE("compound_subtraction_different_size") {
 	auto right_vector = comp6771::euclidean_vector(size2, val);
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size2);
-	REQUIRE(std::all_of(left_vector.begin(), left_vector.end(), [&](auto value) {
+    const auto casted_left_vector = comp6771_helpers::convert_to_vector_manually(left_vector);
+    const auto casted_right_vector = comp6771_helpers::convert_to_vector_manually(right_vector);
+	REQUIRE(std::all_of(casted_left_vector.begin(), casted_left_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
-	REQUIRE(std::all_of(right_vector.begin(), right_vector.end(), [&](auto value) {
+	REQUIRE(std::all_of(casted_right_vector.begin(), casted_right_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
 	REQUIRE_THROWS_WITH(left_vector -= right_vector,
@@ -79,10 +84,10 @@ TEST_CASE("compound_subtraction_different_size") {
 	// NO CHANGES!
 	REQUIRE(static_cast<size_t>(left_vector.dimensions()) == size1);
 	REQUIRE(static_cast<size_t>(right_vector.dimensions()) == size2);
-	REQUIRE(std::all_of(left_vector.begin(), left_vector.end(), [&](auto value) {
+	REQUIRE(std::all_of(casted_left_vector.begin(), casted_left_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
-	REQUIRE(std::all_of(right_vector.begin(), right_vector.end(), [&](auto value) {
+	REQUIRE(std::all_of(casted_right_vector.begin(), casted_right_vector.end(), [&](auto value) {
 		return value == Approx(val).margin(0.000001);
 	}));
 }
