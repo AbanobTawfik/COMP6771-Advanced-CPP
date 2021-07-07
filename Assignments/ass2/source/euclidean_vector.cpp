@@ -266,26 +266,19 @@ namespace comp6771 {
 	//                                                                                            //
 	////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// i chose to do this rather than making the method allow the user to pass in a input as this
-	// could be malicious and give wrong results, so instead i force that the cached norm is ALWAYS
-	// correct this way, so if a person calls set_cached_norm outside of this class they cannot set
-	// an invalid cache
-	void euclidean_vector::set_cached_norm() const noexcept {
-		auto euclidean_norm = std::sqrt(
-		   std::inner_product(magnitude_.get(), magnitude_.get() + length_, magnitude_.get(), 0.0));
-		euclidean_norm_ = euclidean_norm;
-		auto vector = euclidean_vector(*this);
-	}
-
+    // had to make it a friend to follow the specifcation for caching the norm, requiring access to the norm stored
+    // in cache, and modification
 	auto euclidean_norm(euclidean_vector const& vector) noexcept -> double {
-		auto cached_norm = vector.check_cached_norm();
+		auto cached_norm = vector.euclidean_norm_;
 		if (cached_norm != -1 && cached_norm >= 0) {
 			return cached_norm;
 		}
-		// compute and cache
-		vector.set_cached_norm();
+		// compute and cache, might aswell use magnitude_ instead of casting to vector since its a friend anyway
+        auto euclidean_norm = std::sqrt(
+                std::inner_product(vector.magnitude_.get(), vector.magnitude_.get() + vector.length_, vector.magnitude_.get(), 0.0));
+        vector.euclidean_norm_ = euclidean_norm;
 		// return either 0 if length 0 or the cached result we computed above
-		return vector.check_cached_norm();
+		return euclidean_norm;
 	}
 
 	auto unit(const euclidean_vector& vector) -> euclidean_vector {
