@@ -12,22 +12,26 @@ auto main() -> int {
 //    auto c = g.insert_edge("hello", "hi", 5);
 //    std::cout << b << std::endl;
     auto g = gdwg::graph<std::string, int>();
-    g.insert_node("hello");
-    g.insert_node("how");
-    g.insert_node("are");
-    g.insert_node("you?");
+    g.insert_node("A");
+    g.insert_node("B");
+    g.insert_node("C");
+    g.insert_node("D");
+//    g.insert_node("E");
+    g.insert_edge("A", "B", 1);
+    g.insert_edge("A", "C", 2);
+    g.insert_edge("A", "D", 3);
+    g.insert_edge("B", "B", 1);
 
-    g.insert_edge("hello", "how", 5);
-    g.insert_edge("hello", "how", 5);
-    g.insert_edge("hello", "are", 8);
-    g.insert_edge("hello", "are", 2);
 
-    g.insert_edge("how", "you?", 1);
-    g.insert_edge("how", "hello", 4);
+    g.merge_replace_node("A", "B");
 
-    g.insert_edge("are", "you?", 3);
-
-    g.replace_node("hello", "kekw");
+//    g.insert_edge("B", "C", 1);
+//    g.insert_edge("B", "D", 2);
+//    g.insert_edge("B", "E", 3);
+//    g.insert_edge("C", "D", 1);
+//    g.insert_edge("D", "E", 4);
+//
+//    g.merge_replace_node("D", "A");
 //	std::cout << g << "\n";
 //
 //	auto g2 = gdwg::graph<std::string, int>(g);

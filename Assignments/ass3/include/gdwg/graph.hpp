@@ -117,11 +117,11 @@ namespace gdwg {
             }
 
             bool operator()(const Edge &lhs, const Edge &rhs) const {
-                if (not lhs.from == rhs.from) {
-                    return lhs.from < rhs.from;
+                if (lhs.from.lock().get()->value != rhs.from.lock().get()->value) {
+                    return lhs.from.lock().get()->value < rhs.from.lock().get()->value;
                 }
-                if (not lhs.to == rhs.to) {
-                    return lhs.to < rhs.to;
+                if (lhs.to.lock().get()->value != rhs.to.lock().get()->value) {
+                    return lhs.to.lock().get()->value < rhs.to.lock().get()->value;
                 }
                 return lhs.weight < rhs.weight;
             }
@@ -133,6 +133,51 @@ namespace gdwg {
         // due to nodes containing a set of weak_ptrs for both incoming/outgoing connections, when a edge
         // is removed from the all_Edges set, all nodes assosicated will have corresponding connections removed too
         // only book keeping is required for managing the connections on nodes
+        auto debug() -> void {
+            std::cout << "NODES: " << all_nodes_.size() << std::endl;
+            for (auto node : all_nodes_) {
+                std::cout << node->value << std::endl;
+                std::cout << "incoming" << std::endl;
+                for (auto edge : node->incoming) {
+                    std::cout << edge.lock().get()->from.lock().get()->value << " -> "
+                              << edge.lock().get()->to.lock().get()->value << ",   weight: "
+                              << edge.lock().get()->weight << std::endl;
+                }
+                std::cout << std::endl;
+                std::cout << "outgoing" << std::endl;
+                for (auto edge : node->outgoing) {
+                    std::cout << edge.lock().get()->from.lock().get()->value << " -> "
+                              << edge.lock().get()->to.lock().get()->value << ",   weight: "
+                              << edge.lock().get()->weight << std::endl;
+                }
+                std::cout << std::endl;
+            }
+            std::cout << std::endl;
+            std::cout << "EDGES" << std::endl;
+            for (auto edge : all_edges_) {
+                std::cout << edge.get()->from.lock().get()->value << " -> " << edge.get()->to.lock().get()->value
+                          << ",   weight: " << edge.get()->weight << std::endl;
+            }
+        }
+
+        auto linear_sort_set(
+                std::set<std::shared_ptr<Edge>, set_comparator> to_sort) -> std::set<std::shared_ptr<Edge>, set_comparator> {
+            auto sorted_set = std::set<std::shared_ptr<Edge>, set_comparator>();
+            for(auto edge : to_sort){
+                sorted_set.insert(edge);
+            }
+            return sorted_set;
+        }
+
+        auto linear_sort_set(
+                std::set<std::weak_ptr<Edge>, set_comparator> to_sort) -> std::set<std::weak_ptr<Edge>, set_comparator> {
+            auto sorted_set = std::set<std::weak_ptr<Edge>, set_comparator>();
+            for(auto edge : to_sort){
+                sorted_set.insert(edge);
+            }
+            return sorted_set;
+        }
+
         std::set<std::shared_ptr<Node>, set_comparator> all_nodes_;
         std::set<std::shared_ptr<Edge>, set_comparator> all_edges_;
     };
@@ -230,27 +275,12 @@ namespace gdwg {
         if (all_nodes_.find(std::make_shared<Node>(new_data)) != all_nodes_.end()) {
             return false;
         }
-        // creating the new node
-        auto new_node = std::make_shared<Node>(new_data);
-        auto updated_in_edges = std::set<std::weak_ptr<Edge>, set_comparator>();
-        auto updated_out_edges = std::set<std::weak_ptr<Edge>, set_comparator>();
-        for (auto in_edge : old_node->get()->incoming) {
-            auto edge_to_insert = std::make_shared<Edge>(
-                    Edge{in_edge.lock().get()->from, new_node, in_edge.lock().get()->weight});
-            all_edges_.erase(in_edge.lock());
-            updated_in_edges.insert(edge_to_insert);
-        }
-        for (auto out_edge : old_node->get()->outgoing) {
-            auto edge_to_insert = std::make_shared<Edge>(Edge{new_node, out_edge.lock().get()->from,
-                                                              out_edge.lock().get()->weight});
-            all_edges_.erase(out_edge.lock());
-            updated_out_edges.insert(edge_to_insert);
-        }
-        new_node.get()->incoming = updated_in_edges;
-        new_node.get()->outgoing = updated_out_edges;
-        all_nodes_.insert(new_node);
-        all_nodes_.erase(old_node);
-        auto z = all_nodes_.find(std::make_shared<Node>(new_data))->get();
+        debug();
+        old_node->get()->value = new_data;
+        std::cout << "__________________________________________________" << std::endl;
+        std::cout << "__________________________________________________" << std::endl;
+        std::cout << "__________________________________________________" << std::endl;
+        debug();
         return true;
     }
 
@@ -263,45 +293,68 @@ namespace gdwg {
             throw std::runtime_error(
                     "Cannot call gdwg::graph<N, E>::merge_replace_node on old or new data if they don't exist in the graph");
         }
-        // due to the nature of our sets, duplicates are ignored anyways, since sets are compared by elements itself
-        // so we just need to update all edge connections recursively
-//        auto check_duplicates_incoming = std::set<Raw_Edge, raw_edge_comparator>();
-//        for (auto in_edge : new_node->get()->incoming) {
-//            check_duplicates_incoming.insert(Raw_Edge{in_edge.lock().get()->from.lock().get()->value,
-//                                                      in_edge.lock().get()->to.lock().get()->value,
-//                                                      in_edge.lock().get()->weight});
-//        }
-//        auto check_duplicates_outgoing = std::set<Raw_Edge, raw_edge_comparator>();
-//        for (auto out_edge : new_node->get()->incoming) {
-//            check_duplicates_incoming.insert(Raw_Edge{out_edge.lock().get()->from.lock().get()->value,
-//                                                      out_edge.lock().get()->to.lock().get()->value,
-//                                                      out_edge.lock().get()->weight});
-//        }
-//
-//        for (auto in_edge : old_node->get()->incoming) {
-//            if (check_duplicates_incoming.find(
-//                    Raw_Edge{in_edge.lock().get()->from.lock().get()->value, new_data, in_edge.lock().get()->weight}) !=
-//                check_duplicates_incoming.end()) {
-//                continue;
-//            }
-//            check_duplicates_incoming.insert(
-//                    Raw_Edge{in_edge.lock().get()->from.lock().get()->value, new_data, in_edge.lock().get()->weight});
-//            auto edge_to_insert = std::make_shared<Edge>(
-//                    Edge{in_edge.lock().get()->from, new_node, in_edge.lock().get()->weight});
-//            new_node->
-//            all_edges_.erase(in_edge.lock());
-//            updated_in_edges.insert(edge_to_insert);
-//        }
-//        for (auto out_edge : old_node->get()->outgoing) {
-//            auto edge_to_insert = std::make_shared<Edge>(Edge{new_node, out_edge.lock().get()->from,
-//                                                              out_edge.lock().get()->weight});
-//            all_edges_.erase(out_edge.lock());
-//            updated_out_edges.insert(edge_to_insert);
-//        }
-//        new_node.get()->incoming = updated_in_edges;
-//        new_node.get()->outgoing = updated_out_edges;
-//        all_nodes_.insert(new_node);
-        auto z = all_nodes_.find(std::make_shared<Node>(new_data))->get();
+        // to do this properly we will go through each inc/out connection and update the pointers appropriately to new node
+        // incoming = inc -> old
+        // check if a duplicate edge exists first
+        auto existing_connections = std::set<Edge, set_comparator>();
+        for (auto edge : new_node->get()->incoming) {
+            existing_connections.insert(
+                    Edge{edge.lock().get()->from, edge.lock().get()->to, edge.lock().get()->weight});
+        }
+        for (auto edge : new_node->get()->outgoing) {
+            existing_connections.insert(
+                    Edge{edge.lock().get()->from, edge.lock().get()->to, edge.lock().get()->weight});
+        }
+
+        for (auto edge : old_node->get()->incoming) {
+            auto insertion_edge = Edge{edge.lock().get()->from.lock(), *new_node, edge.lock().get()->weight};
+            if (existing_connections.find(insertion_edge) != existing_connections.end()) {
+                continue;
+            }
+            edge.lock().get()->to = *new_node;
+            new_node->get()->incoming.insert(edge);
+            existing_connections.insert(insertion_edge);
+        }
+        for (auto edge : old_node->get()->outgoing) {
+            auto insertion_edge = Edge{*new_node, edge.lock().get()->to.lock(), edge.lock().get()->weight};
+            if (existing_connections.find(insertion_edge) != existing_connections.end()) {
+                continue;
+            }
+            edge.lock().get()->from = *new_node;
+            new_node->get()->outgoing.insert(edge);
+            existing_connections.insert(insertion_edge);
+        }
+        // final cleanup is to remove any edges with old_node in the new node (the final remnants)
+        auto edge_to_remove_incoming = std::set<std::weak_ptr<Edge>, set_comparator>();
+        for (auto edge : new_node->get()->incoming) {
+            if (edge.lock().get()->from.lock().get()->value == old_data) {
+                edge_to_remove_incoming.insert(edge);
+            }
+        }
+        for (auto edge : edge_to_remove_incoming) {
+            new_node->get()->incoming.erase(edge);
+            all_edges_.erase(edge.lock());
+        }
+
+        auto edge_to_remove_outgoing = std::set<std::weak_ptr<Edge>, set_comparator>();
+        for (auto edge : new_node->get()->outgoing) {
+            if (edge.lock().get()->to.lock().get()->value == old_data) {
+                edge_to_remove_outgoing.insert(edge);
+            }
+        }
+        for (auto edge : edge_to_remove_outgoing) {
+            new_node->get()->outgoing.erase(edge);
+            all_edges_.erase(edge.lock());
+        }
+        // since i changed the nodes without updating the set again, i will re-sort my set
+        all_nodes_.erase(old_node);
+        all_edges_ = linear_sort_set(all_edges_);
+        for(auto node : all_nodes_){
+            node.get()->incoming = linear_sort_set(node.get()->incoming);
+            node.get()->outgoing = linear_sort_set(node.get()->outgoing);
+        }
+        debug();
+
     }
 
 
