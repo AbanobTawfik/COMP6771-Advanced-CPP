@@ -5,7 +5,7 @@
 #include <set>
 #include <unordered_map>
 #include <map>
-
+#include <iterator>
 namespace gdwg {
     template<typename N, typename E>
     class graph {
@@ -39,6 +39,12 @@ namespace gdwg {
         auto replace_node(N const &old_data, N const &new_data) -> bool;
 
         auto merge_replace_node(N const &old_data, N const &new_data) -> void;
+
+        auto erase_node(N const &value) -> bool;
+
+        auto erase_edge(N const &src, N const &dst, E const &weight) -> bool;
+
+        auto erase_edge(iterator i) -> iterator;
 
     private:
         struct Node;
@@ -163,7 +169,7 @@ namespace gdwg {
         auto linear_sort_set(
                 std::set<std::shared_ptr<Edge>, set_comparator> to_sort) -> std::set<std::shared_ptr<Edge>, set_comparator> {
             auto sorted_set = std::set<std::shared_ptr<Edge>, set_comparator>();
-            for(auto edge : to_sort){
+            for (auto edge : to_sort) {
                 sorted_set.insert(edge);
             }
             return sorted_set;
@@ -172,7 +178,7 @@ namespace gdwg {
         auto linear_sort_set(
                 std::set<std::weak_ptr<Edge>, set_comparator> to_sort) -> std::set<std::weak_ptr<Edge>, set_comparator> {
             auto sorted_set = std::set<std::weak_ptr<Edge>, set_comparator>();
-            for(auto edge : to_sort){
+            for (auto edge : to_sort) {
                 sorted_set.insert(edge);
             }
             return sorted_set;
@@ -349,12 +355,57 @@ namespace gdwg {
         // since i changed the nodes without updating the set again, i will re-sort my set
         all_nodes_.erase(old_node);
         all_edges_ = linear_sort_set(all_edges_);
-        for(auto node : all_nodes_){
+        for (auto node : all_nodes_) {
             node.get()->incoming = linear_sort_set(node.get()->incoming);
             node.get()->outgoing = linear_sort_set(node.get()->outgoing);
         }
-        debug();
+    }
 
+    template<typename N, typename E>
+    auto graph<N, E>::erase_node(const N &value) -> bool {
+        auto node_to_delete = all_nodes_.find(std::make_shared<Node>(value));
+        if (node_to_delete == all_nodes_.end()) {
+            return false;
+        } else {
+            // delete the edges in all the incoming/outgoing for that node
+            for (auto edge : node_to_delete->get()->incoming) {
+                // delete this edge from the from node's outgoing
+                edge.lock().get()->from.lock().get()->outgoing.erase(edge);
+                all_edges_.erase(edge.lock());
+            }
+            for (auto edge : node_to_delete->get()->outgoing) {
+                // delete this edge from the from node's outgoing
+                edge.lock().get()->to.lock().get()->incoming.erase(edge);
+                all_edges_.erase(edge.lock());
+            }
+            all_nodes_.erase(node_to_delete);
+            return true;
+        }
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::erase_edge(const N &src, const N &dst, const E &weight) -> bool {
+        auto from = all_nodes_.find(std::make_shared<Node>(src));
+        auto to = all_nodes_.find(std::make_shared<Node>(dst));
+        if (from == all_nodes_.end() || to == all_nodes_.end()) {
+            throw std::runtime_error(
+                    "Cannot call gdwg::graph<N, E>::erase_edge on src or dst if they don't exist in the graph");
+        }
+        // we want to get the outgoing -> incoming edge for src and dst delete them there, then delete the edge
+        // each find + removal = o(log(N)) due to set implementation
+        auto edge_to_remove = all_edges_.find(
+                std::make_shared<Edge>(Edge{*from, *to, weight}));
+        if (edge_to_remove == all_edges_.end()) {
+            return false;
+        }
+//        auto z = edge_to_remove->get();
+        // now that we have the edge to remove, we want to remove it from the OUTGOING of the src, and INCOMING of dst
+        // and then simply remove it from all_edges
+        // total O(e) + O(log(n))
+        from->get()->outgoing.erase(*edge_to_remove);
+        to->get()->incoming.erase(*edge_to_remove);
+        all_edges_.erase(*edge_to_remove);
+        return true;
     }
 
 

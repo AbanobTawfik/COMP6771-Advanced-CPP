@@ -23,8 +23,8 @@ auto main() -> int {
     g.insert_edge("B", "B", 1);
 
 
-    g.merge_replace_node("A", "B");
-
+//    g.merge_replace_node("A", "B");
+    g.erase_edge("A","B", 1);
 //    g.insert_edge("B", "C", 1);
 //    g.insert_edge("B", "D", 2);
 //    g.insert_edge("B", "E", 3);
