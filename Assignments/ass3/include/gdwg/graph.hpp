@@ -12,6 +12,13 @@ namespace gdwg {
     template<typename N, typename E>
     class graph {
 
+    public:
+        struct value_type {
+            N from;
+            N to;
+            E weight;
+        };
+
     private:
         struct Node;
         struct Edge;
@@ -31,10 +38,6 @@ namespace gdwg {
             std::weak_ptr<Node> to;
             E weight;
         };
-
-//        struct Edge_Iterator_Type{
-//
-//        };
 
         struct Node {
             Node() = default;
@@ -128,13 +131,20 @@ namespace gdwg {
             return sorted_set;
         }
 
+
+        struct edge_iterate {
+            edge_iterate(std::shared_ptr<Edge> edge, std::shared_ptr<Edge> &&next) : next{std::move(next)} {
+                value = value_type{edge.get()->from.lock().get()->value, edge.get()->to.lock().get()->value,
+                                   edge.get()->weight};
+            }
+
+            value_type value;
+            std::shared_ptr<edge_iterate> next;
+        };
+
         class graph_iterator {
         public:
-            using value_type = struct value_type {
-                N from;
-                N to;
-                E weight;
-            };;
+            using value_type = graph<N, E>::value_type;
             using reference = value_type;
             using pointer = void;
             using difference_type = std::ptrdiff_t;
@@ -144,12 +154,21 @@ namespace gdwg {
             graph_iterator() = default;
 
             // Iterator source
-            auto operator*() -> reference;
+            auto operator*() -> reference{
+                return this->edge_;
+            };
 
             // Iterator traversal
-            auto operator++() -> graph_iterator &;
+            auto operator++() -> graph_iterator &{
+                auto next_address = std::advance(this->edge_address_, 1);
+                return iterator(next_address);
+            };
 
-            auto operator++(int) -> graph_iterator;
+            auto operator++(int) -> graph_iterator{
+                auto next_address = this->edge_address_;
+                std::advance(next_address, 1);
+                return iterator(next_address);
+            }
 
             auto operator--() -> graph_iterator &;
 
@@ -159,8 +178,16 @@ namespace gdwg {
             auto operator==(graph_iterator const &other) -> bool;
 
         private:
-            explicit graph_iterator(Edge* edge);
-            Edge* edge_;
+            explicit graph_iterator(typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator edge) {
+                edge_ = value_type{edge->get()->from.lock().get()->value, edge->get()->to.lock().get()->value,
+                                   edge->get()->weight};
+                edge_address_ = edge;
+            };
+            value_type edge_;
+//            graph_iterator* next_;
+//            graph_iterator* prev_;
+            typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator edge_address_;
+
             friend class graph;
         };
 
@@ -169,11 +196,6 @@ namespace gdwg {
         using const_iterator = graph_iterator;
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-        struct value_type {
-            N from;
-            N to;
-            E weight;
-        };
 
         graph() = default;
 
@@ -518,7 +540,7 @@ namespace gdwg {
 
     template<typename N, typename E>
     auto graph<N, E>::begin() const -> graph::iterator {
-        return all_edges_.begin();
+        return iterator(all_edges_.begin());
     }
 
     template<typename N, typename E>
