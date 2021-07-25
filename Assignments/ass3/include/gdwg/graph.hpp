@@ -6,10 +6,175 @@
 #include <unordered_map>
 #include <map>
 #include <iterator>
+#include <numeric>
+
 namespace gdwg {
     template<typename N, typename E>
     class graph {
+
+    private:
+        struct Node;
+        struct Edge;
+        struct set_comparator;
+
+        struct Edge {
+            Edge() = default;
+
+            Edge(std::weak_ptr<Node> from, std::weak_ptr<Node> to, E weight) : from{from}, to{to},
+                                                                               weight{weight} {}
+
+            ~Edge() {
+                from.reset();
+            }
+
+            std::weak_ptr<Node> from;
+            std::weak_ptr<Node> to;
+            E weight;
+        };
+
+//        struct Edge_Iterator_Type{
+//
+//        };
+
+        struct Node {
+            Node() = default;
+
+            explicit Node(N value) : value{value} {
+                incoming = std::set<std::weak_ptr<Edge>, set_comparator>();
+                outgoing = std::set<std::weak_ptr<Edge>, set_comparator>();
+            }
+
+            Node(N value, std::set<std::weak_ptr<Edge>> incoming, std::set<std::weak_ptr<Edge>> outgoing) : value{
+                    value}, incoming{incoming}, outgoing{outgoing} {};
+
+            std::set<std::weak_ptr<Edge>, set_comparator> incoming;
+            std::set<std::weak_ptr<Edge>, set_comparator> outgoing;
+            N value;
+        };
+
+        struct set_comparator {
+            auto operator()(const std::shared_ptr<Node> &lhs, const std::shared_ptr<Node> &rhs) const -> bool {
+                return lhs.get()->value < rhs.get()->value;
+            }
+
+            auto operator()(const std::weak_ptr<Node> &lhs, const std::weak_ptr<Node> &rhs) const -> bool {
+                return lhs.lock().get()->value < rhs.lock().get()->value;
+            }
+
+            auto operator()(const Node &lhs, const Node &rhs) const -> bool {
+                return lhs->value < rhs->value;
+            }
+
+            // in order to do this in O(log(N) time we need edges to be sorted properly
+            // sort first by from, to, weight in that order
+            auto operator()(const std::shared_ptr<Edge> &lhs, const std::shared_ptr<Edge> &rhs) const -> bool {
+                // first compare by from
+                if (lhs.get()->from.lock().get()->value != rhs.get()->from.lock().get()->value) {
+                    return lhs.get()->from.lock().get()->value < rhs.get()->from.lock().get()->value;
+                }
+                // if above check failed, means from nodes are identical so now check to nodes
+                if (lhs.get()->to.lock().get()->value != rhs.get()->to.lock().get()->value) {
+                    return lhs.get()->to.lock().get()->value < rhs.get()->to.lock().get()->value;
+                }
+                // now we have same from and to nodes (same edge location), compare by weight now
+                return lhs.get()->weight < rhs.get()->weight;
+            }
+
+            auto operator()(const std::weak_ptr<Edge> &lhs, const std::weak_ptr<Edge> &rhs) const -> bool {
+                if (lhs.lock().get()->from.lock().get()->value != rhs.lock().get()->from.lock().get()->value) {
+                    return lhs.lock().get()->from.lock().get()->value < rhs.lock().get()->from.lock().get()->value;
+                }
+                if (lhs.lock().get()->to.lock().get()->value != rhs.lock().get()->to.lock().get()->value) {
+                    return lhs.lock().get()->to.lock().get()->value < rhs.lock().get()->to.lock().get()->value;
+                }
+                return lhs.lock().get()->weight < rhs.lock().get()->weight;
+            }
+
+            auto operator()(const Edge &lhs, const Edge &rhs) const -> bool {
+                if (lhs.from.lock().get()->value != rhs.from.lock().get()->value) {
+                    return lhs.from.lock().get()->value < rhs.from.lock().get()->value;
+                }
+                if (lhs.to.lock().get()->value != rhs.to.lock().get()->value) {
+                    return lhs.to.lock().get()->value < rhs.to.lock().get()->value;
+                }
+                return lhs.weight < rhs.weight;
+            }
+        };
+
+        auto linear_sort_set(
+                std::set<std::shared_ptr<Edge>, set_comparator> to_sort) -> std::set<std::shared_ptr<Edge>, set_comparator> {
+            auto sorted_set = std::set<std::shared_ptr<Edge>, set_comparator>();
+            for (auto edge : to_sort) {
+                if (edge.get()->from.expired() || edge.get()->to.expired()) {
+                    continue;
+                }
+                sorted_set.insert(edge);
+            }
+            return sorted_set;
+        }
+
+        auto linear_sort_set(
+                std::set<std::weak_ptr<Edge>, set_comparator> to_sort) -> std::set<std::weak_ptr<Edge>, set_comparator> {
+            auto sorted_set = std::set<std::weak_ptr<Edge>, set_comparator>();
+            for (auto edge : to_sort) {
+                if (edge.expired()) {
+                    continue;
+                }
+                if (edge.lock().get()->from.expired() || edge.lock().get()->to.expired()) {
+                    continue;
+                }
+                sorted_set.insert(edge);
+            }
+            return sorted_set;
+        }
+
+        class graph_iterator {
+        public:
+            using value_type = struct value_type {
+                N from;
+                N to;
+                E weight;
+            };;
+            using reference = value_type;
+            using pointer = void;
+            using difference_type = std::ptrdiff_t;
+            using iterator_category = std::bidirectional_iterator_tag;
+
+            // Iterator constructor
+            graph_iterator() = default;
+
+            // Iterator source
+            auto operator*() -> reference;
+
+            // Iterator traversal
+            auto operator++() -> graph_iterator &;
+
+            auto operator++(int) -> graph_iterator;
+
+            auto operator--() -> graph_iterator &;
+
+            auto operator--(int) -> graph_iterator;
+
+            // Iterator comparison
+            auto operator==(graph_iterator const &other) -> bool;
+
+        private:
+            explicit graph_iterator(Edge* edge);
+            Edge* edge_;
+            friend class graph;
+        };
+
     public:
+        using iterator = graph_iterator;
+        using const_iterator = graph_iterator;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+        struct value_type {
+            N from;
+            N to;
+            E weight;
+        };
+
         graph() = default;
 
         graph(std::initializer_list<N>);
@@ -24,12 +189,6 @@ namespace gdwg {
         auto operator=(graph const &other) -> graph &;
 
         auto operator=(graph &&other) noexcept -> graph &;
-
-        struct value_type {
-            N from;
-            N to;
-            E weight;
-        };
 
         // Your member functions go here
         auto insert_node(N const &value) -> bool;
@@ -46,144 +205,42 @@ namespace gdwg {
 
         auto erase_edge(iterator i) -> iterator;
 
+        auto erase_edge(iterator i, iterator s) -> iterator;
+
+        auto clear() noexcept -> void;
+
+        [[nodiscard]] auto is_node(N const &value) -> bool;
+
+        [[nodiscard]] auto empty() -> bool;
+
+        [[nodiscard]] auto is_connected(N const &src, N const &dst) -> bool;
+
+        [[nodiscard]] auto nodes() -> std::vector<N>;
+
+        [[nodiscard]] auto weights(N const &src, N const &dst) -> std::vector<E>;
+
+        [[nodiscard]] auto find(N const &src, N const &dst, E const &weight) -> iterator;
+
+        [[nodiscard]] auto connections(N const &src) -> std::vector<N>;
+
+        [[nodiscard]] auto begin() const -> iterator;
+
+        [[nodiscard]] auto end() const -> iterator;
+
+        [[nodiscard]] auto operator==(graph const &other) -> bool;
+
+        template<typename node, typename edge>
+        friend auto operator<<(std::ostream &os, graph<node, edge> const &g) -> std::ostream &;
+
+//        friend auto operator<<(std::ostream &os, graph const &g) -> std::ostream &;
+
     private:
-        struct Node;
-        struct Edge;
-        struct set_comparator;
-        struct Raw_Edge;
-
-        struct Edge {
-            Edge() = default;
-
-            Edge(std::weak_ptr<Node> from, std::weak_ptr<Node> to, E weight) : from{from}, to{to},
-                                                                               weight{weight} {}
-
-            ~Edge() {
-                from.reset();
-                to.reset();
-            }
-
-            std::weak_ptr<Node> from;
-            std::weak_ptr<Node> to;
-            E weight;
-        };
-
-        struct Node {
-            Node() = default;
-
-            Node(N value) : value{value} {
-                incoming = std::set<std::weak_ptr<Edge>, set_comparator>();
-                outgoing = std::set<std::weak_ptr<Edge>, set_comparator>();
-            }
-
-            Node(N value, std::set<std::weak_ptr<Edge>> incoming, std::set<std::weak_ptr<Edge>> outgoing) : value{
-                    value}, incoming{incoming}, outgoing{outgoing} {};
-
-            std::set<std::weak_ptr<Edge>, set_comparator> incoming;
-            std::set<std::weak_ptr<Edge>, set_comparator> outgoing;
-            N value;
-        };
-
-        struct set_comparator {
-            bool operator()(const std::shared_ptr<Node> &lhs, const std::shared_ptr<Node> &rhs) const {
-                return lhs.get()->value < rhs.get()->value;
-            }
-
-            bool operator()(const std::weak_ptr<Node> &lhs, const std::weak_ptr<Node> &rhs) const {
-                return lhs.lock().get()->value < rhs.lock().get()->value;
-            }
-
-            bool operator()(const Node &lhs, const Node &rhs) const {
-                return lhs->value < rhs->value;
-            }
-
-            // in order to do this in O(log(N) time we need edges to be sorted properly
-            // sort first by from, to, weight in that order
-            bool operator()(const std::shared_ptr<Edge> &lhs, const std::shared_ptr<Edge> &rhs) const {
-                // first compare by from
-                if (lhs.get()->from.lock().get()->value != rhs.get()->from.lock().get()->value) {
-                    return lhs.get()->from.lock().get()->value < rhs.get()->from.lock().get()->value;
-                }
-                // if above check failed, means from nodes are identical so now check to nodes
-                if (lhs.get()->to.lock().get()->value != rhs.get()->to.lock().get()->value) {
-                    return lhs.get()->to.lock().get()->value < rhs.get()->to.lock().get()->value;
-                }
-                // now we have same from and to nodes (same edge location), compare by weight now
-                return lhs.get()->weight < rhs.get()->weight;
-            }
-
-            bool operator()(const std::weak_ptr<Edge> &lhs, const std::weak_ptr<Edge> &rhs) const {
-                if (lhs.lock().get()->from.lock().get()->value != rhs.lock().get()->from.lock().get()->value) {
-                    return lhs.lock().get()->from.lock().get()->value < rhs.lock().get()->from.lock().get()->value;
-                }
-                if (lhs.lock().get()->to.lock().get()->value != rhs.lock().get()->to.lock().get()->value) {
-                    return lhs.lock().get()->to.lock().get()->value < rhs.lock().get()->to.lock().get()->value;
-                }
-                return lhs.lock().get()->weight < rhs.lock().get()->weight;
-            }
-
-            bool operator()(const Edge &lhs, const Edge &rhs) const {
-                if (lhs.from.lock().get()->value != rhs.from.lock().get()->value) {
-                    return lhs.from.lock().get()->value < rhs.from.lock().get()->value;
-                }
-                if (lhs.to.lock().get()->value != rhs.to.lock().get()->value) {
-                    return lhs.to.lock().get()->value < rhs.to.lock().get()->value;
-                }
-                return lhs.weight < rhs.weight;
-            }
-        };
-
         // set keeps order so O(logn) lookups due to binary search built into find (RB trees)
         // nodes contain a list of all their incoming and outgoing connections, and the set of edges
         // can be used for book keeping
         // due to nodes containing a set of weak_ptrs for both incoming/outgoing connections, when a edge
         // is removed from the all_Edges set, all nodes assosicated will have corresponding connections removed too
         // only book keeping is required for managing the connections on nodes
-        auto debug() -> void {
-            std::cout << "NODES: " << all_nodes_.size() << std::endl;
-            for (auto node : all_nodes_) {
-                std::cout << node->value << std::endl;
-                std::cout << "incoming" << std::endl;
-                for (auto edge : node->incoming) {
-                    std::cout << edge.lock().get()->from.lock().get()->value << " -> "
-                              << edge.lock().get()->to.lock().get()->value << ",   weight: "
-                              << edge.lock().get()->weight << std::endl;
-                }
-                std::cout << std::endl;
-                std::cout << "outgoing" << std::endl;
-                for (auto edge : node->outgoing) {
-                    std::cout << edge.lock().get()->from.lock().get()->value << " -> "
-                              << edge.lock().get()->to.lock().get()->value << ",   weight: "
-                              << edge.lock().get()->weight << std::endl;
-                }
-                std::cout << std::endl;
-            }
-            std::cout << std::endl;
-            std::cout << "EDGES" << std::endl;
-            for (auto edge : all_edges_) {
-                std::cout << edge.get()->from.lock().get()->value << " -> " << edge.get()->to.lock().get()->value
-                          << ",   weight: " << edge.get()->weight << std::endl;
-            }
-        }
-
-        auto linear_sort_set(
-                std::set<std::shared_ptr<Edge>, set_comparator> to_sort) -> std::set<std::shared_ptr<Edge>, set_comparator> {
-            auto sorted_set = std::set<std::shared_ptr<Edge>, set_comparator>();
-            for (auto edge : to_sort) {
-                sorted_set.insert(edge);
-            }
-            return sorted_set;
-        }
-
-        auto linear_sort_set(
-                std::set<std::weak_ptr<Edge>, set_comparator> to_sort) -> std::set<std::weak_ptr<Edge>, set_comparator> {
-            auto sorted_set = std::set<std::weak_ptr<Edge>, set_comparator>();
-            for (auto edge : to_sort) {
-                sorted_set.insert(edge);
-            }
-            return sorted_set;
-        }
-
         std::set<std::shared_ptr<Node>, set_comparator> all_nodes_;
         std::set<std::shared_ptr<Edge>, set_comparator> all_edges_;
     };
@@ -281,12 +338,7 @@ namespace gdwg {
         if (all_nodes_.find(std::make_shared<Node>(new_data)) != all_nodes_.end()) {
             return false;
         }
-        debug();
         old_node->get()->value = new_data;
-        std::cout << "__________________________________________________" << std::endl;
-        std::cout << "__________________________________________________" << std::endl;
-        std::cout << "__________________________________________________" << std::endl;
-        debug();
         return true;
     }
 
@@ -330,35 +382,7 @@ namespace gdwg {
             new_node->get()->outgoing.insert(edge);
             existing_connections.insert(insertion_edge);
         }
-        // final cleanup is to remove any edges with old_node in the new node (the final remnants)
-        auto edge_to_remove_incoming = std::set<std::weak_ptr<Edge>, set_comparator>();
-        for (auto edge : new_node->get()->incoming) {
-            if (edge.lock().get()->from.lock().get()->value == old_data) {
-                edge_to_remove_incoming.insert(edge);
-            }
-        }
-        for (auto edge : edge_to_remove_incoming) {
-            new_node->get()->incoming.erase(edge);
-            all_edges_.erase(edge.lock());
-        }
-
-        auto edge_to_remove_outgoing = std::set<std::weak_ptr<Edge>, set_comparator>();
-        for (auto edge : new_node->get()->outgoing) {
-            if (edge.lock().get()->to.lock().get()->value == old_data) {
-                edge_to_remove_outgoing.insert(edge);
-            }
-        }
-        for (auto edge : edge_to_remove_outgoing) {
-            new_node->get()->outgoing.erase(edge);
-            all_edges_.erase(edge.lock());
-        }
-        // since i changed the nodes without updating the set again, i will re-sort my set
         all_nodes_.erase(old_node);
-        all_edges_ = linear_sort_set(all_edges_);
-        for (auto node : all_nodes_) {
-            node.get()->incoming = linear_sort_set(node.get()->incoming);
-            node.get()->outgoing = linear_sort_set(node.get()->outgoing);
-        }
     }
 
     template<typename N, typename E>
@@ -367,18 +391,8 @@ namespace gdwg {
         if (node_to_delete == all_nodes_.end()) {
             return false;
         } else {
-            // delete the edges in all the incoming/outgoing for that node
-            for (auto edge : node_to_delete->get()->incoming) {
-                // delete this edge from the from node's outgoing
-                edge.lock().get()->from.lock().get()->outgoing.erase(edge);
-                all_edges_.erase(edge.lock());
-            }
-            for (auto edge : node_to_delete->get()->outgoing) {
-                // delete this edge from the from node's outgoing
-                edge.lock().get()->to.lock().get()->incoming.erase(edge);
-                all_edges_.erase(edge.lock());
-            }
             all_nodes_.erase(node_to_delete);
+            all_edges_ = linear_sort_set(all_edges_);
             return true;
         }
     }
@@ -391,21 +405,154 @@ namespace gdwg {
             throw std::runtime_error(
                     "Cannot call gdwg::graph<N, E>::erase_edge on src or dst if they don't exist in the graph");
         }
-        // we want to get the outgoing -> incoming edge for src and dst delete them there, then delete the edge
-        // each find + removal = o(log(N)) due to set implementation
         auto edge_to_remove = all_edges_.find(
                 std::make_shared<Edge>(Edge{*from, *to, weight}));
         if (edge_to_remove == all_edges_.end()) {
             return false;
         }
-//        auto z = edge_to_remove->get();
-        // now that we have the edge to remove, we want to remove it from the OUTGOING of the src, and INCOMING of dst
-        // and then simply remove it from all_edges
-        // total O(e) + O(log(n))
-        from->get()->outgoing.erase(*edge_to_remove);
-        to->get()->incoming.erase(*edge_to_remove);
         all_edges_.erase(*edge_to_remove);
         return true;
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::erase_edge(graph::iterator i) -> graph::iterator {
+        auto ret = i++;
+        all_edges_.erase(*i);
+        return ret;
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::erase_edge(graph::iterator i, graph::iterator s) -> graph::iterator {
+        auto ret = s;
+        while (i != s) {
+            all_edges_.remove(*i);
+            i++;
+        }
+
+        return end() ? i == end() : ret;
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::clear() noexcept -> void {
+        // erasing all nodes in turn erases all edges
+        all_nodes_.clear();
+        all_edges_.clear();
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::is_node(const N &value) -> bool {
+        return all_nodes_.find(std::make_shared<Node>(value)) != all_nodes_.end();
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::empty() -> bool {
+        return all_nodes_.size() == 0;
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::is_connected(const N &src, const N &dst) -> bool {
+        // we can just check the outgoing edges of src to see if dst is in there at all and we can also use this too
+        auto from_node = all_nodes_.find(std::make_shared<Node>(src));
+        auto to_node = all_nodes_.find(std::make_shared<Node>(dst));
+        if (from_node == all_nodes_.end() || to_node == all_nodes_.end()) {
+            throw std::runtime_error(
+                    "Cannot call gdwg::graph<N, E>::is_connected if src or dst node don't exist in the graph");
+        }
+        from_node->get()->outgoing = linear_sort_set(from_node->get()->outgoing);
+        to_node->get()->incoming = linear_sort_set(from_node->get()->incoming);
+        for (auto edge : from_node->get()->outgoing) {
+            if (edge.lock().get()->to.lock().get()->value == dst) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::nodes() -> std::vector<N> {
+        auto return_vector = std::vector<N>();
+        for (auto node : all_nodes_) {
+            return_vector.push_back(node.get()->value);
+        }
+        return return_vector;
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::weights(const N &src, const N &dst) -> std::vector<E> {
+        auto return_vector = std::vector<E>();
+        auto from_node = all_nodes_.find(std::make_shared<Node>(src));
+        auto to_node = all_nodes_.find(std::make_shared<Node>(dst));
+        if (from_node == all_nodes_.end() || to_node == all_nodes_.end()) {
+            throw std::runtime_error(
+                    "Cannot call gdwg::graph<N, E>::weights if src or dst node don't exist in the graph");
+        }
+        // O(e) = size of edges stored in the outgoing (slightly less than e)
+        for (auto edge : from_node->get()->outgoing) {
+            if (edge.lock().get()->to.lock().get()->value == dst) {
+                return_vector.push_back(edge.lock().get()->weight);
+            }
+        }
+        return return_vector;
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::find(const N &src, const N &dst, const E &weight) -> graph::iterator {
+        // only o(log(e))
+        return all_edges_.find(Edge{std::make_shared<Node>(src), std::make_shared<Node>(dst), weight});
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::connections(const N &src) -> std::vector<N> {
+        auto node_set = std::set<N>();
+        auto from_node = all_nodes_.find(std::make_shared<Node>(src));
+        if (from_node == all_nodes_.end()) {
+            throw std::runtime_error(
+                    "Cannot call gdwg::graph<N, E>::weights if src or dst node don't exist in the graph");
+        }
+        from_node->get()->outgoing = linear_sort_set(from_node->get()->outgoing);
+        for (auto edge : from_node->get()->outgoing) {
+            node_set.insert(edge.lock().get()->to.lock().get()->value);
+        }
+        return std::vector<N>(node_set.begin(), node_set.end());
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::begin() const -> graph::iterator {
+        return all_edges_.begin();
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::end() const -> graph::iterator {
+        return all_edges_.end();
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::operator==(const graph &other) -> bool {
+        // quick cleanups of junk edges
+        auto other_cmp = linear_sort_set(other.all_edges_);
+        auto cmp = linear_sort_set(all_edges_);
+        return std::equal(other.all_nodes_.begin(), other.all_nodes_.end(), all_nodes_.begin(), all_nodes_.end()) &&
+               std::equal(cmp.begin(), cmp.end(), other_cmp.begin(), other_cmp.end());
+    }
+
+    template<typename N, typename E>
+    auto operator<<(std::ostream &os, const graph<N, E> &g) -> std::ostream & {
+        os << "(";
+        for (auto node : g.all_nodes_) {
+            os << node.get()->value << "(" << std::endl;
+            // add all the edges appropriately now
+            for (auto edge : node.get()->outgoing) {
+                if (edge.expired() || edge.lock().get()->to.expired() || edge.lock().get()->from.expired()) {
+                    continue;
+                }
+                os << edge.lock().get()->to.lock().get()->value << " | " << edge.lock().get()->weight << std::endl;
+            }
+
+            os << ")" << std::endl;
+
+        }
+        os << ")";
+        return os;
     }
 
 
