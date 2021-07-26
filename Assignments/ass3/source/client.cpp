@@ -28,9 +28,18 @@ auto main() -> int {
     };
 
     g.insert_node(64);
+    auto dd = graph(g);
     auto p = *g.begin();
     auto c = g.begin();
     auto d = c++;
+    auto vec1 = std::vector<int>{1,2,3,4};
+    auto vec2 = std::vector<int>{1,2,3,4};
+    auto r = g.begin();
     std::cout << g << std::endl;
+    g.erase_edge(r);
+    std::cout << g << std::endl;
+    auto t = g.begin();
+    auto f = (r == t);
+//    std::cout << g << std::endl;
 
 }

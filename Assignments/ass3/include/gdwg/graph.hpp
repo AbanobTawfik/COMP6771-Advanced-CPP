@@ -126,6 +126,9 @@ namespace gdwg {
                 if (edge.lock().get()->from.expired() || edge.lock().get()->to.expired()) {
                     continue;
                 }
+                if (all_edges_.find(edge) == all_edges_.end()) {
+                    continue;
+                }
                 sorted_set.insert(edge);
             }
             return sorted_set;
@@ -154,28 +157,45 @@ namespace gdwg {
             graph_iterator() = default;
 
             // Iterator source
-            auto operator*() -> reference{
+            auto operator*() -> reference {
                 return this->edge_;
             };
 
             // Iterator traversal
-            auto operator++() -> graph_iterator &{
-                auto next_address = std::advance(this->edge_address_, 1);
-                return iterator(next_address);
+            auto operator++() -> graph_iterator & {
+                auto next_address = this->edge_address_;
+                std::advance(next_address, 1);
+                auto next_edge = iterator(next_address);
+                edge_ = next_edge.edge_;
+                edge_address_ = next_edge.edge_address_;
+                return *this;
             };
 
-            auto operator++(int) -> graph_iterator{
+            auto operator++(int) -> graph_iterator {
                 auto next_address = this->edge_address_;
                 std::advance(next_address, 1);
                 return iterator(next_address);
             }
 
-            auto operator--() -> graph_iterator &;
+            auto operator--() -> graph_iterator & {
+                auto next_address = this->edge_address_;
+                std::advance(next_address, -1);
+                auto next_edge = iterator(next_address);
+                edge_ = next_edge.edge_;
+                edge_address_ = next_edge.edge_address_;
+                return *this;
+            }
 
-            auto operator--(int) -> graph_iterator;
+            auto operator--(int) -> graph_iterator {
+                auto next_address = this->edge_address_;
+                std::advance(next_address, 1);
+                return iterator(next_address);
+            }
 
             // Iterator comparison
-            auto operator==(graph_iterator const &other) -> bool;
+            auto operator==(graph_iterator const &other) -> bool {
+                return other.edge_address_ == this->edge_address_;
+            }
 
         private:
             explicit graph_iterator(typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator edge) {
@@ -184,8 +204,6 @@ namespace gdwg {
                 edge_address_ = edge;
             };
             value_type edge_;
-//            graph_iterator* next_;
-//            graph_iterator* prev_;
             typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator edge_address_;
 
             friend class graph;
@@ -208,7 +226,11 @@ namespace gdwg {
 
         graph(graph const &other);
 
+        graph(graph &other);
+
         auto operator=(graph const &other) -> graph &;
+
+        auto operator=(graph &other) -> graph &;
 
         auto operator=(graph &&other) noexcept -> graph &;
 
@@ -297,14 +319,27 @@ namespace gdwg {
 
     template<typename N, typename E>
     graph<N, E>::graph(const graph &other) {
-        std::copy(other.all_nodes_.begin(), other.all_nodes_.end(), all_nodes_.begin(), all_nodes_.end());
-        std::copy(other.all_edges_.begin(), other.all_edges_.end(), all_edges_.begin(), all_edges_.end());
+        std::for_each(other.all_nodes_.begin(), other.all_nodes_.end(), [&](auto node) { all_nodes_.insert(node); });
+        std::for_each(other.all_edges_.begin(), other.all_edges_.end(), [&](auto edge) { all_edges_.insert(edge); });
+    }
+
+    template<typename N, typename E>
+    graph<N, E>::graph(graph &other) {
+        std::for_each(other.all_nodes_.begin(), other.all_nodes_.end(), [&](auto node) { all_nodes_.insert(node); });
+        std::for_each(other.all_edges_.begin(), other.all_edges_.end(), [&](auto edge) { all_edges_.insert(edge); });
     }
 
     template<typename N, typename E>
     auto graph<N, E>::operator=(const graph &other) -> graph & {
-        std::copy(other.all_nodes_.begin(), other.all_nodes_.end(), all_nodes_.begin(), all_nodes_.end());
-        std::copy(other.all_edges_.begin(), other.all_edges_.end(), all_edges_.begin(), all_edges_.end());
+        std::for_each(other.all_nodes_.begin(), other.all_nodes_.end(), [&](auto node) { all_nodes_.insert(node); });
+        std::for_each(other.all_edges_.begin(), other.all_edges_.end(), [&](auto edge) { all_edges_.insert(edge); });
+        return *this;
+    }
+
+    template<typename N, typename E>
+    auto graph<N, E>::operator=(graph &other) -> graph & {
+        std::for_each(other.all_nodes_.begin(), other.all_nodes_.end(), [&](auto node) { all_nodes_.insert(node); });
+        std::for_each(other.all_edges_.begin(), other.all_edges_.end(), [&](auto edge) { all_edges_.insert(edge); });
         return *this;
     }
 
@@ -439,7 +474,7 @@ namespace gdwg {
     template<typename N, typename E>
     auto graph<N, E>::erase_edge(graph::iterator i) -> graph::iterator {
         auto ret = i++;
-        all_edges_.erase(*i);
+        all_edges_.erase(i.edge_address_);
         return ret;
     }
 
@@ -447,7 +482,7 @@ namespace gdwg {
     auto graph<N, E>::erase_edge(graph::iterator i, graph::iterator s) -> graph::iterator {
         auto ret = s;
         while (i != s) {
-            all_edges_.remove(*i);
+            all_edges_.remove(i.edge_address_);
             i++;
         }
 
@@ -540,12 +575,13 @@ namespace gdwg {
 
     template<typename N, typename E>
     auto graph<N, E>::begin() const -> graph::iterator {
+        auto p = all_edges_.begin();
         return iterator(all_edges_.begin());
     }
 
     template<typename N, typename E>
     auto graph<N, E>::end() const -> graph::iterator {
-        return all_edges_.end();
+        return iterator(all_edges_.end());
     }
 
     template<typename N, typename E>
@@ -567,6 +603,9 @@ namespace gdwg {
                 if (edge.expired() || edge.lock().get()->to.expired() || edge.lock().get()->from.expired()) {
                     continue;
                 }
+                if (g.all_edges_.find(edge.lock()) == g.all_edges_.end()) {
+                    continue;
+                }
                 os << edge.lock().get()->to.lock().get()->value << " | " << edge.lock().get()->weight << std::endl;
             }
 
@@ -576,7 +615,6 @@ namespace gdwg {
         os << ")";
         return os;
     }
-
 
 } // namespace gdwg
 #endif // GDWG_GRAPH_HPP
