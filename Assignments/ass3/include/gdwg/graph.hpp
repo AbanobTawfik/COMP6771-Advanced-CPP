@@ -32,6 +32,7 @@ namespace gdwg {
 
             ~Edge() {
                 from.reset();
+                to.reset();
             }
 
             std::weak_ptr<Node> from;
@@ -133,17 +134,6 @@ namespace gdwg {
             }
             return sorted_set;
         }
-
-
-        struct edge_iterate {
-            edge_iterate(std::shared_ptr<Edge> edge, std::shared_ptr<Edge> &&next) : next{std::move(next)} {
-                value = value_type{edge.get()->from.lock().get()->value, edge.get()->to.lock().get()->value,
-                                   edge.get()->weight};
-            }
-
-            value_type value;
-            std::shared_ptr<edge_iterate> next;
-        };
 
         class graph_iterator {
         public:
@@ -253,25 +243,25 @@ namespace gdwg {
 
         auto clear() noexcept -> void;
 
-        [[nodiscard]] auto is_node(N const &value) -> bool;
+        [[nodiscard]] auto is_node(N const &value) const -> bool;
 
-        [[nodiscard]] auto empty() -> bool;
+        [[nodiscard]] auto empty() const -> bool;
 
-        [[nodiscard]] auto is_connected(N const &src, N const &dst) -> bool;
+        [[nodiscard]] auto is_connected(N const &src, N const &dst) const -> bool;
 
-        [[nodiscard]] auto nodes() -> std::vector<N>;
+        [[nodiscard]] auto nodes() const -> std::vector<N>;
 
-        [[nodiscard]] auto weights(N const &src, N const &dst) -> std::vector<E>;
+        [[nodiscard]] auto weights(N const &src, N const &dst) const -> std::vector<E>;
 
-        [[nodiscard]] auto find(N const &src, N const &dst, E const &weight) -> iterator;
+        [[nodiscard]] auto find(N const &src, N const &dst, E const &weight) const -> iterator;
 
-        [[nodiscard]] auto connections(N const &src) -> std::vector<N>;
+        [[nodiscard]] auto connections(N const &src) const -> std::vector<N>;
 
         [[nodiscard]] auto begin() const -> iterator;
 
         [[nodiscard]] auto end() const -> iterator;
 
-        [[nodiscard]] auto operator==(graph const &other) -> bool;
+        [[nodiscard]] auto operator==(graph const &other) const -> bool;
 
         template<typename node, typename edge>
         friend auto operator<<(std::ostream &os, graph<node, edge> const &g) -> std::ostream &;
@@ -411,35 +401,38 @@ namespace gdwg {
         // to do this properly we will go through each inc/out connection and update the pointers appropriately to new node
         // incoming = inc -> old
         // check if a duplicate edge exists first
-        auto existing_connections = std::set<Edge, set_comparator>();
-        for (auto edge : new_node->get()->incoming) {
-            existing_connections.insert(
-                    Edge{edge.lock().get()->from, edge.lock().get()->to, edge.lock().get()->weight});
-        }
-        for (auto edge : new_node->get()->outgoing) {
-            existing_connections.insert(
-                    Edge{edge.lock().get()->from, edge.lock().get()->to, edge.lock().get()->weight});
-        }
-
+//        auto existing_connections = std::set<Edge, set_comparator>();
+//        for (auto edge : new_node->get()->incoming) {
+//            existing_connections.insert(
+//                    Edge{edge.lock().get()->from, edge.lock().get()->to, edge.lock().get()->weight});
+//        }
+//        for (auto edge : new_node->get()->outgoing) {
+//            existing_connections.insert(
+//                    Edge{edge.lock().get()->from, edge.lock().get()->to, edge.lock().get()->weight});
+//        }
+        old_node->get()->incoming = linear_sort_set(old_node->get()->incoming);
         for (auto edge : old_node->get()->incoming) {
             auto insertion_edge = Edge{edge.lock().get()->from.lock(), *new_node, edge.lock().get()->weight};
-            if (existing_connections.find(insertion_edge) != existing_connections.end()) {
-                continue;
-            }
+//            if (existing_connections.find(insertion_edge) != existing_connections.end()) {
+//                continue;
+//            }
             edge.lock().get()->to = *new_node;
             new_node->get()->incoming.insert(edge);
-            existing_connections.insert(insertion_edge);
+//            existing_connections.insert(insertion_edge);
         }
+        old_node->get()->outgoing = linear_sort_set(old_node->get()->outgoing);
         for (auto edge : old_node->get()->outgoing) {
             auto insertion_edge = Edge{*new_node, edge.lock().get()->to.lock(), edge.lock().get()->weight};
-            if (existing_connections.find(insertion_edge) != existing_connections.end()) {
-                continue;
-            }
+//            if (existing_connections.find(insertion_edge) != existing_connections.end()) {
+//                continue;
+//            }
             edge.lock().get()->from = *new_node;
             new_node->get()->outgoing.insert(edge);
-            existing_connections.insert(insertion_edge);
+//            existing_connections.insert(insertion_edge);
         }
         all_nodes_.erase(old_node);
+        new_node->get()->incoming = linear_sort_set(new_node->get()->incoming);
+        new_node->get()->outgoing = linear_sort_set(new_node->get()->outgoing);
     }
 
     template<typename N, typename E>
@@ -497,17 +490,17 @@ namespace gdwg {
     }
 
     template<typename N, typename E>
-    auto graph<N, E>::is_node(const N &value) -> bool {
+    auto graph<N, E>::is_node(const N &value) const -> bool {
         return all_nodes_.find(std::make_shared<Node>(value)) != all_nodes_.end();
     }
 
     template<typename N, typename E>
-    auto graph<N, E>::empty() -> bool {
+    auto graph<N, E>::empty() const -> bool {
         return all_nodes_.size() == 0;
     }
 
     template<typename N, typename E>
-    auto graph<N, E>::is_connected(const N &src, const N &dst) -> bool {
+    auto graph<N, E>::is_connected(const N &src, const N &dst) const -> bool {
         // we can just check the outgoing edges of src to see if dst is in there at all and we can also use this too
         auto from_node = all_nodes_.find(std::make_shared<Node>(src));
         auto to_node = all_nodes_.find(std::make_shared<Node>(dst));
@@ -518,6 +511,9 @@ namespace gdwg {
         from_node->get()->outgoing = linear_sort_set(from_node->get()->outgoing);
         to_node->get()->incoming = linear_sort_set(from_node->get()->incoming);
         for (auto edge : from_node->get()->outgoing) {
+            if(edge.lock().expired()){
+                continue;
+            }
             if (edge.lock().get()->to.lock().get()->value == dst) {
                 return true;
             }
@@ -526,7 +522,7 @@ namespace gdwg {
     }
 
     template<typename N, typename E>
-    auto graph<N, E>::nodes() -> std::vector<N> {
+    auto graph<N, E>::nodes() const -> std::vector<N> {
         auto return_vector = std::vector<N>();
         for (auto node : all_nodes_) {
             return_vector.push_back(node.get()->value);
@@ -535,7 +531,7 @@ namespace gdwg {
     }
 
     template<typename N, typename E>
-    auto graph<N, E>::weights(const N &src, const N &dst) -> std::vector<E> {
+    auto graph<N, E>::weights(const N &src, const N &dst) const -> std::vector<E> {
         auto return_vector = std::vector<E>();
         auto from_node = all_nodes_.find(std::make_shared<Node>(src));
         auto to_node = all_nodes_.find(std::make_shared<Node>(dst));
@@ -545,6 +541,12 @@ namespace gdwg {
         }
         // O(e) = size of edges stored in the outgoing (slightly less than e)
         for (auto edge : from_node->get()->outgoing) {
+            if(edge.expired()){
+                continue;
+            }
+            if(edge.lock().get()->to.expired()){
+                continue;
+            }
             if (edge.lock().get()->to.lock().get()->value == dst) {
                 return_vector.push_back(edge.lock().get()->weight);
             }
@@ -553,21 +555,27 @@ namespace gdwg {
     }
 
     template<typename N, typename E>
-    auto graph<N, E>::find(const N &src, const N &dst, const E &weight) -> graph::iterator {
+    auto graph<N, E>::find(const N &src, const N &dst, const E &weight) const -> graph::iterator {
         // only o(log(e))
         return all_edges_.find(Edge{std::make_shared<Node>(src), std::make_shared<Node>(dst), weight});
     }
 
     template<typename N, typename E>
-    auto graph<N, E>::connections(const N &src) -> std::vector<N> {
+    auto graph<N, E>::connections(const N &src) const -> std::vector<N> {
         auto node_set = std::set<N>();
         auto from_node = all_nodes_.find(std::make_shared<Node>(src));
         if (from_node == all_nodes_.end()) {
             throw std::runtime_error(
                     "Cannot call gdwg::graph<N, E>::weights if src or dst node don't exist in the graph");
         }
-        from_node->get()->outgoing = linear_sort_set(from_node->get()->outgoing);
+//        from_node->get()->outgoing = linear_sort_set(from_node->get()->outgoing);
         for (auto edge : from_node->get()->outgoing) {
+            if(edge.expired()){
+                continue;
+            }
+            if(edge.lock().get()->to.expired() || edge.lock().get()->from.expired()){
+                continue;
+            }
             node_set.insert(edge.lock().get()->to.lock().get()->value);
         }
         return std::vector<N>(node_set.begin(), node_set.end());
@@ -585,7 +593,7 @@ namespace gdwg {
     }
 
     template<typename N, typename E>
-    auto graph<N, E>::operator==(const graph &other) -> bool {
+    auto graph<N, E>::operator==(const graph &other) const -> bool {
         // quick cleanups of junk edges
         auto other_cmp = linear_sort_set(other.all_edges_);
         auto cmp = linear_sort_set(all_edges_);
