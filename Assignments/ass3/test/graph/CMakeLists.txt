@@ -57,3 +57,18 @@ cxx_test(
         TARGET merge_replace_node
         FILENAME "Modifiers/merge_replace_node.cpp"
 )
+
+cxx_test(
+        TARGET erase_node
+        FILENAME "Modifiers/erase_node.cpp"
+)
+
+cxx_test(
+        TARGET erase_edges
+        FILENAME "Modifiers/erase_edge.cpp"
+)
+
+cxx_test(
+        TARGET erase_edge_iterator
+        FILENAME "Modifiers/erase_edge_iterator.cpp"
+)

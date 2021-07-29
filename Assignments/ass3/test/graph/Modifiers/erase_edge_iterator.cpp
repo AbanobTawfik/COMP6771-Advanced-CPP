@@ -10,8 +10,14 @@
 // Simplest test case, makes sure that when calling the default constructor we get a euclidean
 // vector like [0]
 
-TEST_CASE("default_constructor_ints") {
+TEST_CASE("default_delete_iterator") {
     using graph = gdwg::graph<int, int>;
-    const auto default_graph = graph();
-    REQUIRE(default_graph.empty());
+    auto g = graph{1, 2, 3, 4};
+    REQUIRE(g.insert_edge(1,2,3));
+    REQUIRE(g.weights(1, 2) == std::vector<int>{3});
+    auto iterator_begin = g.begin();
+    REQUIRE(*iterator_begin == gdwg::graph<int, int>::value_type{1,2,3});
+    auto next_iterator = g.erase_edge(iterator_begin);
+    REQUIRE(next_iterator == g.end());
+    REQUIRE(g.weights(1, 2) == std::vector<int>{});
 }

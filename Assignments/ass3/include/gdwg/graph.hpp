@@ -19,6 +19,10 @@ namespace gdwg {
             N from;
             N to;
             E weight;
+
+            bool operator==(const value_type &v) const {
+                return from == v.from && to == v.to && weight == v.weight;
+            }
         };
 
     private:
@@ -33,7 +37,7 @@ namespace gdwg {
                                                                                weight{weight} {}
 
             ~Edge() {
-//                from.reset();
+                from.reset();
 //                to.reset();
             }
 
@@ -105,6 +109,7 @@ namespace gdwg {
                 }
                 return lhs.weight < rhs.weight;
             }
+
         };
 
         auto linear_sort_set(
@@ -154,7 +159,7 @@ namespace gdwg {
             auto operator++() -> graph_iterator & {
                 auto next_address = this->edge_address_;
                 std::advance(next_address, 1);
-                auto next_edge = iterator(next_address);
+                auto next_edge = iterator(next_address, iterator_end_);
                 edge_ = next_edge.edge_;
                 edge_address_ = next_edge.edge_address_;
                 return *this;
@@ -163,13 +168,13 @@ namespace gdwg {
             auto operator++(int) -> graph_iterator {
                 auto next_address = this->edge_address_;
                 std::advance(next_address, 1);
-                return iterator(next_address);
+                return iterator(next_address, iterator_end_);
             }
 
             auto operator--() -> graph_iterator & {
                 auto next_address = this->edge_address_;
                 std::advance(next_address, -1);
-                auto next_edge = iterator(next_address);
+                auto next_edge = iterator(next_address, iterator_end_);
                 edge_ = next_edge.edge_;
                 edge_address_ = next_edge.edge_address_;
                 return *this;
@@ -178,20 +183,28 @@ namespace gdwg {
             auto operator--(int) -> graph_iterator {
                 auto next_address = this->edge_address_;
                 std::advance(next_address, 1);
-                return iterator(next_address);
+                return iterator(next_address, iterator_end_);
             }
 
             // Iterator comparison
-            auto operator==(graph_iterator const &other) -> bool {
+            auto operator==(graph_iterator const &other) const -> bool {
                 return other.edge_address_ == this->edge_address_;
             }
 
         private:
-            explicit graph_iterator(typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator edge) {
-                edge_ = value_type{edge->get()->from.lock().get()->value, edge->get()->to.lock().get()->value,
-                                   edge->get()->weight};
-                edge_address_ = edge;
+            explicit graph_iterator(typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator edge,
+                                    typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator iterator_end) {
+                iterator_end_ = iterator_end;
+                if (edge == iterator_end) {
+                    edge_address_ = iterator_end;
+                }else {
+                    edge_ = value_type{edge->get()->from.lock().get()->value, edge->get()->to.lock().get()->value,
+                                       edge->get()->weight};
+                    edge_address_ = edge;
+                }
             };
+
+            typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator iterator_end_;
             value_type edge_;
             typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator edge_address_;
 
@@ -409,6 +422,9 @@ namespace gdwg {
     template<typename N, typename E>
     auto graph<N, E>::merge_replace_node(const N &old_data, const N &new_data) -> void {
         // we can call replace_node for this since sets naturally do not contain duplicates!
+        if (old_data == new_data) {
+            return;
+        }
         auto old_node = all_nodes_.find(std::make_shared<Node>(old_data));
         auto new_node = all_nodes_.find(std::make_shared<Node>(new_data));
         if (old_node == all_nodes_.end() || new_node == all_nodes_.end()) {
@@ -416,12 +432,8 @@ namespace gdwg {
                     "Cannot call gdwg::graph<N, E>::merge_replace_node on old or new data if they don't exist in the graph");
         }
         all_edges_ = linear_sort_set(all_edges_);
-        auto new_outgoing = std::set<std::weak_ptr<Edge>, set_comparator>();
-
-//        for(auto edge : linear_sort_set(new_node->get()->outgoing)){
-//            new_outgoing.insert()
-//        }
         auto new_edges = std::set<std::shared_ptr<Edge>, set_comparator>();
+        new_node->get()->outgoing.clear();
         for (auto edge : all_edges_) {
             auto replaced = false;
             if (edge.get()->from.lock().get()->value == old_data) {
@@ -467,6 +479,7 @@ namespace gdwg {
             new_edges.insert(new_edge);
         }
         all_nodes_.erase(old_node);
+//        all_nodes_.insert(*new_node);
         all_edges_ = new_edges;
     }
 
@@ -501,8 +514,8 @@ namespace gdwg {
 
     template<typename N, typename E>
     auto graph<N, E>::erase_edge(graph::iterator i) -> graph::iterator {
-        auto ret = i++;
-        all_edges_.erase(i.edge_address_);
+        auto ret = all_edges_.size() == 1 ? iterator(all_edges_.end(), all_edges_.end()) : i++;
+        all_edges_.erase(*i.edge_address_);
         return ret;
     }
 
@@ -510,7 +523,7 @@ namespace gdwg {
     auto graph<N, E>::erase_edge(graph::iterator i, graph::iterator s) -> graph::iterator {
         auto ret = s;
         while (i != s) {
-            all_edges_.remove(i.edge_address_);
+            all_edges_.erase(i.edge_address_);
             i++;
         }
 
@@ -620,14 +633,22 @@ namespace gdwg {
 
     template<typename N, typename E>
     auto graph<N, E>::begin() const -> graph::iterator {
-        auto clean_edges = linear_sort_set(all_edges_);
-        return iterator(clean_edges.begin());
+        if (all_edges_.empty()) {
+            return iterator(all_edges_.end(), all_edges_.end());
+        }
+        // here we can just perform our checks to skip over dead nodes (since it's a const method we cant remove them here)
+        auto ret = all_edges_.begin();
+        while(ret != all_edges_.end() && (ret->get()->from.expired() || ret->get()->to.expired())){
+            ret++;
+        }
+//        auto clean_edges = linear_sort_set(all_edges_);
+        return iterator(ret, all_edges_.end());
     }
 
     template<typename N, typename E>
     auto graph<N, E>::end() const -> graph::iterator {
-        auto clean_edges = linear_sort_set(all_edges_);
-        return iterator(clean_edges.end());
+//        auto clean_edges = linear_sort_set(all_edges_);
+        return iterator(all_edges_.end(), all_edges_.end());
     }
 
     template<typename N, typename E>
@@ -676,7 +697,6 @@ namespace gdwg {
 
     template<typename N, typename E>
     auto operator<<(std::ostream &os, const graph<N, E> &g) -> std::ostream & {
-        os << "(";
         for (auto node : g.all_nodes_) {
             os << node.get()->value << " (" << "\n";
             // add all the edges appropriately now
@@ -693,7 +713,6 @@ namespace gdwg {
             os << ")" << "\n";
 
         }
-        os << ")";
         return os;
     }
 
