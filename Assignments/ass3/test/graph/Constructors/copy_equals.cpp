@@ -10,8 +10,10 @@
 // Simplest test case, makes sure that when calling the default constructor we get a euclidean
 // vector like [0]
 
-TEST_CASE("default_constructor_ints") {
-    using graph = gdwg::graph<int, int>;
-    const auto g = graph();
-    REQUIRE(g.empty());
+TEST_CASE("copy_equals") {
+    using graph = gdwg::graph<std::string, int>;
+    const auto g1 = graph{"Hey", "hello", "why", "??", "lol", "Kappa123", "PauseChamp"};
+    REQUIRE(!g1.empty());
+    const auto g2 = g1;
+    REQUIRE(g1 == g2);
 }

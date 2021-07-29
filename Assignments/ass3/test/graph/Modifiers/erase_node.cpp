@@ -12,6 +12,6 @@
 
 TEST_CASE("default_constructor_ints") {
     using graph = gdwg::graph<int, int>;
-    const auto g = graph();
-    REQUIRE(g.empty());
+    const auto default_graph = graph();
+    REQUIRE(default_graph.empty());
 }
