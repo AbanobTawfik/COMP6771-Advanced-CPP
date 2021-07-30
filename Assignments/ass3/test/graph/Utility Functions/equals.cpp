@@ -10,8 +10,13 @@
 // Simplest test case, makes sure that when calling the default constructor we get a euclidean
 // vector like [0]
 
-TEST_CASE("default_constructor_ints") {
+TEST_CASE("equals_test") {
     using graph = gdwg::graph<int, int>;
-    const auto default_graph = graph();
-    REQUIRE(default_graph.empty());
+    const auto g1 = graph();
+    const auto g2 = graph();
+    const auto g3 = graph{3};
+    const auto g4 = graph(g3);
+    CHECK(g1 == g2);
+    CHECK(g1 != g3);
+    CHECK(g3 == g4);
 }

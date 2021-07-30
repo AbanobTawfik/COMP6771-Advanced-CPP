@@ -36,9 +36,10 @@ namespace gdwg {
             Edge(std::weak_ptr<Node> from, std::weak_ptr<Node> to, E weight) : from{from}, to{to},
                                                                                weight{weight} {}
 
+            Edge(std::shared_ptr<Node> from, std::shared_ptr<Node> to, E weight) : from{from}, to{to},
+                                                                               weight{weight} {}
             ~Edge() {
                 from.reset();
-//                to.reset();
             }
 
             std::weak_ptr<Node> from;
@@ -182,7 +183,7 @@ namespace gdwg {
 
             auto operator--(int) -> graph_iterator {
                 auto next_address = this->edge_address_;
-                std::advance(next_address, 1);
+                std::advance(next_address, -1);
                 return iterator(next_address, iterator_end_);
             }
 
@@ -521,13 +522,15 @@ namespace gdwg {
 
     template<typename N, typename E>
     auto graph<N, E>::erase_edge(graph::iterator i, graph::iterator s) -> graph::iterator {
-        auto ret = s;
         while (i != s) {
-            all_edges_.erase(i.edge_address_);
-            i++;
+            auto next_validated = i++;
+            if(i != s){
+                all_edges_.erase(*i.edge_address_);
+            }
+            i = next_validated;
         }
 
-        return end() ? i == end() : ret;
+        return s;
     }
 
     template<typename N, typename E>
@@ -607,7 +610,7 @@ namespace gdwg {
     template<typename N, typename E>
     auto graph<N, E>::find(const N &src, const N &dst, const E &weight) const -> graph::iterator {
         // only o(log(e))
-        return all_edges_.find(Edge{std::make_shared<Node>(src), std::make_shared<Node>(dst), weight});
+        return iterator(all_edges_.find(std::make_shared<Edge>(Edge{std::make_shared<Node>(src), std::make_shared<Node>(dst), weight})), all_edges_.end());
     }
 
     template<typename N, typename E>
@@ -616,7 +619,7 @@ namespace gdwg {
         auto from_node = all_nodes_.find(std::make_shared<Node>(src));
         if (from_node == all_nodes_.end()) {
             throw std::runtime_error(
-                    "Cannot call gdwg::graph<N, E>::weights if src or dst node don't exist in the graph");
+                    "Cannot call gdwg::graph<N, E>::connections if src doesn't exist in the graph");
         }
 //        from_node->get()->outgoing = linear_sort_set(from_node->get()->outgoing);
         for (auto edge : from_node->get()->outgoing) {
@@ -707,7 +710,7 @@ namespace gdwg {
                 if (g.all_edges_.find(edge.lock()) == g.all_edges_.end()) {
                     continue;
                 }
-                os << "    " << edge.lock().get()->to.lock().get()->value << " | " << edge.lock().get()->weight << "\n";
+                os << "  " << edge.lock().get()->to.lock().get()->value << " | " << edge.lock().get()->weight << "\n";
             }
 
             os << ")" << "\n";

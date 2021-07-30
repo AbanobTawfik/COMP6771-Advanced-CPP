@@ -72,3 +72,73 @@ cxx_test(
         TARGET erase_edge_iterator
         FILENAME "Modifiers/erase_edge_iterator.cpp"
 )
+
+cxx_test(
+        TARGET clear_graph
+        FILENAME "Modifiers/clear.cpp"
+)
+
+cxx_test(
+        TARGET equals
+        FILENAME "Utility Functions/equals.cpp"
+)
+
+cxx_test(
+        TARGET os
+        FILENAME "Utility Functions/print.cpp"
+)
+
+cxx_test(
+        TARGET iterator_begin
+        FILENAME "Iterator/begin_end.cpp"
+)
+
+cxx_test(
+        TARGET iterator_derference
+        FILENAME "Iterator/dereference.cpp"
+)
+
+cxx_test(
+        TARGET iterator_increment
+        FILENAME "Iterator/increment.cpp"
+)
+
+cxx_test(
+        TARGET iterator_decrement
+        FILENAME "Iterator/decrement.cpp"
+)
+
+cxx_test(
+        TARGET connections
+        FILENAME "Accessors/connections.cpp"
+)
+
+cxx_test(
+        TARGET empty
+        FILENAME "Accessors/empty.cpp"
+)
+
+cxx_test(
+        TARGET find
+        FILENAME "Accessors/find.cpp"
+)
+
+cxx_test(
+        TARGET is_connected
+        FILENAME "Accessors/is_connected.cpp"
+)
+
+cxx_test(
+        TARGET is_node
+        FILENAME "Accessors/is_node.cpp"
+)
+
+cxx_test(
+        TARGET nodes
+        FILENAME "Accessors/nodes.cpp"
+)
+
+cxx_test(
+        TARGET weights
+        FILENAME "Accessors/weights.cpp"
+)

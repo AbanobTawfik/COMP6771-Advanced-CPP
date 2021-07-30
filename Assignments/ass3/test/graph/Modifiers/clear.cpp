@@ -10,8 +10,10 @@
 // Simplest test case, makes sure that when calling the default constructor we get a euclidean
 // vector like [0]
 
-TEST_CASE("default_constructor_ints") {
+TEST_CASE("clear_graphs") {
     using graph = gdwg::graph<int, int>;
-    const auto default_graph = graph();
-    REQUIRE(default_graph.empty());
+    auto g = graph{1,2,3,4,5,6,7,8,0, 9};
+    REQUIRE(g.nodes() == std::vector<int>{0,1,2,3,4,5,6,7,8,9});
+    g.clear();
+    REQUIRE(g.empty());
 }
