@@ -13,14 +13,13 @@
 
 TEST_CASE("weights_normal_case") {
     using graph = gdwg::graph<int, int>;
-    auto g = graph{1, 2, 3, 4, 5, 6, 7, 8, 8};
-    CHECK(g.nodes() == std::vector<int>{1, 2, 3, 4, 5, 6, 7, 8});
+    auto g = graph{1, 2};
+    CHECK(g.nodes() == std::vector<int>{1, 2});
     g.insert_edge(1, 2, 4);
     g.insert_edge(1, 2, 9);
     g.insert_edge(1, 2, 9);
     g.insert_edge(1, 2, 3);
     g.insert_edge(2, 2, 1);
-    g.erase_node(1);
     CHECK(g.weights(1,2) == std::vector<int>{3,4,9});
     CHECK(g.weights(2,2) == std::vector<int>{1});
     g.merge_replace_node(1,2);
