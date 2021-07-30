@@ -47,6 +47,11 @@ namespace gdwg {
             E weight;
         };
 
+        // Nodes store the incoming and outgoing edges RELATED TO THAT NODE
+        // so nodes can look like , 1 , incoming 2 -> 1, 3 -> 1, 1 -> 1 and outgoing 1 -> 1, 1 -> 4
+        // this is extremely useful for reaching time complexities required when we store informaiton as weak pointers
+        // this is because shared pointers dont increase memory load as much as creating a new node, however
+        // give us the benefit of time complexity
         struct Node {
             Node() = default;
 
@@ -63,6 +68,7 @@ namespace gdwg {
             N value;
         };
 
+        // comparator can be used for set of edges/nodes in shared/weak pointer form
         struct set_comparator {
             auto operator()(const std::shared_ptr<Node> &lhs, const std::shared_ptr<Node> &rhs) const -> bool {
                 return lhs.get()->value < rhs.get()->value;
@@ -113,6 +119,9 @@ namespace gdwg {
 
         };
 
+        // this method is used to recreate the edges set for all edges
+        // this method just goes through each edge in all_edges and only adds in edges that have alive connections
+        // to the shared pointers.
         auto linear_sort_set(
                 const std::set<std::shared_ptr<Edge>, set_comparator> to_sort) const -> std::set<std::shared_ptr<Edge>, set_comparator> {
             auto sorted_set = std::set<std::shared_ptr<Edge>, set_comparator>();
@@ -125,6 +134,8 @@ namespace gdwg {
             return sorted_set;
         }
 
+        // this method is identical to above except it goes through the outgoing/incoming connections of the
+        // nodes
         auto linear_sort_set(
                 const std::set<std::weak_ptr<Edge>, set_comparator> to_sort) const -> std::set<std::weak_ptr<Edge>, set_comparator> {
             auto sorted_set = std::set<std::weak_ptr<Edge>, set_comparator>();
@@ -140,6 +151,8 @@ namespace gdwg {
             return sorted_set;
         }
 
+        // because my all_edges structure encapsulates the idea of the iterator (all edges sorted)
+        // the iterator is just a wrapper for my all_edges
         class graph_iterator {
         public:
             using value_type = graph<N, E>::value_type;
@@ -193,6 +206,9 @@ namespace gdwg {
             }
 
         private:
+            // iterator construction happens behind the scenes, so i take 2 values to avoid segmentation faults
+            // i take the end iterator of all edges always in order to see if i am going to assign the iterator
+            // to the end (this way i dont try to dereference the end of the all_edges_ iterator)
             explicit graph_iterator(typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator edge,
                                     typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator iterator_end) {
                 iterator_end_ = iterator_end;
@@ -205,6 +221,7 @@ namespace gdwg {
                 }
             };
 
+            // iterator variables
             typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator iterator_end_;
             value_type edge_;
             typename std::set<std::shared_ptr<Edge>, set_comparator>::iterator edge_address_;
@@ -281,15 +298,13 @@ namespace gdwg {
         template<typename node, typename edge>
         friend auto operator<<(std::ostream &os, graph<node, edge> const &g) -> std::ostream &;
 
-//        friend auto operator<<(std::ostream &os, graph const &g) -> std::ostream &;
-
     private:
-        // set keeps order so O(logn) lookups due to binary search built into find (RB trees)
+        // set keeps order so O(logn) lookups due RB trees
         // nodes contain a list of all their incoming and outgoing connections, and the set of edges
         // can be used for book keeping
         // due to nodes containing a set of weak_ptrs for both incoming/outgoing connections, when a edge
-        // is removed from the all_Edges set, all nodes assosicated will have corresponding connections removed too
-        // only book keeping is required for managing the connections on nodes
+        // is removed from the all_Edges set, all nodes assosicated will have corresponding connections expired too
+        // only book keeping is required for managing the incoming/outgoing connections on nodes
         std::set<std::shared_ptr<Node>, set_comparator> all_nodes_;
         std::set<std::shared_ptr<Edge>, set_comparator> all_edges_;
     };
@@ -379,7 +394,6 @@ namespace gdwg {
                     "Cannot call gdwg::graph<N, E>::insert_edge when either from or to node does not exist");
         }
         // first we will check if the edge already exists, this will be O(log(n)) due to search time for set
-
         auto edge_to_insert = std::make_shared<Edge>(*check_node_from, *check_node_to, weight);
         if (all_edges_.find(edge_to_insert) == all_edges_.end()) {
             all_edges_.insert(edge_to_insert);
@@ -400,6 +414,8 @@ namespace gdwg {
         if (all_nodes_.find(std::make_shared<Node>(new_data)) != all_nodes_.end()) {
             return false;
         }
+        // in order to correctly update the memory address for all the incoming/outgoing nodes we need to insert a new
+        // node, with the new value, and insert into it the old updated connections,
         auto new_node = std::make_shared<Node>(new_data);
         old_node->get()->incoming = linear_sort_set(old_node->get()->incoming);
         for (auto edge : old_node->get()->incoming) {
@@ -433,8 +449,19 @@ namespace gdwg {
                     "Cannot call gdwg::graph<N, E>::merge_replace_node on old or new data if they don't exist in the graph");
         }
         all_edges_ = linear_sort_set(all_edges_);
+        // remake edges + new node outgoing set in order to maintain order and delete junk memory etc.
         auto new_edges = std::set<std::shared_ptr<Edge>, set_comparator>();
         new_node->get()->outgoing.clear();
+        // go through each edge,
+        // 1. if the source node of that edge is equal to the old data, we want to re-create a new edge with
+        //    the new node as the new source, and updating the connection for the destination nodes incoming connection
+        //    finally insert it into the all edges
+        // 2. if the destination node of that edge is equal to the old data we want to re-create a new edge with
+        //    the new node as the destination, and updating the connection for the source node incoming connection
+        //    finally insert it into the all edges
+        // 3. edge unrelated? -> add it in as it is no need to modify anything
+        // to handle double old node -> old node edges, i will simply check if that case has occurred and insert
+        // a self edge in that case.
         for (auto edge : all_edges_) {
             auto replaced = false;
             if (edge.get()->from.lock().get()->value == old_data) {
@@ -480,7 +507,6 @@ namespace gdwg {
             new_edges.insert(new_edge);
         }
         all_nodes_.erase(old_node);
-//        all_nodes_.insert(*new_node);
         all_edges_ = new_edges;
     }
 
@@ -621,7 +647,6 @@ namespace gdwg {
             throw std::runtime_error(
                     "Cannot call gdwg::graph<N, E>::connections if src doesn't exist in the graph");
         }
-//        from_node->get()->outgoing = linear_sort_set(from_node->get()->outgoing);
         for (auto edge : from_node->get()->outgoing) {
             if (edge.expired()) {
                 continue;
@@ -644,13 +669,11 @@ namespace gdwg {
         while(ret != all_edges_.end() && (ret->get()->from.expired() || ret->get()->to.expired())){
             ret++;
         }
-//        auto clean_edges = linear_sort_set(all_edges_);
         return iterator(ret, all_edges_.end());
     }
 
     template<typename N, typename E>
     auto graph<N, E>::end() const -> graph::iterator {
-//        auto clean_edges = linear_sort_set(all_edges_);
         return iterator(all_edges_.end(), all_edges_.end());
     }
 
