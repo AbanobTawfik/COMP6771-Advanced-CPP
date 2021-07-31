@@ -502,6 +502,10 @@ namespace gdwg {
             }
             auto new_edge = std::make_shared<Edge>(
                     Edge{edge.get()->from.lock(), edge.get()->to.lock(), edge.get()->weight});
+
+            edge.get()->from.lock().get()->outgoing = linear_sort_set(edge.get()->from.lock().get()->outgoing);
+            edge.get()->to.lock().get()->incoming = linear_sort_set(edge.get()->to.lock().get()->incoming);
+
             edge.get()->from.lock().get()->outgoing.insert(new_edge);
             edge.get()->to.lock().get()->incoming.insert(new_edge);
             new_edges.insert(new_edge);

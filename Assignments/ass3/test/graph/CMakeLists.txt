@@ -142,3 +142,8 @@ cxx_test(
         TARGET weights
         FILENAME "Accessors/weights.cpp"
 )
+
+cxx_test(
+        TARGET equals_iterator
+        FILENAME "Iterator/equals.cpp"
+)

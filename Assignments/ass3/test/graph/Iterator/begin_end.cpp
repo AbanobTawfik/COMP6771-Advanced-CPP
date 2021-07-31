@@ -16,9 +16,10 @@ TEST_CASE("empty_graph_with_nodes") {
 
 TEST_CASE("graph_with_edges") {
     using graph = gdwg::graph<int, int>;
+    using value_type = gdwg::graph<int, int>::value_type;
     auto g = graph{1,2,3,4,5};
     CHECK(g.nodes() == std::vector<int>{1,2,3,4,5});
     CHECK(g.begin() == g.end());
     g.insert_edge(1,2,3);
-    CHECK(*g.begin() == gdwg::graph<int, int>::value_type{1,2,3});
+    CHECK(*g.begin() == value_type{1,2,3});
 }
