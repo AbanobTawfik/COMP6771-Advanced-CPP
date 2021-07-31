@@ -4,7 +4,7 @@
 
 #include "gdwg/graph.hpp"
 
-TEST_CASE("Equal iterators") {
+TEST_CASE("Equal_iterators") {
     using graph = gdwg::graph<int, int>;
     auto g = graph{1, 2, 3, 4, 5};
     g.insert_edge(1, 2, 3);
